@@ -1,0 +1,10 @@
+coverage/
+.tmp/
+*.log
+.DS_Store
+Thumbs.db
+
+# Local Codex instructions and private/manual regression captures.
+/AGENTS.md
+/tests/*__chrome-test.png
+/tests/artifacts/

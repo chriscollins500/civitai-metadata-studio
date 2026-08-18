@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-%%SCRIPT_HASH%%'; style-src 'unsafe-inline'; img-src data: blob:; connect-src https://civitai.com; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Civitai Metadata Studio</title>
+  <style>
+%%STYLES%%
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to metadata editor</a>
+  <input id="fileInput" class="visually-hidden" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" multiple aria-label="Choose images to inspect">
+
+  <header class="site-header">
+    <a class="brand" href="#main" aria-label="Go to the top of Civitai Metadata Studio">
+      <span class="brand-mark" aria-hidden="true">CM</span>
+      <span>
+        <strong>Civitai Metadata Studio</strong>
+        <small>Inspect · verify · repair</small>
+      </span>
+    </a>
+    <div class="header-actions">
+      <button id="headerAddImagesButton" class="button secondary small" type="button" hidden>Add images</button>
+      <button id="headerClearQueueButton" class="button quiet small" type="button" aria-label="Clear image queue" hidden>Clear</button>
+      <label class="switch" for="autoVerify">
+        <input id="autoVerify" type="checkbox" checked aria-label="Automatic Civitai verification">
+        <span class="switch-track" aria-hidden="true"></span>
+        <span>Automatic Civitai verification</span>
+      </label>
+      <button id="themeButton" class="icon-button" type="button" aria-label="Change color theme" title="Change color theme">
+        <span aria-hidden="true">◐</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="top" class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <p class="eyebrow">Private by design · zero installation</p>
+        <h1 id="heroTitle" tabindex="-1">Make image metadata tell the truth.</h1>
+        <p class="hero-summary">Open PNG, JPEG, or WebP images. Review every generation field, positively identify Civitai resources, and save new verified copies without changing the originals.</p>
+        <ul class="trust-list" aria-label="Privacy and safety guarantees">
+          <li><span aria-hidden="true">✓</span> Images stay on this device</li>
+          <li><span aria-hidden="true">✓</span> Only hashes, IDs, or names you explicitly search reach Civitai</li>
+          <li><span aria-hidden="true">✓</span> Original files are never changed</li>
+        </ul>
+      </div>
+
+      <div class="load-card">
+        <div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-labelledby="dropTitle" aria-describedby="dropHelp">
+          <span class="drop-glyph" aria-hidden="true">↥</span>
+          <h2 id="dropTitle">Drop images here</h2>
+          <p id="dropHelp">PNG, JPEG, WebP · single images or a batch · any dimensions your current browser can address</p>
+          <button id="openButton" class="button primary" type="button">Choose images</button>
+        </div>
+        <p class="privacy-line"><span aria-hidden="true">●</span> Local processing is active. Civitai checks can be turned off at any time.</p>
+      </div>
+    </section>
+
+    <section id="workspace" class="workspace" hidden tabindex="-1" aria-label="Metadata workspace">
+      <aside class="rail" aria-label="Current image">
+        <section class="panel preview-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="overline">Current image</p>
+              <h2 id="currentFileName">No image selected</h2>
+            </div>
+            <span id="fileFormatBadge" class="badge neutral">—</span>
+          </div>
+          <div class="preview-frame">
+            <img id="previewImage" alt="" hidden>
+            <div id="previewFallback" class="preview-fallback">
+              <span aria-hidden="true">◇</span>
+              <p>Preview will appear here</p>
+            </div>
+          </div>
+          <dl id="fileFacts" class="facts"></dl>
+        </section>
+
+        <section class="panel queue-panel" aria-labelledby="queueTitle">
+          <div class="panel-heading compact">
+            <div>
+              <p class="overline">Batch</p>
+              <h2 id="queueTitle">Image queue</h2>
+            </div>
+            <div class="queue-heading-actions">
+              <span id="queueCount" class="count-badge">0</span>
+              <button id="clearQueueButton" class="button quiet small" type="button" disabled>Clear all</button>
+            </div>
+          </div>
+          <ol id="fileQueue" class="file-queue"></ol>
+          <button id="addImagesButton" class="button quiet full" type="button">Add more images</button>
+        </section>
+      </aside>
+
+      <div class="editor-column">
+        <section class="status-strip" aria-labelledby="statusTitle">
+          <div>
+            <p class="overline">Verification status</p>
+            <h2 id="statusTitle" tabindex="-1">Inspecting metadata…</h2>
+            <p id="statusSummary">Reading supported metadata carriers.</p>
+          </div>
+          <div class="status-actions">
+            <button id="importCivitaiImageButton" class="button quiet" type="button">Import image metadata</button>
+            <button id="verifyButton" class="button secondary" type="button">Verify with Civitai</button>
+            <button id="resetButton" class="button quiet" type="button">Reset edits</button>
+          </div>
+        </section>
+
+        <div id="alertRegion" class="alert-region" role="alert" aria-live="assertive"></div>
+        <div id="statusAnnouncer" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
+        <nav class="section-nav" role="tablist" aria-label="Editor sections">
+          <button id="generationTab" type="button" role="tab" aria-controls="generationSection" aria-selected="true" data-section-target="generationSection">Generation</button>
+          <button id="resourcesTab" type="button" role="tab" aria-controls="resourcesSection" aria-selected="false" data-section-target="resourcesSection" tabindex="-1">Resources</button>
+          <button id="otherTab" type="button" role="tab" aria-controls="otherSection" aria-selected="false" data-section-target="otherSection" tabindex="-1">Other metadata</button>
+          <button id="reviewTab" type="button" role="tab" aria-controls="reviewSection" aria-selected="false" data-section-target="reviewSection" tabindex="-1">Review</button>
+        </nav>
+
+        <section id="generationSection" class="panel editor-section" role="tabpanel" aria-labelledby="generationTab" tabindex="0">
+          <div class="section-heading">
+            <div>
+              <p class="overline">Editable</p>
+              <h2 id="generationTitle">Generation fields</h2>
+              <p>These values feed every supported metadata output from one shared record.</p>
+            </div>
+            <span id="generationIssueCount" class="badge neutral">No issues</span>
+          </div>
+
+          <form id="generationForm" class="field-form" autocomplete="off">
+            <div class="field span-2">
+              <label for="positivePrompt">Positive prompt</label>
+              <textarea id="positivePrompt" name="positivePrompt" rows="6" spellcheck="false"></textarea>
+              <p class="field-meta" id="positivePromptMeta">Not detected</p>
+            </div>
+            <div class="field span-2">
+              <label for="negativePrompt">Negative prompt</label>
+              <textarea id="negativePrompt" name="negativePrompt" rows="4" spellcheck="false"></textarea>
+              <p class="field-meta" id="negativePromptMeta">Not detected</p>
+            </div>
+            <div class="field">
+              <label for="steps">Steps</label>
+              <input id="steps" name="steps" type="number" min="0" step="1" inputmode="numeric">
+              <p class="field-meta" id="stepsMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="seed">Seed</label>
+              <input id="seed" name="seed" type="text" inputmode="numeric" pattern="[0-9-]*">
+              <p class="field-meta" id="seedMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="sampler">Sampler</label>
+              <input id="sampler" name="sampler" type="text" list="samplerList">
+              <datalist id="samplerList">
+                <option value="Euler">
+                <option value="Euler a">
+                <option value="DPM++ 2M">
+                <option value="DPM++ 2M SDE">
+                <option value="DPM++ 3M SDE">
+                <option value="DPM++ SDE">
+                <option value="UniPC">
+                <option value="LCM">
+              </datalist>
+              <p class="field-meta" id="samplerMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="scheduler">Scheduler</label>
+              <input id="scheduler" name="scheduler" type="text" list="schedulerList">
+              <datalist id="schedulerList">
+                <option value="Karras">
+                <option value="Exponential">
+                <option value="SGM Uniform">
+                <option value="Simple">
+                <option value="Normal">
+                <option value="DDIM Uniform">
+                <option value="Beta">
+              </datalist>
+              <p class="field-meta" id="schedulerMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="cfgScale">CFG scale</label>
+              <input id="cfgScale" name="cfgScale" type="number" min="0" step="0.01" inputmode="decimal">
+              <p class="field-meta" id="cfgScaleMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="guidance">Guidance</label>
+              <input id="guidance" name="guidance" type="number" min="0" step="0.01" inputmode="decimal">
+              <p class="field-meta" id="guidanceMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="denoise">Denoising strength</label>
+              <input id="denoise" name="denoise" type="number" min="0" max="1" step="0.01" inputmode="decimal">
+              <p class="field-meta" id="denoiseMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="clipSkip">Clip skip</label>
+              <input id="clipSkip" name="clipSkip" type="number" min="0" step="1" inputmode="numeric">
+              <p class="field-meta" id="clipSkipMeta">Unknown</p>
+            </div>
+            <div class="field">
+              <label for="width">Width</label>
+              <input id="width" name="width" type="number" min="1" step="1" inputmode="numeric">
+              <p class="field-meta" id="widthMeta">Image dimensions</p>
+            </div>
+            <div class="field">
+              <label for="height">Height</label>
+              <input id="height" name="height" type="number" min="1" step="1" inputmode="numeric">
+              <p class="field-meta" id="heightMeta">Image dimensions</p>
+            </div>
+            <div class="field span-2">
+              <label for="modelName">Primary model</label>
+              <input id="modelName" name="modelName" type="text">
+              <p class="field-meta" id="modelNameMeta">Unknown</p>
+            </div>
+            <div class="field span-2">
+              <label for="modelHash">Primary model hash</label>
+              <input id="modelHash" name="modelHash" type="text" class="monospace" spellcheck="false">
+              <p class="field-meta" id="modelHashMeta">Unknown</p>
+            </div>
+            <div class="field span-2">
+              <label for="vaeName">VAE</label>
+              <input id="vaeName" name="vaeName" type="text">
+              <p class="field-meta" id="vaeNameMeta">Unknown</p>
+            </div>
+            <div class="field span-2">
+              <label for="vaeHash">VAE hash</label>
+              <input id="vaeHash" name="vaeHash" type="text" class="monospace" spellcheck="false">
+              <p class="field-meta" id="vaeHashMeta">Unknown</p>
+            </div>
+          </form>
+        </section>
+
+        <section id="resourcesSection" class="panel editor-section" role="tabpanel" aria-labelledby="resourcesTab" tabindex="0" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="overline">Identity evidence</p>
+              <h2 id="resourcesTitle">Resources</h2>
+              <p>Models, LoRAs, VAEs, encoders, embeddings, ControlNet, IPAdapter, and upscalers found in active metadata.</p>
+            </div>
+            <div class="section-actions">
+              <input id="identityImportInput" class="visually-hidden" type="file" accept=".json,application/json" aria-label="Choose identity JSON to import">
+              <button id="importIdentityButton" class="button quiet" type="button">Import identities</button>
+              <button id="exportIdentityButton" class="button quiet" type="button">Export identities</button>
+              <button id="cacheButton" class="button quiet" type="button">Model cache</button>
+              <button id="addResourceButton" class="button quiet" type="button">Add resource</button>
+            </div>
+          </div>
+          <div id="resourcesList" class="resource-list"></div>
+        </section>
+
+        <section id="otherSection" class="panel editor-section" role="tabpanel" aria-labelledby="otherTab" tabindex="0" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="overline">Selective preservation</p>
+              <h2 id="otherTitle">Other metadata</h2>
+              <p>Safe technical metadata is preserved automatically. Potentially identifying fields require an explicit choice.</p>
+            </div>
+            <span id="preservedCount" class="badge neutral">0 preserved</span>
+          </div>
+          <div id="otherMetadataList" class="metadata-list"></div>
+        </section>
+
+        <section id="reviewSection" class="panel editor-section" role="tabpanel" aria-labelledby="reviewTab" tabindex="0" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="overline">Before saving</p>
+              <h2 id="reviewTitle" tabindex="-1">Review changes</h2>
+              <p>Nothing is written until you save a new copy.</p>
+            </div>
+            <button id="exportReportButton" class="button quiet" type="button">Export report</button>
+          </div>
+          <div id="conflictList" class="conflict-list"></div>
+          <div id="diffList" class="diff-list"></div>
+          <details id="rawDetails" class="raw-details">
+            <summary>Raw metadata carriers</summary>
+            <div class="raw-toolbar">
+              <label for="rawCarrierSelect">Carrier</label>
+              <select id="rawCarrierSelect"></select>
+              <button id="copyRawButton" class="button quiet small" type="button">Copy</button>
+            </div>
+            <pre id="rawMetadataView" tabindex="0"></pre>
+          </details>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer id="saveBar" class="save-bar" hidden>
+    <div>
+      <p class="overline">New copy</p>
+      <p id="outputSummary">Ready when verification is complete.</p>
+    </div>
+    <div class="save-controls">
+      <label class="visually-hidden" for="outputSuffix">Output filename suffix</label>
+      <input id="outputSuffix" type="text" value="_civitai-verified" aria-label="Output filename suffix">
+      <button id="saveButton" class="button primary" type="button">Save verified copy</button>
+    </div>
+  </footer>
+
+  <dialog id="resourceDialog" aria-labelledby="resourceDialogTitle">
+    <form id="resourceForm" method="dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="overline">Resource editor</p>
+          <h2 id="resourceDialogTitle">Edit resource</h2>
+        </div>
+        <button id="closeResourceDialog" class="icon-button" type="button" aria-label="Close resource editor">×</button>
+      </div>
+      <input id="resourceKey" type="hidden">
+      <div class="dialog-grid">
+        <div class="field span-2"><label for="resourceName">Name</label><input id="resourceName" type="text"></div>
+        <div class="field span-2"><label for="resourceVersionName">Version name</label><input id="resourceVersionName" type="text"></div>
+        <div class="field span-2"><label for="resourceBaseModel">Base model / ecosystem</label><input id="resourceBaseModel" type="text" autocomplete="off"></div>
+        <div class="field"><label for="resourceRole">Role</label><select id="resourceRole"></select></div>
+        <div class="field"><label for="resourceType">Type</label><select id="resourceType"></select></div>
+        <div class="field span-2"><label for="resourceAir">AIR</label><input id="resourceAir" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field"><label for="resourceModelId">Model ID</label><input id="resourceModelId" type="text" inputmode="numeric"></div>
+        <div class="field"><label for="resourceVersionId">Version ID</label><input id="resourceVersionId" type="text" inputmode="numeric"></div>
+        <div class="field"><label for="resourceFileId">File ID</label><input id="resourceFileId" type="text" inputmode="numeric"></div>
+        <div class="field"><label for="resourceWeight">Weight</label><input id="resourceWeight" type="number" step="0.01"></div>
+        <div class="field span-2"><label for="resourceUrl">Civitai model URL</label><input id="resourceUrl" type="url" inputmode="url" spellcheck="false"></div>
+        <div class="field span-2"><label for="resourceSha256">SHA-256</label><input id="resourceSha256" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field span-2"><label for="resourceBlake3">BLAKE3</label><input id="resourceBlake3" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field"><label for="resourceAutoV3">AutoV3</label><input id="resourceAutoV3" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field"><label for="resourceAutoV2">AutoV2</label><input id="resourceAutoV2" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field"><label for="resourceCrc32">CRC32</label><input id="resourceCrc32" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field"><label for="resourceAutoV1">AutoV1</label><input id="resourceAutoV1" class="monospace" type="text" spellcheck="false"></div>
+        <div class="field span-2"><label for="resourceModelFile">Model file for positive identification</label><input id="resourceModelFile" type="file" accept=".safetensors,.gguf,.ckpt,.pt,.pth,.bin"></div>
+      </div>
+      <div id="resourceDialogStatus" class="dialog-status" role="status"></div>
+      <div id="resourceCandidateList" class="candidate-list" aria-live="polite"></div>
+      <div class="dialog-actions">
+        <button id="removeResourceButton" class="button danger" type="button">Remove resource</button>
+        <button id="searchResourceButton" class="button secondary" type="button">Search Civitai</button>
+        <span class="spacer"></span>
+        <button class="button quiet" value="cancel">Cancel</button>
+        <button id="saveResourceButton" class="button primary" type="button">Apply resource</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="cacheDialog" aria-labelledby="cacheDialogTitle">
+    <div class="cache-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="overline">Local performance cache</p>
+          <h2 id="cacheDialogTitle">Civitai model cache</h2>
+        </div>
+        <button id="closeCacheDialog" class="icon-button" type="button" aria-label="Close model cache">×</button>
+      </div>
+      <p class="dialog-intro">Verified public resource identities are cached in this browser profile. Images, prompts, workflows, local paths, and credentials are never stored here.</p>
+      <dl class="cache-facts">
+        <div><dt>Storage</dt><dd id="cacheBackend">Checking…</dd></div>
+        <div><dt>Model versions</dt><dd id="cacheVersionCount">—</dd></div>
+        <div><dt>Cache records</dt><dd id="cacheRecordCount">—</dd></div>
+        <div><dt>Approximate data</dt><dd id="cacheByteCount">—</dd></div>
+      </dl>
+      <p id="cacheDialogStatus" class="dialog-status" role="status">Reading cache statistics…</p>
+      <p class="cache-note">This disposable cache is separate for each browser, browser profile, and page origin. Clearing it does not change any image or exported identity document.</p>
+      <div class="dialog-actions">
+        <button id="clearCacheButton" class="button danger" type="button">Clear model cache</button>
+        <span class="spacer"></span>
+        <button id="doneCacheButton" class="button primary" type="button">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="imageLookupDialog" aria-labelledby="imageLookupTitle">
+    <form id="imageLookupForm" class="lookup-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="overline">Explicit public lookup</p>
+          <h2 id="imageLookupTitle">Import from a Civitai image</h2>
+        </div>
+        <button id="closeImageLookupDialog" class="icon-button" type="button" aria-label="Close Civitai image lookup">×</button>
+      </div>
+      <p class="dialog-intro">Paste a numeric image ID or an exact <span class="monospace">civitai.com/images/…</span> URL. Missing fields are imported. Different values stay unchanged and appear in Review.</p>
+      <div class="field">
+        <label for="civitaiImageInput">Civitai image URL or ID</label>
+        <input id="civitaiImageInput" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://civitai.com/images/123456">
+        <p class="field-meta">Only the public image ID is sent. No local pixels, filename, path, prompt, or credentials are uploaded.</p>
+      </div>
+      <p id="imageLookupStatus" class="dialog-status" role="status" aria-live="polite">Ready to look up public metadata.</p>
+      <div class="dialog-actions">
+        <button id="cancelImageLookupButton" class="button quiet" type="button">Cancel</button>
+        <span class="spacer"></span>
+        <button id="submitImageLookupButton" class="button primary" type="submit">Look up and import</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>%%SCRIPT%%</script>
+</body>
+</html>

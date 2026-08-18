@@ -1,0 +1,40 @@
+{
+  "name": "civitai-metadata-studio",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Local-first, single-file Civitai generation metadata inspector and editor.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chriscollins500/civitai-metadata-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chriscollins500/civitai-metadata-studio/issues"
+  },
+  "homepage": "https://github.com/chriscollins500/civitai-metadata-studio#readme",
+  "keywords": [
+    "civitai",
+    "comfyui",
+    "image-metadata",
+    "stable-diffusion"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "package": "node scripts/build.mjs && node scripts/package-release.mjs",
+    "test": "node scripts/build.mjs && node --test",
+    "verify": "node scripts/build.mjs && node scripts/package-release.mjs && node scripts/verify-build.mjs && node scripts/verify-release.mjs",
+    "check": "node --check scripts/build.mjs && node --check scripts/package-release.mjs && node --check scripts/verify-build.mjs && node --check scripts/verify-release.mjs",
+    "ci": "npm run check && npm test && npm run verify",
+    "regression": "node --use-system-ca scripts/full-regression.mjs",
+    "regression:civitai": "node --use-system-ca scripts/civitai-fixture-regression.mjs",
+    "regression:sidecars": "node scripts/paired-sidecar-regression.mjs",
+    "regression:public-images": "node --use-system-ca scripts/civitai-public-image-regression.mjs",
+    "regression:model-families": "node --use-system-ca scripts/civitai-model-family-regression.mjs",
+    "discover:civitai-users": "node --use-system-ca scripts/civitai-user-workflow-discovery.mjs",
+    "audit:civitai-contract": "node --use-system-ca scripts/audit-civitai-contract.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
