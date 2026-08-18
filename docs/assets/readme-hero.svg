@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720" role="img" aria-labelledby="title desc">
+  <title id="title">Civitai Metadata Studio</title>
+  <desc id="desc">A private browser tool that opens an AI image, reads its hidden generation recipe, verifies resources with Civitai, and saves a corrected copy.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1713"/><stop offset="0.55" stop-color="#123128"/><stop offset="1" stop-color="#084c40"/></linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.1" r="0.9"><stop offset="0" stop-color="#63d7bd" stop-opacity="0.34"/><stop offset="0.55" stop-color="#2a8b75" stop-opacity="0.08"/><stop offset="1" stop-color="#0d1713" stop-opacity="0"/></radialGradient>
+    <linearGradient id="preview" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#162c5a"/><stop offset="0.48" stop-color="#864fd1"/><stop offset="1" stop-color="#25c4a3"/></linearGradient>
+    <linearGradient id="button" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#006b59"/><stop offset="1" stop-color="#008c75"/></linearGradient>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#b9f4e6" stroke-opacity="0.06" stroke-width="1"/></pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#020806" flood-opacity="0.42"/></filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0b261f" flood-opacity="0.14"/></filter>
+  </defs>
+
+  <rect width="1600" height="720" rx="38" fill="url(#background)"/>
+  <rect width="1600" height="720" rx="38" fill="url(#glow)"/>
+  <rect width="1600" height="720" rx="38" fill="url(#grid)"/>
+  <circle cx="1480" cy="85" r="180" fill="#63d7bd" opacity="0.08"/>
+  <circle cx="1515" cy="630" r="250" fill="#2b6df4" opacity="0.07"/>
+
+  <g transform="translate(86 76)">
+    <rect width="74" height="74" rx="22" fill="#63d7bd"/>
+    <text x="37" y="47" text-anchor="middle" fill="#0c2e26" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="800">CM</text>
+    <text x="94" y="31" fill="#f4fff9" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="750">Civitai Metadata Studio</text>
+    <text x="94" y="58" fill="#9cd8ca" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="500" letter-spacing="1.5">INSPECT · VERIFY · REPAIR</text>
+    <text x="0" y="170" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="800"><tspan x="0" dy="0">Your AI image has</tspan><tspan x="0" dy="68">a story inside it.</tspan></text>
+    <text x="0" y="334" fill="#cce9e1" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="500"><tspan x="0" dy="0">See how it was made. Fix what is missing.</tspan><tspan x="0" dy="36">Save a clean copy—without touching the pixels.</tspan></text>
+    <g transform="translate(0 410)" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700">
+      <rect width="148" height="42" rx="21" fill="#63d7bd" fill-opacity="0.16" stroke="#63d7bd" stroke-opacity="0.45"/><circle cx="22" cy="21" r="7" fill="#63d7bd"/><text x="39" y="27" fill="#e8fff9">One HTML file</text>
+      <g transform="translate(164 0)"><rect width="156" height="42" rx="21" fill="#63d7bd" fill-opacity="0.16" stroke="#63d7bd" stroke-opacity="0.45"/><circle cx="22" cy="21" r="7" fill="#63d7bd"/><text x="39" y="27" fill="#e8fff9">No image upload</text></g>
+      <g transform="translate(336 0)"><rect width="165" height="42" rx="21" fill="#63d7bd" fill-opacity="0.16" stroke="#63d7bd" stroke-opacity="0.45"/><circle cx="22" cy="21" r="7" fill="#63d7bd"/><text x="39" y="27" fill="#e8fff9">Originals untouched</text></g>
+    </g>
+  </g>
+
+  <g transform="translate(900 64)" filter="url(#shadow)">
+    <rect width="620" height="500" rx="30" fill="#f4f2ec"/><rect width="620" height="66" rx="30" fill="#fffefa"/><path d="M0 66H620" stroke="#d8d6ce"/>
+    <circle cx="30" cy="33" r="6" fill="#d86b64"/><circle cx="50" cy="33" r="6" fill="#d9a43c"/><circle cx="70" cy="33" r="6" fill="#54a36e"/>
+    <rect x="94" y="18" width="38" height="32" rx="10" fill="#006b59"/><text x="113" y="40" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="800">CM</text>
+    <text x="144" y="39" fill="#17211d" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="750">Civitai Metadata Studio</text>
+    <rect x="433" y="20" width="160" height="28" rx="14" fill="#d8eee8"/><circle cx="451" cy="34" r="6" fill="#006b59"/><text x="464" y="39" fill="#004f42" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">Automatic verification</text>
+
+    <g transform="translate(24 90)">
+      <rect width="172" height="320" rx="20" fill="#fffefa" stroke="#dedbd1"/><text x="18" y="28" fill="#006b59" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="800" letter-spacing="1.5">CURRENT IMAGE</text>
+      <rect x="18" y="44" width="136" height="172" rx="14" fill="url(#preview)"/><circle cx="91" cy="105" r="40" fill="#ffffff" opacity="0.15"/><path d="M45 178L81 132L104 157L121 137L153 181V201H45Z" fill="#e6fff8" opacity="0.72"/>
+      <text x="18" y="241" fill="#17211d" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="750">portrait-final.png</text>
+      <text x="18" y="266" fill="#5f6964" font-family="Arial, Helvetica, sans-serif" font-size="10">Dimensions</text><text x="151" y="266" text-anchor="end" fill="#17211d" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">1080 × 1920</text>
+      <text x="18" y="288" fill="#5f6964" font-family="Arial, Helvetica, sans-serif" font-size="10">Pixels</text><text x="151" y="288" text-anchor="end" fill="#17211d" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700">Untouched</text>
+    </g>
+
+    <g transform="translate(216 90)">
+      <text x="0" y="19" fill="#006b59" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="800" letter-spacing="1.5">FOUND IN THIS IMAGE</text>
+      <g transform="translate(0 36)" filter="url(#softShadow)"><rect width="378" height="92" rx="17" fill="#ffffff"/><rect x="16" y="16" width="44" height="44" rx="13" fill="#d8eee8"/><text x="38" y="44" text-anchor="middle" fill="#006b59" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800">CH</text><text x="74" y="34" fill="#17211d" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="750">Krea 2 checkpoint</text><text x="74" y="55" fill="#5f6964" font-family="Arial, Helvetica, sans-serif" font-size="11">Exact AIR + hash match</text><rect x="290" y="24" width="70" height="27" rx="14" fill="#d8eee8"/><circle cx="307" cy="37" r="6" fill="#38a875"/><text x="318" y="41" fill="#176347" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="800">Verified</text><rect x="16" y="70" width="344" height="6" rx="3" fill="#38a875"/></g>
+      <g transform="translate(0 142)" filter="url(#softShadow)"><rect width="378" height="92" rx="17" fill="#ffffff"/><rect x="16" y="16" width="44" height="44" rx="13" fill="#d8eee8"/><text x="38" y="44" text-anchor="middle" fill="#006b59" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800">LO</text><text x="74" y="34" fill="#17211d" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="750">Style LoRA</text><text x="74" y="55" fill="#5f6964" font-family="Arial, Helvetica, sans-serif" font-size="11">Active workflow resource</text><rect x="290" y="24" width="70" height="27" rx="14" fill="#d8eee8"/><circle cx="307" cy="37" r="6" fill="#38a875"/><text x="318" y="41" fill="#176347" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="800">Verified</text><rect x="16" y="70" width="344" height="6" rx="3" fill="#38a875"/></g>
+      <g transform="translate(0 255)"><rect width="378" height="45" rx="13" fill="#ece9df"/><text x="16" y="28" fill="#5f6964" font-family="Arial, Helvetica, sans-serif" font-size="11">2 resources verified · no conflicts</text></g>
+    </g>
+    <g transform="translate(216 422)"><rect width="378" height="52" rx="15" fill="url(#button)"/><text x="189" y="33" text-anchor="middle" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800">Save a new verified copy</text></g>
+  </g>
+
+  <g transform="translate(86 616)" font-family="Arial, Helvetica, sans-serif">
+    <rect width="1428" height="62" rx="22" fill="#06100d" fill-opacity="0.56" stroke="#75e0c7" stroke-opacity="0.17"/>
+    <g transform="translate(28 0)"><circle cx="22" cy="31" r="15" fill="#63d7bd"/><text x="22" y="37" text-anchor="middle" fill="#0c2e26" font-size="16" font-weight="800">1</text><text x="50" y="37" fill="#eafff9" font-size="16" font-weight="700">Open an image</text></g>
+    <path d="M310 31H374M366 24L374 31L366 38" fill="none" stroke="#63d7bd" stroke-opacity="0.5" stroke-width="2"/>
+    <g transform="translate(392 0)"><circle cx="22" cy="31" r="15" fill="#63d7bd"/><text x="22" y="37" text-anchor="middle" fill="#0c2e26" font-size="16" font-weight="800">2</text><text x="50" y="37" fill="#eafff9" font-size="16" font-weight="700">Read the hidden recipe</text></g>
+    <path d="M724 31H788M780 24L788 31L780 38" fill="none" stroke="#63d7bd" stroke-opacity="0.5" stroke-width="2"/>
+    <g transform="translate(806 0)"><circle cx="22" cy="31" r="15" fill="#63d7bd"/><text x="22" y="37" text-anchor="middle" fill="#0c2e26" font-size="16" font-weight="800">3</text><text x="50" y="37" fill="#eafff9" font-size="16" font-weight="700">Verify and edit</text></g>
+    <path d="M1078 31H1142M1134 24L1142 31L1134 38" fill="none" stroke="#63d7bd" stroke-opacity="0.5" stroke-width="2"/>
+    <g transform="translate(1160 0)"><circle cx="22" cy="31" r="15" fill="#63d7bd"/><text x="22" y="37" text-anchor="middle" fill="#0c2e26" font-size="16" font-weight="800">4</text><text x="50" y="37" fill="#eafff9" font-size="16" font-weight="700">Save a new copy</text></g>
+  </g>
+</svg>
