@@ -30,20 +30,27 @@ jobs:
       - name: Check source syntax
         run: npm run check
 
+      - name: Install optional automation tools
+        run: npm ci --prefix automation --ignore-scripts
+
       - name: Run automated tests
         run: npm test
 
       - name: Verify portable release
         run: npm run verify
 
+      - name: Verify HTTP and MCP companion
+        run: npm run test:automation
+
       - name: Upload verified release
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: civitai-metadata-studio-v0.5.0
+          name: civitai-metadata-studio-v1.0.0
           path: |
             dist/civitai-metadata-studio.html
             dist/civitai-metadata-studio.zip
+            dist/SHA256SUMS.txt
           if-no-files-found: error
           compression-level: 0
           retention-days: 14

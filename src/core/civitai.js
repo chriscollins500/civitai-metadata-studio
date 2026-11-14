@@ -15,13 +15,14 @@
   const CACHE_TTL = Studio.identityCache.TTL.positive;
   const NEGATIVE_CACHE_TTL = Studio.identityCache.TTL.negative;
   const SEARCH_CACHE_TTL = Studio.identityCache.TTL.search;
-  const MODEL_BATCH_SIZE = 20;
   const HASH_BATCH_SIZE = 20;
   const MAX_RATE_LIMIT_COOLDOWN = 5 * 60 * 1000;
   const RETRYABLE_STATUS = new Set([502, 503, 504]);
   const RETRY_DELAYS = [500, 1500, 3000];
   const inflight = new Map();
   let cooldownUntil = 0;
+  let referenceSnapshot = null;
+  let referenceExpires = 0;
 
   function rateLimitError(delay = cooldownUntil - Date.now()) {
     const seconds = Math.max(1, Math.ceil(Math.max(0, delay) / 1000));
@@ -102,7 +103,6 @@
 
   async function clearCache() {
     inflight.clear();
-    cooldownUntil = 0;
     await Studio.identityCache.clear();
   }
 
@@ -162,6 +162,11 @@
     };
   }
 
+  function hasModelDetails(model) {
+    return Boolean(model?.creator?.username || model?.username)
+      && ["allowNoCredit", "allowCommercialUse", "allowDerivatives", "allowDifferentLicense"].every((key) => isPresent(model[key]));
+  }
+
   function compactSearchPayload(value) {
     if (!value || typeof value !== "object" || !Array.isArray(value.items)) return value;
     return {
@@ -209,7 +214,8 @@
           cache: "no-store",
           credentials: "omit",
           referrerPolicy: "no-referrer",
-          signal
+          signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20_000)]) : AbortSignal.timeout(20_000),
+          redirect: "error"
         });
       } catch (error) {
         if (error.name === "AbortError") throw error;
@@ -230,7 +236,7 @@
 
       if (RETRYABLE_STATUS.has(response.status) && transientAttempt < RETRY_DELAYS.length) {
         await response.body?.cancel().catch(() => {});
-        await waitForRetry(retryAfterDelay(response, RETRY_DELAYS[transientAttempt]), signal);
+        await waitForRetry(Math.min(10_000, retryAfterDelay(response, RETRY_DELAYS[transientAttempt])), signal);
         transientAttempt += 1;
         continue;
       }
@@ -258,6 +264,7 @@
     metrics,
     batch = false
   } = {}) {
+    signal?.throwIfAborted();
     const cached = await cachedValue(cacheKey, cacheTtl);
     if (cached.hit) {
       increment(metrics, "cacheHits");
@@ -265,12 +272,13 @@
     }
 
     const identity = requestIdentity(method, path, body);
-    if (inflight.has(identity)) {
+    if (inflight.has(identity) && !inflight.get(identity).controller.signal.aborted) {
       increment(metrics, "coalesced");
-      return inflight.get(identity);
+      return consumeShared(inflight.get(identity), signal);
     }
+    const controller = new AbortController();
     const pending = performRequest(path, {
-      signal,
+      signal: controller.signal,
       cacheKey,
       cacheTtl,
       compact,
@@ -280,12 +288,30 @@
       metrics,
       batch
     });
-    inflight.set(identity, pending);
-    try {
-      return await pending;
-    } finally {
-      if (inflight.get(identity) === pending) inflight.delete(identity);
-    }
+    const entry = { promise: pending, controller, consumers: 0, settled: false };
+    inflight.set(identity, entry);
+    const finish = () => { entry.settled = true; if (inflight.get(identity) === entry) inflight.delete(identity); };
+    pending.then(finish, finish);
+    return consumeShared(entry, signal);
+  }
+
+  function consumeShared(entry, signal) {
+    entry.consumers += 1;
+    return new Promise((resolve, reject) => {
+      let complete = false;
+      const finish = (callback, value) => {
+        if (complete) return;
+        complete = true;
+        signal?.removeEventListener("abort", onAbort);
+        entry.consumers -= 1;
+        if (!entry.consumers && !entry.settled) entry.controller.abort();
+        callback(value);
+      };
+      const onAbort = () => finish(reject, new DOMException("Verification was cancelled.", "AbortError"));
+      signal?.addEventListener("abort", onAbort, { once: true });
+      entry.promise.then((value) => finish(resolve, value), (error) => finish(reject, error));
+      if (signal?.aborted) onAbort();
+    });
   }
 
   function hashEntries(files) {
@@ -349,10 +375,10 @@
       ttl: CACHE_TTL,
       groupId
     }];
-    if (modelId && compact.model) {
+    if (modelId && hasModelDetails(compact.model) && (!positiveIdOrNull(compact.model.id) || positiveIdOrNull(compact.model.id) === modelId)) {
       records.push({
         key: `model:${modelId}`,
-        value: compactModelPayload(compact.model),
+        value: compactModelPayload({ ...compact.model, id: modelId }),
         ttl: CACHE_TTL,
         groupId: `model:${modelId}`
       });
@@ -537,13 +563,15 @@
     const modelId = positiveIdOrNull(data?.modelId ?? data?.model?.id);
     if (!modelId) return data;
     const embedded = data.model && typeof data.model === "object" ? data.model : {};
-    const hasCreator = Boolean(embedded.creator?.username || embedded.username);
-    const hasLicense = ["allowNoCredit", "allowCommercialUse", "allowDerivatives", "allowDifferentLicense"]
-      .every((key) => isPresent(embedded[key]));
-    if (hasCreator && hasLicense) return data;
+    if (positiveIdOrNull(embedded.id) && positiveIdOrNull(embedded.id) !== modelId) throw new Error("Civitai returned conflicting parent model IDs for a model version.");
+    if (hasModelDetails(embedded)) return data;
 
     let model;
     try {
+      const cachedModel = await cachedValue(`model:${modelId}`);
+      if (cachedModel.hit && cachedModel.value && (positiveIdOrNull(cachedModel.value.id) !== modelId || !hasModelDetails(cachedModel.value))) {
+        await Studio.identityCache.deleteMany([`model:${modelId}`]);
+      }
       model = await request(`/models/${modelId}`, {
         signal,
         metrics,
@@ -562,7 +590,7 @@
       ...data,
       model: {
         ...model,
-        ...embedded,
+        ...Object.fromEntries(Object.entries(embedded).filter(([, value]) => isPresent(value))),
         id: modelId
       }
     };
@@ -823,45 +851,9 @@
     return versionIds;
   }
 
-  async function prefetchVersions(versionIds, { signal, metrics } = {}) {
-    const unique = [...new Set(versionIds.map(positiveIdOrNull).filter(Boolean))];
-    const cached = await Studio.identityCache.getMany(unique.map((id) => `version:${id}`));
-    const needed = unique.filter((id) => !cached.get(`version:${id}`)?.hit);
-    for (const group of chunks(needed, MODEL_BATCH_SIZE)) {
-      const data = await request(`/models?limit=100&modelVersionIds=${group.join(",")}`, {
-        signal,
-        metrics,
-        compact: (value) => value,
-        batch: true
-      });
-      const expected = new Set(group);
-      const matched = new Set();
-      const records = [];
-      for (const model of Array.isArray(data?.items) ? data.items : []) {
-        const compactModel = compactModelPayload(model);
-        for (const version of Array.isArray(model?.modelVersions) ? model.modelVersions : []) {
-          const id = positiveIdOrNull(version?.id ?? version?.modelVersionId);
-          if (!id || !expected.has(id)) continue;
-          records.push(...versionCacheRecords({
-            ...version,
-            id,
-            modelId: positiveIdOrNull(version.modelId) || positiveIdOrNull(model.id),
-            model: compactModel
-          }));
-          matched.add(id);
-        }
-      }
-      await Studio.identityCache.setMany(records);
-    }
-  }
-
   async function prefetchResources(resources, { signal, metrics } = {}) {
-    const versionIds = new Set();
     const sha256Hashes = new Set();
     for (const resource of resources) {
-      const versionId = positiveIdOrNull(resource.modelVersionId);
-      if (versionId) versionIds.add(versionId);
-      if (versionId) continue;
       const sha256 = normalizeHash(resource.hashes?.SHA256 ?? resource.hashes?.sha256);
       if (!/^[A-F0-9]{64}$/.test(sha256)) continue;
       sha256Hashes.add(sha256);
@@ -873,33 +865,21 @@
       const cachedMapping = hashCandidateKeys(sha256, "SHA256")
         .map((key) => cachedHashes.get(key))
         .find((entry) => entry?.hit);
-      if (cachedMapping?.hit) {
-        for (const candidate of Array.isArray(cachedMapping.value?.candidates) ? cachedMapping.value.candidates : []) {
-          const cachedId = positiveIdOrNull(candidate?.modelVersionId);
-          if (cachedId) versionIds.add(cachedId);
-        }
-      } else {
+      if (!cachedMapping?.hit) {
         missingHashes.push(sha256);
       }
     }
 
     if (missingHashes.length) {
       try {
-        const mapped = await prefetchHashCandidates(missingHashes, { signal, metrics });
-        for (const id of mapped) versionIds.add(id);
+        await prefetchHashCandidates(missingHashes, { signal, metrics });
       } catch (error) {
         if (error.name === "AbortError") throw error;
         increment(metrics, "batchFallbacks");
       }
     }
-    if (versionIds.size) {
-      try {
-        await prefetchVersions([...versionIds], { signal, metrics });
-      } catch (error) {
-        if (error.name === "AbortError") throw error;
-        increment(metrics, "batchFallbacks");
-      }
-    }
+    // Version-only resources use their exact endpoint during verification.
+    // This avoids an undocumented models-list filter and sends no name text.
   }
 
   function identityConflict(resource, identity, evidence) {
@@ -1254,7 +1234,7 @@
   async function lookupImage(value, { signal, metrics } = {}) {
     const imageId = parseCivitaiImageId(value);
     if (!imageId) throw new Error("Enter a numeric Civitai image ID or a civitai.com/images/… URL.");
-    const response = await request(`/images?imageId=${imageId}&limit=1`, {
+    const response = await request(`/images?imageId=${imageId}&limit=1&withMeta=true&browsingLevel=31`, {
       signal,
       metrics,
       compact: (data) => data
@@ -1269,7 +1249,7 @@
     const query = sanitizeText(name, 200).trim();
     if (query.length < 2) return [];
     const cacheKey = `search:${query.toLowerCase()}`;
-    const data = await request(`/models?limit=10&query=${encodeURIComponent(query)}`, {
+    const data = await request(`/models?limit=10&nsfw=true&query=${encodeURIComponent(query)}`, {
       signal,
       metrics,
       cacheKey,
@@ -1283,9 +1263,18 @@
       type: sanitizeText(model.type || "Other", 80),
       creator: sanitizeText(model.creator?.username || "", 512),
       versions: Array.isArray(model.modelVersions)
-        ? model.modelVersions.slice(0, 10).map((version) => normalizeVersion({ ...version, model }))
+        ? model.modelVersions.slice(0, 10).map((version) => normalizeVersion({ ...version, model })).filter(Boolean)
         : []
     }));
+  }
+
+  async function referenceData({ signal } = {}) {
+    if (referenceSnapshot && Date.now() < referenceExpires) return structuredClone(referenceSnapshot);
+    const data = await request("/enums", { signal, compact: (value) => value });
+    if (!data || typeof data !== "object" || !Array.isArray(data.ModelType) || !Array.isArray(data.BaseModel)) throw new Error("Civitai returned an invalid reference list.");
+    referenceSnapshot = Object.fromEntries(["ModelType", "ModelFileType", "BaseModel", "ActiveBaseModel", "BaseModelType"].map((key) => [key, Array.isArray(data[key]) ? [...new Set(data[key].filter((value) => typeof value === "string").slice(0, 2000).map((value) => sanitizeText(value, 160)))] : []]));
+    referenceExpires = Date.now() + 15 * 60_000;
+    return structuredClone(referenceSnapshot);
   }
 
   Studio.civitai = Object.freeze({
@@ -1299,6 +1288,7 @@
     normalizeVersion,
     parseCivitaiImageId,
     prefetchResources,
+    referenceData,
     searchCandidates,
     verifyRecord,
     verifyResource

@@ -36,9 +36,28 @@ const Studio = globalThis.CMStudio;
 const allowedImageHosts = new Set([
   "image.civitai.com",
   "imagecache.civitai.com",
-  "image-b2.civitai.com"
+  "image-b2.civitai.com",
+  "blobs-b2.civitai.com"
 ]);
 const maximumImageBytes = 64 * 1024 * 1024;
+
+async function fetchPublicImage(value) {
+  let url = new URL(value);
+  for (let hop = 0; hop <= 3; hop += 1) {
+    if (url.protocol !== "https:" || url.username || url.password || !allowedImageHosts.has(url.hostname)) throw new Error("Civitai fixture referenced an unapproved image host.");
+    const response = await fetch(url, {
+      headers: { Accept: "image/webp,image/png,image/jpeg" },
+      cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer",
+      redirect: "manual", signal: AbortSignal.timeout(20_000)
+    });
+    if (![301, 302, 303, 307, 308].includes(response.status)) return response;
+    await response.body?.cancel();
+    const location = response.headers.get("location");
+    if (!location) throw new Error("Civitai fixture redirect has no destination.");
+    url = new URL(location, url);
+  }
+  throw new Error("Civitai fixture exceeded the three-redirect limit.");
+}
 
 function flagValue(name, fallback) {
   const index = process.argv.indexOf(name);
@@ -151,8 +170,8 @@ async function pixelPayloadMatches(source, inspection, edited, editedInspection)
 const imageLimit = flagValue("--images", 8);
 const versionLimit = flagValue("--versions", 20);
 const imageResponse = await fetch(
-  "https://civitai.com/api/v1/images?limit=100&nsfw=false&sort=Most%20Reactions&period=AllTime",
-  { headers: { Accept: "application/json" }, cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" }
+  "https://civitai.com/api/v1/images?limit=100&withMeta=true&browsingLevel=31&sort=Most%20Reactions&period=AllTime",
+  { headers: { Accept: "application/json" }, cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(20_000), redirect: "error" }
 );
 if (!imageResponse.ok) throw new Error(`Civitai images API returned HTTP ${imageResponse.status}.`);
 const imageDocument = await imageResponse.json();
@@ -160,14 +179,12 @@ const selected = (Array.isArray(imageDocument.items) ? imageDocument.items : [])
   .filter((item) =>
     item
     && item.type === "image"
-    && item.nsfw === false
-    && item.nsfwLevel === "None"
     && Array.isArray(item.modelVersionIds)
     && item.modelVersionIds.length
     && allowedImageHosts.has(new URL(item.url).hostname)
   )
   .slice(0, imageLimit);
-if (!selected.length) throw new Error("Civitai returned no safe public image fixtures with model-version evidence.");
+if (!selected.length) throw new Error("Civitai returned no supported public image fixtures with model-version evidence.");
 
 const directory = await mkdtemp(join(tmpdir(), "civitai-metadata-regression-"));
 const results = [];
@@ -180,13 +197,7 @@ try {
       const value = Studio.util.positiveIdOrNull(id);
       if (value) versionIds.add(value);
     }
-    const response = await fetch(item.url, {
-      headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,*/*" },
-      cache: "no-store",
-      credentials: "omit",
-      referrerPolicy: "no-referrer",
-      redirect: "follow"
-    });
+    const response = await fetchPublicImage(item.url);
     if (!response.ok) throw new Error(`Civitai image ${item.id} returned HTTP ${response.status}.`);
     if (!allowedImageHosts.has(new URL(response.url).hostname)) {
       throw new Error(`Civitai image ${item.id} redirected to an unapproved host.`);
@@ -220,7 +231,7 @@ try {
   }
 
   const selectedVersionIds = [...versionIds].slice(0, versionLimit);
-  Studio.civitai.clearCache();
+  await Studio.civitai.clearCache();
   const versionRecord = {
     dirty: false,
     resources: selectedVersionIds.map((id) => Studio.canonical.normalizeResource({
@@ -247,11 +258,11 @@ try {
     license: Boolean(identity.license),
     error: identity.verification === "error" ? identity.verificationMessage : undefined
   }));
-  const expectedVersionBatches = Math.ceil(selectedVersionIds.length / 20);
+  const cachedVerification = await Studio.civitai.verifyRecord(versionRecord);
 
   const summary = {
     apiImagesReturned: Array.isArray(imageDocument.items) ? imageDocument.items.length : 0,
-    safeFixturesTested: results.length,
+    publicFixturesTested: results.length,
     apiImageMetaPresent: selected.filter((item) => item.meta && Object.keys(item.meta).length).length,
     apiMetaKeys: [...apiMetaKeys].sort(),
     formats: Object.fromEntries(["png", "jpeg", "webp"].map((format) => [
@@ -268,10 +279,13 @@ try {
     modelVersionLookupsFound: versionResults.filter((item) => item.found).length,
     modelVersionLookupsNotFound: versionResults.filter((item) => item.found === false).length,
     modelVersionLookupErrors: versionResults.filter((item) => item.error).length,
-    modelVersionBatchMetrics: versionVerification,
-    modelVersionBatchEfficient: versionVerification.batchFallbacks === 0
-      && versionVerification.networkCalls === expectedVersionBatches
-      && versionVerification.batchCalls === expectedVersionBatches,
+    modelVersionDirectMetrics: versionVerification,
+    modelVersionCachedMetrics: cachedVerification,
+    modelVersionQueriesEfficient: versionVerification.batchFallbacks === 0
+      && versionVerification.networkCalls >= selectedVersionIds.length
+      && versionVerification.networkCalls <= selectedVersionIds.length * 2
+      && versionVerification.batchCalls === 0
+      && cachedVerification.networkCalls === 0,
     versionFieldCoverage: {
       modelId: versionResults.filter((item) => item.modelId).length,
       modelVersionId: versionResults.filter((item) => item.modelVersionId).length,
@@ -296,7 +310,7 @@ try {
       || !item.resourcesRoundTrip
     )
     || versionResults.some((item) => item.error || (item.found && !item.modelVersionId))
-    || !summary.modelVersionBatchEfficient
+    || !summary.modelVersionQueriesEfficient
   ) {
     process.exitCode = 1;
   }

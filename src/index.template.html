@@ -1,4 +1,7 @@
 <!doctype html>
+<!--
+%%LICENSE%%
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -20,10 +23,11 @@
       <span class="brand-mark" aria-hidden="true">CM</span>
       <span>
         <strong>Civitai Metadata Studio</strong>
-        <small>Inspect · verify · repair</small>
+        <small>Every image. Its whole story.</small>
       </span>
     </a>
     <div class="header-actions">
+      <button id="commandsButton" class="button quiet small command-trigger" type="button" aria-label="Open commands" aria-keyshortcuts="Control+k Meta+k">Commands <kbd>⌘ / Ctrl K</kbd></button>
       <button id="headerAddImagesButton" class="button secondary small" type="button" hidden>Add images</button>
       <button id="headerClearQueueButton" class="button quiet small" type="button" aria-label="Clear image queue" hidden>Clear</button>
       <label class="switch" for="autoVerify">
@@ -40,24 +44,26 @@
   <main id="main">
     <section id="top" class="hero" aria-labelledby="heroTitle">
       <div class="hero-copy">
-        <p class="eyebrow">Private by design · zero installation</p>
-        <h1 id="heroTitle" tabindex="-1">Make image metadata tell the truth.</h1>
-        <p class="hero-summary">Open PNG, JPEG, or WebP images. Review every generation field, positively identify Civitai resources, and save new verified copies without changing the originals.</p>
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Civitai Metadata Studio · 1.0</p>
+        <h1 id="heroTitle" tabindex="-1">Your image.<br><span class="hero-accent">The whole story.</span></h1>
+        <p class="hero-summary">The prompt. The model. The details that matter. Uncover the recipe inside your AI images, verify it with Civitai, and make it yours to edit.</p>
         <ul class="trust-list" aria-label="Privacy and safety guarantees">
           <li><span aria-hidden="true">✓</span> Images stay on this device</li>
-          <li><span aria-hidden="true">✓</span> Only hashes, IDs, or names you explicitly search reach Civitai</li>
+          <li><span aria-hidden="true">✓</span> Exact identity checks. No guesswork.</li>
           <li><span aria-hidden="true">✓</span> Original files are never changed</li>
         </ul>
       </div>
 
       <div class="load-card">
-        <div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-labelledby="dropTitle" aria-describedby="dropHelp">
+        <div id="dropZone" class="drop-zone" role="group" aria-labelledby="dropTitle" aria-describedby="dropHelp">
           <span class="drop-glyph" aria-hidden="true">↥</span>
-          <h2 id="dropTitle">Drop images here</h2>
-          <p id="dropHelp">PNG, JPEG, WebP · single images or a batch · any dimensions your current browser can address</p>
+          <p class="overline">Your next creation starts with clarity</p>
+          <h2 id="dropTitle">Drop an image.<br>Discover what's inside.</h2>
+          <p id="dropHelp">PNG, JPEG, WebP · one image or a whole batch · 8K and beyond</p>
           <button id="openButton" class="button primary" type="button">Choose images</button>
         </div>
         <p class="privacy-line"><span aria-hidden="true">●</span> Local processing is active. Civitai checks can be turned off at any time.</p>
+        <div class="start-steps" aria-label="How it works"><span><b>01</b> Open</span><span><b>02</b> Verify &amp; edit</span><span><b>03</b> Save a new copy</span></div>
       </div>
     </section>
 
@@ -113,6 +119,19 @@
 
         <div id="alertRegion" class="alert-region" role="alert" aria-live="assertive"></div>
         <div id="statusAnnouncer" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
+        <div class="workspace-toolbar" aria-label="Editing controls">
+          <div class="history-actions">
+            <button id="undoButton" class="button quiet small" type="button" aria-label="Undo last edit" disabled>↶ Undo</button>
+            <button id="redoButton" class="button quiet small" type="button" aria-label="Redo last edit" disabled>↷ Redo</button>
+            <span id="editStatus" class="edit-status">Original metadata</span>
+          </div>
+          <div class="toolbar-checks">
+            <label class="preserve-check" for="verifyExport"><input id="verifyExport" type="checkbox" checked>Verify pixel integrity</label>
+            <button id="cancelVerificationButton" class="button quiet small" type="button" hidden>Stop lookup</button>
+            <button id="verifyAllButton" class="button quiet small" type="button" hidden>Verify batch</button>
+          </div>
+        </div>
 
         <nav class="section-nav" role="tablist" aria-label="Editor sections">
           <button id="generationTab" type="button" role="tab" aria-controls="generationSection" aria-selected="true" data-section-target="generationSection">Generation</button>
@@ -249,6 +268,13 @@
               <button id="addResourceButton" class="button quiet" type="button">Add resource</button>
             </div>
           </div>
+          <div class="resource-filters">
+            <label class="visually-hidden" for="resourceFilter">Find a resource in this image</label>
+            <input id="resourceFilter" type="search" placeholder="Find a resource, AIR, or hash…" autocomplete="off">
+            <label class="visually-hidden" for="resourceStatusFilter">Filter resources by verification</label>
+            <select id="resourceStatusFilter"><option value="all">All resources</option><option value="verified">Verified</option><option value="unresolved">Unresolved</option><option value="conflict">Conflicts</option></select>
+            <span id="resourceResultCount" class="field-meta" role="status"></span>
+          </div>
           <div id="resourcesList" class="resource-list"></div>
         </section>
 
@@ -269,12 +295,14 @@
             <div>
               <p class="overline">Before saving</p>
               <h2 id="reviewTitle" tabindex="-1">Review changes</h2>
-              <p>Nothing is written until you save a new copy.</p>
+              <p>Review differences, identity evidence, and the details your new copy will carry.</p>
             </div>
             <button id="exportReportButton" class="button quiet" type="button">Export report</button>
           </div>
           <div id="conflictList" class="conflict-list"></div>
           <div id="diffList" class="diff-list"></div>
+          <div id="integrityResult" class="integrity-result" role="status" hidden></div>
+          <p class="workflow-note">Original embedded workflows are preserved exactly. They may contain input filenames or local paths. Review the raw workflow before sharing if that matters to you.</p>
           <details id="rawDetails" class="raw-details">
             <summary>Raw metadata carriers</summary>
             <div class="raw-toolbar">
@@ -296,8 +324,9 @@
     </div>
     <div class="save-controls">
       <label class="visually-hidden" for="outputSuffix">Output filename suffix</label>
-      <input id="outputSuffix" type="text" value="_civitai-verified" aria-label="Output filename suffix">
-      <button id="saveButton" class="button primary" type="button">Save verified copy</button>
+      <input id="outputSuffix" type="text" value="_metadata" aria-label="Output filename suffix">
+      <button id="saveCurrentButton" class="button secondary" type="button" hidden>Save this image</button>
+      <button id="saveButton" class="button primary" type="button">Save new copy</button>
     </div>
   </footer>
 
@@ -314,7 +343,7 @@
       <div class="dialog-grid">
         <div class="field span-2"><label for="resourceName">Name</label><input id="resourceName" type="text"></div>
         <div class="field span-2"><label for="resourceVersionName">Version name</label><input id="resourceVersionName" type="text"></div>
-        <div class="field span-2"><label for="resourceBaseModel">Base model / ecosystem</label><input id="resourceBaseModel" type="text" autocomplete="off"></div>
+        <div class="field span-2"><label for="resourceBaseModel">Base model / ecosystem</label><input id="resourceBaseModel" type="text" autocomplete="off" list="resourceBaseModels"><datalist id="resourceBaseModels"></datalist></div>
         <div class="field"><label for="resourceRole">Role</label><select id="resourceRole"></select></div>
         <div class="field"><label for="resourceType">Type</label><select id="resourceType"></select></div>
         <div class="field span-2"><label for="resourceAir">AIR</label><input id="resourceAir" class="monospace" type="text" spellcheck="false"></div>
@@ -336,6 +365,8 @@
       <div class="dialog-actions">
         <button id="removeResourceButton" class="button danger" type="button">Remove resource</button>
         <button id="searchResourceButton" class="button secondary" type="button">Search Civitai</button>
+        <button id="refreshReferenceButton" class="button quiet" type="button">Refresh Civitai lists</button>
+        <button id="cancelHashButton" class="button quiet" type="button" hidden>Stop hashing</button>
         <span class="spacer"></span>
         <button class="button quiet" value="cancel">Cancel</button>
         <button id="saveResourceButton" class="button primary" type="button">Apply resource</button>
@@ -393,6 +424,20 @@
     </form>
   </dialog>
 
+  <dialog id="commandDialog" class="command-dialog" aria-labelledby="commandTitle">
+    <div class="dialog-heading"><div><p class="overline">Your studio, at your fingertips</p><h2 id="commandTitle">What would you like to do?</h2></div><button id="closeCommandDialog" class="icon-button" type="button" aria-label="Close commands">×</button></div>
+    <label class="visually-hidden" for="commandSearch">Find a command</label>
+    <input id="commandSearch" type="search" placeholder="Search actions…" autocomplete="off">
+    <ul id="commandList" class="command-list"></ul>
+    <p class="field-meta">Tab or arrow keys to navigate · Enter to run · Esc to close</p>
+  </dialog>
+  <dialog id="automationDialog" aria-labelledby="automationTitle">
+    <div class="dialog-heading"><div><p class="overline">For your scripts and assistants</p><h2 id="automationTitle">One engine. More ways to create.</h2></div><button id="closeAutomationDialog" class="icon-button" type="button" aria-label="Close automation guide">×</button></div>
+    <p>The optional local companion adds an HTTP API and an MCP server to this same metadata engine. The portable editor works on its own.</p>
+    <div class="automation-cards"><div><strong>HTTP API</strong><p>Inspect, edit, verify, and export with a documented OpenAPI contract and revision checks.</p></div><div><strong>MCP tools</strong><p>Give an assistant controlled access to selected folders, exact resource checks, and verified exports.</p></div></div>
+    <p class="dialog-intro">Folder access, new-file exports, and Civitai requests are enabled explicitly when you start the companion. Prompts and pixels remain local.</p>
+    <p>Setup instructions are in <span class="monospace">docs/automation.md</span> in the project repository.</p>
+  </dialog>
   <script>%%SCRIPT%%</script>
 </body>
 </html>

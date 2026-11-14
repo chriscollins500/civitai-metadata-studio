@@ -45,6 +45,12 @@ if (zip.readUInt32LE(endOffset) !== 0x06054B50) fail("ZIP end-of-central-directo
 if (zip.readUInt16LE(endOffset + 8) !== 1 || zip.readUInt16LE(endOffset + 10) !== 1) fail("ZIP must contain exactly one entry");
 if (zip.readUInt16LE(endOffset + 20) !== 0 || endOffset + 22 !== zip.length) fail("ZIP has an unexpected comment or trailing data");
 
+const htmlHash = createHash("sha256").update(html).digest("hex");
+const zipHash = createHash("sha256").update(zip).digest("hex");
+const checksums = await readFile(join(root, "dist/SHA256SUMS.txt"), "utf8");
+if (checksums !== `${htmlHash}  ${expectedName}\n${zipHash}  civitai-metadata-studio.zip\n`) fail("SHA256SUMS.txt does not match the verified files");
+
 console.log("Release ZIP verification passed.");
-console.log(`HTML ${html.length.toLocaleString()} bytes · SHA256 ${createHash("sha256").update(html).digest("hex")}`);
-console.log(`ZIP ${zip.length.toLocaleString()} bytes · SHA256 ${createHash("sha256").update(zip).digest("hex")}`);
+console.log(`HTML ${html.length.toLocaleString()} bytes · SHA256 ${htmlHash}`);
+console.log(`ZIP ${zip.length.toLocaleString()} bytes · SHA256 ${zipHash}`);
+console.log("Release checksum manifest verification passed.");

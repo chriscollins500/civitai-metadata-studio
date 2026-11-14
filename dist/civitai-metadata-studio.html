@@ -1,11 +1,34 @@
 <!doctype html>
+<!--
+MIT License
+
+Copyright (c) 2026 Chris Collins
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-aGcAj9iqpntcoN0CDHI6oNEL4xrmZLeBr4VnQK9KM2M='; style-src 'unsafe-inline'; img-src data: blob:; connect-src https://civitai.com; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-loOEYMxXO/T8qrz0eUAndb7dF4NKNnUzPEfK7b13ZmU='; style-src 'unsafe-inline'; img-src data: blob:; connect-src https://civitai.com; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Civitai Metadata Studio</title>
   <style>
 :root {
@@ -1637,6 +1660,123 @@ dialog::backdrop {
   }
 }
 
+/* Studio 1.0 — a focused, responsive workspace with progressive disclosure. */
+:root {
+  --page: min(96vw, 112rem);
+  --radius-lg: 1.25rem;
+  --radius-md: 0.85rem;
+  --shadow: 0 20px 70px rgb(18 48 36 / 0.06);
+}
+html { font-size: clamp(14px, 0.15vw + 12px, 16px); }
+body { font-feature-settings: "cv11", "ss01"; }
+.site-header { min-height: 5rem; padding-block: 0.85rem; }
+.brand small { font-weight: 500; letter-spacing: 0.025em; }
+.brand-mark { border-radius: 1rem; box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 18%, transparent); }
+.button { transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease; }
+.button.primary { box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 15%, transparent); }
+.button.primary:hover { box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 24%, transparent); }
+kbd { padding: 0.15rem 0.4rem; border: 1px solid var(--line); border-radius: 0.35rem; font-size: 0.65rem; font-family: var(--font-mono); color: var(--ink-muted); }
+.command-trigger { gap: 0.75rem; }
+.switch { position: relative; min-height: 2.75rem; }
+.switch input { position: absolute; top: 50%; left: 0; z-index: 1; width: 2.65rem; height: 2.75rem; margin: 0; padding: 0; clip-path: none; overflow: visible; opacity: 0; pointer-events: auto; transform: translateY(-50%); cursor: pointer; }
+.switch-track { pointer-events: none; }
+.hero { gap: clamp(2rem, 6vw, 7rem); min-height: min(46rem, 82svh); padding-block: 4rem; }
+.hero-copy h1 { max-width: 12ch; font-size: clamp(3.8rem, 6.8vw, 7.2rem); line-height: 0.98; letter-spacing: -0.07em; text-wrap: balance; }
+.hero-accent { color: var(--accent); font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-weight: 500; font-style: italic; letter-spacing: -0.055em; }
+.hero-summary { max-width: 42ch; font-size: 1.18rem; line-height: 1.7; }
+.eyebrow { display: flex; align-items: center; gap: 0.65rem; }
+.live-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+.load-card { position: relative; padding: 1rem; border-radius: 1.75rem; background: var(--surface); box-shadow: var(--shadow); }
+.drop-zone { min-height: 26rem; border-style: dashed; border-width: 1px; border-color: color-mix(in srgb, var(--accent) 48%, var(--line)); border-radius: 1.1rem; background: radial-gradient(ellipse at 50% 0, var(--accent-soft), transparent 70%), var(--surface); }
+.drop-zone h2 { font-size: clamp(1.8rem, 2.7vw, 2.65rem); line-height: 1.2; letter-spacing: -0.04em; }
+.drop-zone .overline { margin-block: 1.25rem 0.25rem; font-size: 0.65rem; }
+.drop-glyph { width: 4.4rem; height: 4.4rem; border-radius: 1.25rem; background: var(--surface-raised); box-shadow: var(--shadow-small); }
+.start-steps { display: flex; justify-content: space-around; gap: 1rem; padding: 0.6rem; color: var(--ink-muted); font-size: 0.72rem; }
+.start-steps b { color: var(--accent); margin-right: 0.35rem; font-family: var(--font-mono); font-size: 0.65rem; }
+.panel { box-shadow: none; }
+.workspace { grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr); gap: 1.4rem; }
+.status-strip { padding: 1rem 1.2rem; gap: 1rem; border-radius: 1rem; box-shadow: none; }
+.status-strip h2 { font-size: 1.15rem; }
+.status-strip .overline { font-size: 0.62rem; }
+.status-strip p:last-child { font-size: 0.78rem; }
+.workspace-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding-inline: 0.15rem; }
+.history-actions, .toolbar-checks { display: flex; align-items: center; flex-wrap: wrap; gap: 0.45rem; }
+.edit-status { color: var(--ink-muted); font-size: 0.72rem; padding-inline: 0.4rem; }
+.workspace-toolbar .preserve-check { font-size: 0.7rem; font-weight: 600; }
+.workspace-toolbar .button { min-height: 2.3rem; }
+.section-nav { border-radius: 0.75rem; box-shadow: 0 1px 2px rgb(0 0 0 / 0.02); }
+.section-nav button[aria-selected="true"] { background: var(--accent); color: var(--surface); }
+[data-theme="dark"] .section-nav button[aria-selected="true"] { color: #082a20; }
+.editor-section { padding: 1.35rem; }
+.section-heading { margin-bottom: 1.15rem; }
+.section-heading h2 { font-size: 1.45rem; }
+.section-heading p:not(.overline) { font-size: 0.8rem; }
+.field-form { gap: 0.8rem 1rem; }
+.field label { font-weight: 650; font-size: 0.78rem; }
+.field input, .field select { min-height: 2.8rem; }
+.field textarea { min-height: 7rem; font-size: 0.87rem; line-height: 1.65; }
+.field-meta { font-size: 0.68rem; line-height: 1.5; }
+.field > .field-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger); }
+.preview-panel { padding: 1rem; }
+.preview-panel h2 { font-size: 0.9rem; }
+.preview-frame { margin-top: 0.75rem; border-radius: 0.8rem; }
+.facts { margin-bottom: 0; font-size: 0.74rem; }
+.file-queue { max-height: 18rem; overflow-y: auto; scrollbar-gutter: stable; }
+.queue-panel { padding: 1rem; }
+.resource-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-block: 0.5rem 1.25rem; }
+.resource-filters input { min-width: 9rem; flex: 1 1 15rem; }
+.resource-filters select { min-width: 9rem; flex: 0 1 12rem; }
+.resource-card { border-radius: 1rem; padding: 1rem; }
+.resource-subtitle { max-width: 100%; line-height: 1.55; }
+.resource-evidence { gap: 0.5rem; }
+.evidence-item { border-radius: 0.55rem; }
+.integrity-result { padding: 1rem; margin-top: 1rem; background: var(--success-soft); color: var(--success); border: 1px solid var(--success); border-radius: 0.8rem; font: 0.76rem/1.6 var(--font-mono); overflow-wrap: anywhere; }
+.workflow-note { margin-top: 1rem; color: var(--ink-muted); font-size: 0.76rem; line-height: 1.65; }
+.save-bar { bottom: 0.65rem; border-color: var(--line); box-shadow: 0 8px 40px rgb(0 0 0 / 0.12); }
+.save-controls { align-items: center; flex-wrap: wrap; }
+.save-controls input { width: min(12rem, 19vw); }
+.command-dialog { width: min(39rem, calc(100vw - 2rem)); padding: 1.5rem; }
+.command-dialog .dialog-heading { margin-bottom: 1.25rem; }
+.command-dialog h2 { font-size: 1.4rem; letter-spacing: -0.035em; }
+.command-dialog > input { width: 100%; }
+.command-list { list-style: none; padding: 0; margin: 0.75rem 0; max-height: 24rem; overflow: auto; }
+.command-list button { width: 100%; min-height: 3.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.8rem; background: transparent; border: 0; border-radius: 0.6rem; color: var(--ink); text-align: left; cursor: pointer; }
+.command-list button:hover, .command-list button:focus-visible { background: var(--accent-soft); }
+.command-list strong { font-size: 0.84rem; font-weight: 650; }
+.command-list span { color: var(--ink-muted); font-size: 0.72rem; text-align: right; }
+#automationDialog { width: min(46rem, calc(100vw - 2rem)); padding: 1.6rem; }
+.automation-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-block: 1.25rem; }
+.automation-cards > div { padding: 1.1rem; border: 1px solid var(--line); border-radius: 0.85rem; background: var(--surface-muted); }
+.automation-cards p { font-size: 0.85rem; color: var(--ink-muted); }
+@media (min-width: 72.0625rem) {
+  body.working-state { height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+  body.working-state .site-header { position: relative; }
+  body.working-state main { position: static; height: 100%; min-height: 0; overflow: hidden; }
+  body.working-state .workspace { padding-bottom: calc(var(--save-height, 5rem) + 1.2rem); }
+}
+@media (max-width: 72rem) {
+  .workspace { grid-template-columns: 1fr; }
+  .hero { min-height: auto; padding-block: 2.5rem; }
+  .hero-copy h1 { max-width: 14ch; }
+  .command-trigger kbd { display: none; }
+  body.working-state main { padding-bottom: calc(var(--save-height, 7.5rem) + 1.5rem); }
+}
+@media (max-width: 52rem) {
+  .status-strip { gap: 0.65rem; }
+  .workspace-toolbar { align-items: flex-start; }
+  .status-actions .button { min-height: 2.75rem; }
+  .save-bar { padding: 0.65rem 0.85rem; gap: 0.4rem; }
+  .save-bar > div:first-child { display: none; }
+  .save-controls { flex-direction: row; }
+  .save-controls input { width: 100%; min-height: 2.5rem; }
+  .hero-copy h1 { font-size: clamp(3.4rem, 12vw, 5rem); }
+  .automation-cards { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button { transition: none; }
+}
+
   </style>
 </head>
 <body>
@@ -1648,10 +1788,11 @@ dialog::backdrop {
       <span class="brand-mark" aria-hidden="true">CM</span>
       <span>
         <strong>Civitai Metadata Studio</strong>
-        <small>Inspect · verify · repair</small>
+        <small>Every image. Its whole story.</small>
       </span>
     </a>
     <div class="header-actions">
+      <button id="commandsButton" class="button quiet small command-trigger" type="button" aria-label="Open commands" aria-keyshortcuts="Control+k Meta+k">Commands <kbd>⌘ / Ctrl K</kbd></button>
       <button id="headerAddImagesButton" class="button secondary small" type="button" hidden>Add images</button>
       <button id="headerClearQueueButton" class="button quiet small" type="button" aria-label="Clear image queue" hidden>Clear</button>
       <label class="switch" for="autoVerify">
@@ -1668,24 +1809,26 @@ dialog::backdrop {
   <main id="main">
     <section id="top" class="hero" aria-labelledby="heroTitle">
       <div class="hero-copy">
-        <p class="eyebrow">Private by design · zero installation</p>
-        <h1 id="heroTitle" tabindex="-1">Make image metadata tell the truth.</h1>
-        <p class="hero-summary">Open PNG, JPEG, or WebP images. Review every generation field, positively identify Civitai resources, and save new verified copies without changing the originals.</p>
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Civitai Metadata Studio · 1.0</p>
+        <h1 id="heroTitle" tabindex="-1">Your image.<br><span class="hero-accent">The whole story.</span></h1>
+        <p class="hero-summary">The prompt. The model. The details that matter. Uncover the recipe inside your AI images, verify it with Civitai, and make it yours to edit.</p>
         <ul class="trust-list" aria-label="Privacy and safety guarantees">
           <li><span aria-hidden="true">✓</span> Images stay on this device</li>
-          <li><span aria-hidden="true">✓</span> Only hashes, IDs, or names you explicitly search reach Civitai</li>
+          <li><span aria-hidden="true">✓</span> Exact identity checks. No guesswork.</li>
           <li><span aria-hidden="true">✓</span> Original files are never changed</li>
         </ul>
       </div>
 
       <div class="load-card">
-        <div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-labelledby="dropTitle" aria-describedby="dropHelp">
+        <div id="dropZone" class="drop-zone" role="group" aria-labelledby="dropTitle" aria-describedby="dropHelp">
           <span class="drop-glyph" aria-hidden="true">↥</span>
-          <h2 id="dropTitle">Drop images here</h2>
-          <p id="dropHelp">PNG, JPEG, WebP · single images or a batch · any dimensions your current browser can address</p>
+          <p class="overline">Your next creation starts with clarity</p>
+          <h2 id="dropTitle">Drop an image.<br>Discover what's inside.</h2>
+          <p id="dropHelp">PNG, JPEG, WebP · one image or a whole batch · 8K and beyond</p>
           <button id="openButton" class="button primary" type="button">Choose images</button>
         </div>
         <p class="privacy-line"><span aria-hidden="true">●</span> Local processing is active. Civitai checks can be turned off at any time.</p>
+        <div class="start-steps" aria-label="How it works"><span><b>01</b> Open</span><span><b>02</b> Verify &amp; edit</span><span><b>03</b> Save a new copy</span></div>
       </div>
     </section>
 
@@ -1741,6 +1884,19 @@ dialog::backdrop {
 
         <div id="alertRegion" class="alert-region" role="alert" aria-live="assertive"></div>
         <div id="statusAnnouncer" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
+        <div class="workspace-toolbar" aria-label="Editing controls">
+          <div class="history-actions">
+            <button id="undoButton" class="button quiet small" type="button" aria-label="Undo last edit" disabled>↶ Undo</button>
+            <button id="redoButton" class="button quiet small" type="button" aria-label="Redo last edit" disabled>↷ Redo</button>
+            <span id="editStatus" class="edit-status">Original metadata</span>
+          </div>
+          <div class="toolbar-checks">
+            <label class="preserve-check" for="verifyExport"><input id="verifyExport" type="checkbox" checked>Verify pixel integrity</label>
+            <button id="cancelVerificationButton" class="button quiet small" type="button" hidden>Stop lookup</button>
+            <button id="verifyAllButton" class="button quiet small" type="button" hidden>Verify batch</button>
+          </div>
+        </div>
 
         <nav class="section-nav" role="tablist" aria-label="Editor sections">
           <button id="generationTab" type="button" role="tab" aria-controls="generationSection" aria-selected="true" data-section-target="generationSection">Generation</button>
@@ -1877,6 +2033,13 @@ dialog::backdrop {
               <button id="addResourceButton" class="button quiet" type="button">Add resource</button>
             </div>
           </div>
+          <div class="resource-filters">
+            <label class="visually-hidden" for="resourceFilter">Find a resource in this image</label>
+            <input id="resourceFilter" type="search" placeholder="Find a resource, AIR, or hash…" autocomplete="off">
+            <label class="visually-hidden" for="resourceStatusFilter">Filter resources by verification</label>
+            <select id="resourceStatusFilter"><option value="all">All resources</option><option value="verified">Verified</option><option value="unresolved">Unresolved</option><option value="conflict">Conflicts</option></select>
+            <span id="resourceResultCount" class="field-meta" role="status"></span>
+          </div>
           <div id="resourcesList" class="resource-list"></div>
         </section>
 
@@ -1897,12 +2060,14 @@ dialog::backdrop {
             <div>
               <p class="overline">Before saving</p>
               <h2 id="reviewTitle" tabindex="-1">Review changes</h2>
-              <p>Nothing is written until you save a new copy.</p>
+              <p>Review differences, identity evidence, and the details your new copy will carry.</p>
             </div>
             <button id="exportReportButton" class="button quiet" type="button">Export report</button>
           </div>
           <div id="conflictList" class="conflict-list"></div>
           <div id="diffList" class="diff-list"></div>
+          <div id="integrityResult" class="integrity-result" role="status" hidden></div>
+          <p class="workflow-note">Original embedded workflows are preserved exactly. They may contain input filenames or local paths. Review the raw workflow before sharing if that matters to you.</p>
           <details id="rawDetails" class="raw-details">
             <summary>Raw metadata carriers</summary>
             <div class="raw-toolbar">
@@ -1924,8 +2089,9 @@ dialog::backdrop {
     </div>
     <div class="save-controls">
       <label class="visually-hidden" for="outputSuffix">Output filename suffix</label>
-      <input id="outputSuffix" type="text" value="_civitai-verified" aria-label="Output filename suffix">
-      <button id="saveButton" class="button primary" type="button">Save verified copy</button>
+      <input id="outputSuffix" type="text" value="_metadata" aria-label="Output filename suffix">
+      <button id="saveCurrentButton" class="button secondary" type="button" hidden>Save this image</button>
+      <button id="saveButton" class="button primary" type="button">Save new copy</button>
     </div>
   </footer>
 
@@ -1942,7 +2108,7 @@ dialog::backdrop {
       <div class="dialog-grid">
         <div class="field span-2"><label for="resourceName">Name</label><input id="resourceName" type="text"></div>
         <div class="field span-2"><label for="resourceVersionName">Version name</label><input id="resourceVersionName" type="text"></div>
-        <div class="field span-2"><label for="resourceBaseModel">Base model / ecosystem</label><input id="resourceBaseModel" type="text" autocomplete="off"></div>
+        <div class="field span-2"><label for="resourceBaseModel">Base model / ecosystem</label><input id="resourceBaseModel" type="text" autocomplete="off" list="resourceBaseModels"><datalist id="resourceBaseModels"></datalist></div>
         <div class="field"><label for="resourceRole">Role</label><select id="resourceRole"></select></div>
         <div class="field"><label for="resourceType">Type</label><select id="resourceType"></select></div>
         <div class="field span-2"><label for="resourceAir">AIR</label><input id="resourceAir" class="monospace" type="text" spellcheck="false"></div>
@@ -1964,6 +2130,8 @@ dialog::backdrop {
       <div class="dialog-actions">
         <button id="removeResourceButton" class="button danger" type="button">Remove resource</button>
         <button id="searchResourceButton" class="button secondary" type="button">Search Civitai</button>
+        <button id="refreshReferenceButton" class="button quiet" type="button">Refresh Civitai lists</button>
+        <button id="cancelHashButton" class="button quiet" type="button" hidden>Stop hashing</button>
         <span class="spacer"></span>
         <button class="button quiet" value="cancel">Cancel</button>
         <button id="saveResourceButton" class="button primary" type="button">Apply resource</button>
@@ -2021,9 +2189,23 @@ dialog::backdrop {
     </form>
   </dialog>
 
+  <dialog id="commandDialog" class="command-dialog" aria-labelledby="commandTitle">
+    <div class="dialog-heading"><div><p class="overline">Your studio, at your fingertips</p><h2 id="commandTitle">What would you like to do?</h2></div><button id="closeCommandDialog" class="icon-button" type="button" aria-label="Close commands">×</button></div>
+    <label class="visually-hidden" for="commandSearch">Find a command</label>
+    <input id="commandSearch" type="search" placeholder="Search actions…" autocomplete="off">
+    <ul id="commandList" class="command-list"></ul>
+    <p class="field-meta">Tab or arrow keys to navigate · Enter to run · Esc to close</p>
+  </dialog>
+  <dialog id="automationDialog" aria-labelledby="automationTitle">
+    <div class="dialog-heading"><div><p class="overline">For your scripts and assistants</p><h2 id="automationTitle">One engine. More ways to create.</h2></div><button id="closeAutomationDialog" class="icon-button" type="button" aria-label="Close automation guide">×</button></div>
+    <p>The optional local companion adds an HTTP API and an MCP server to this same metadata engine. The portable editor works on its own.</p>
+    <div class="automation-cards"><div><strong>HTTP API</strong><p>Inspect, edit, verify, and export with a documented OpenAPI contract and revision checks.</p></div><div><strong>MCP tools</strong><p>Give an assistant controlled access to selected folders, exact resource checks, and verified exports.</p></div></div>
+    <p class="dialog-intro">Folder access, new-file exports, and Civitai requests are enabled explicitly when you start the companion. Prompts and pixels remain local.</p>
+    <p>Setup instructions are in <span class="monospace">docs/automation.md</span> in the project repository.</p>
+  </dialog>
   <script>/* Civitai Metadata Studio
  * Generated portable build. Source modules and tests are retained in the project.
- * Version 0.5.0 · 2026-08-18
+ * Version 1.0.0 · 2026-11-14
  */
 (() => {
   "use strict";
@@ -2032,7 +2214,7 @@ dialog::backdrop {
 
   Studio.constants = Object.freeze({
     APP_NAME: "Civitai Metadata Studio",
-    APP_VERSION: "0.5.0",
+    APP_VERSION: "1.0.0",
     SCHEMA: "civitai-metadata-studio.record",
     API_ROOT: "https://civitai.com/api/v1",
     API_RESPONSE_LIMIT: 4 * 1024 * 1024,
@@ -2841,6 +3023,7 @@ dialog::backdrop {
         options.onProgress?.(processed, file.size);
       }
     } finally {
+      if (options.signal?.aborted) await reader.cancel().catch(() => {});
       reader.releaseLock();
     }
     const sha256 = sha.hex();
@@ -3621,14 +3804,13 @@ dialog::backdrop {
 
     const resources = Studio.civitaiContract.parserResourceItems(activeResources);
     if (resources.length) add("Civitai resources", stableStringify(resources, 0));
-    add("Civitai metadata", stableStringify({
-      outputFormat: record.format || "unknown",
-      generator: {
-        name: Studio.constants.APP_NAME,
-        version: Studio.constants.APP_VERSION
-      },
-      resources
-    }, 0));
+    // Keep all canonical claims in the Studio carrier; the separate parser-facing
+    // list intentionally contains only identities suitable for Civitai ingestion.
+    const metadata = Studio.canonical?.buildManifest ? Studio.canonical.buildManifest(record) : {
+      generator: { name: Studio.constants.APP_NAME, version: Studio.constants.APP_VERSION },
+      resources: activeResources.map(resourceProjection)
+    };
+    add("Civitai metadata", stableStringify({ outputFormat: record.format || "unknown", ...metadata }, 0));
 
     const lines = [positive];
     if (negative || settings.length) lines.push(`Negative prompt: ${negative}`);
@@ -4033,9 +4215,22 @@ dialog::backdrop {
   async function inflate(bytes) {
     if (typeof DecompressionStream !== "function") throw new Error("This browser does not provide DecompressionStream.");
     const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
-    const result = await new Response(stream).arrayBuffer();
-    if (result.byteLength > METADATA_VALUE_LIMIT) throw new Error("Compressed metadata expands beyond the safety limit.");
-    return new Uint8Array(result);
+    const reader = stream.getReader();
+    const parts = [];
+    let size = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > METADATA_VALUE_LIMIT) {
+          await reader.cancel();
+          throw new Error("Compressed metadata expands beyond the safety limit.");
+        }
+        parts.push(value);
+      }
+    } finally { reader.releaseLock(); }
+    return concatBytes(...parts);
   }
 
   async function decodeTextChunk(type, data) {
@@ -5739,7 +5934,8 @@ dialog::backdrop {
     record.original = {
       fields: clone(record.fields),
       resources: clone(record.resources),
-      metadataSelections: clone(record.metadataSelections)
+      metadataSelections: clone(record.metadataSelections),
+      conflicts: clone(record.conflicts)
     };
     return record;
   }
@@ -5789,7 +5985,7 @@ dialog::backdrop {
     record.fields = clone(record.original.fields);
     record.resources = clone(record.original.resources);
     record.metadataSelections = clone(record.original.metadataSelections);
-    record.conflicts.forEach((conflict) => { conflict.resolved = false; });
+    record.conflicts = clone(record.original.conflicts || []);
     record.dirty = false;
     record.verification = { status: "unverified", checked: 0, verified: 0, unresolved: 0, errors: [] };
     return record;
@@ -5886,7 +6082,7 @@ dialog::backdrop {
       generator: {
         name: Studio.constants.APP_NAME,
         version: Studio.constants.APP_VERSION,
-        processing: "local-browser"
+        processing: record.processingContext || "local-browser"
       },
       prompt: {
         positive: valueOf("positivePrompt") || "",
@@ -6844,13 +7040,14 @@ dialog::backdrop {
   const CACHE_TTL = Studio.identityCache.TTL.positive;
   const NEGATIVE_CACHE_TTL = Studio.identityCache.TTL.negative;
   const SEARCH_CACHE_TTL = Studio.identityCache.TTL.search;
-  const MODEL_BATCH_SIZE = 20;
   const HASH_BATCH_SIZE = 20;
   const MAX_RATE_LIMIT_COOLDOWN = 5 * 60 * 1000;
   const RETRYABLE_STATUS = new Set([502, 503, 504]);
   const RETRY_DELAYS = [500, 1500, 3000];
   const inflight = new Map();
   let cooldownUntil = 0;
+  let referenceSnapshot = null;
+  let referenceExpires = 0;
 
   function rateLimitError(delay = cooldownUntil - Date.now()) {
     const seconds = Math.max(1, Math.ceil(Math.max(0, delay) / 1000));
@@ -6931,7 +7128,6 @@ dialog::backdrop {
 
   async function clearCache() {
     inflight.clear();
-    cooldownUntil = 0;
     await Studio.identityCache.clear();
   }
 
@@ -6991,6 +7187,11 @@ dialog::backdrop {
     };
   }
 
+  function hasModelDetails(model) {
+    return Boolean(model?.creator?.username || model?.username)
+      && ["allowNoCredit", "allowCommercialUse", "allowDerivatives", "allowDifferentLicense"].every((key) => isPresent(model[key]));
+  }
+
   function compactSearchPayload(value) {
     if (!value || typeof value !== "object" || !Array.isArray(value.items)) return value;
     return {
@@ -7038,7 +7239,8 @@ dialog::backdrop {
           cache: "no-store",
           credentials: "omit",
           referrerPolicy: "no-referrer",
-          signal
+          signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20_000)]) : AbortSignal.timeout(20_000),
+          redirect: "error"
         });
       } catch (error) {
         if (error.name === "AbortError") throw error;
@@ -7059,7 +7261,7 @@ dialog::backdrop {
 
       if (RETRYABLE_STATUS.has(response.status) && transientAttempt < RETRY_DELAYS.length) {
         await response.body?.cancel().catch(() => {});
-        await waitForRetry(retryAfterDelay(response, RETRY_DELAYS[transientAttempt]), signal);
+        await waitForRetry(Math.min(10_000, retryAfterDelay(response, RETRY_DELAYS[transientAttempt])), signal);
         transientAttempt += 1;
         continue;
       }
@@ -7087,6 +7289,7 @@ dialog::backdrop {
     metrics,
     batch = false
   } = {}) {
+    signal?.throwIfAborted();
     const cached = await cachedValue(cacheKey, cacheTtl);
     if (cached.hit) {
       increment(metrics, "cacheHits");
@@ -7094,12 +7297,13 @@ dialog::backdrop {
     }
 
     const identity = requestIdentity(method, path, body);
-    if (inflight.has(identity)) {
+    if (inflight.has(identity) && !inflight.get(identity).controller.signal.aborted) {
       increment(metrics, "coalesced");
-      return inflight.get(identity);
+      return consumeShared(inflight.get(identity), signal);
     }
+    const controller = new AbortController();
     const pending = performRequest(path, {
-      signal,
+      signal: controller.signal,
       cacheKey,
       cacheTtl,
       compact,
@@ -7109,12 +7313,30 @@ dialog::backdrop {
       metrics,
       batch
     });
-    inflight.set(identity, pending);
-    try {
-      return await pending;
-    } finally {
-      if (inflight.get(identity) === pending) inflight.delete(identity);
-    }
+    const entry = { promise: pending, controller, consumers: 0, settled: false };
+    inflight.set(identity, entry);
+    const finish = () => { entry.settled = true; if (inflight.get(identity) === entry) inflight.delete(identity); };
+    pending.then(finish, finish);
+    return consumeShared(entry, signal);
+  }
+
+  function consumeShared(entry, signal) {
+    entry.consumers += 1;
+    return new Promise((resolve, reject) => {
+      let complete = false;
+      const finish = (callback, value) => {
+        if (complete) return;
+        complete = true;
+        signal?.removeEventListener("abort", onAbort);
+        entry.consumers -= 1;
+        if (!entry.consumers && !entry.settled) entry.controller.abort();
+        callback(value);
+      };
+      const onAbort = () => finish(reject, new DOMException("Verification was cancelled.", "AbortError"));
+      signal?.addEventListener("abort", onAbort, { once: true });
+      entry.promise.then((value) => finish(resolve, value), (error) => finish(reject, error));
+      if (signal?.aborted) onAbort();
+    });
   }
 
   function hashEntries(files) {
@@ -7178,10 +7400,10 @@ dialog::backdrop {
       ttl: CACHE_TTL,
       groupId
     }];
-    if (modelId && compact.model) {
+    if (modelId && hasModelDetails(compact.model) && (!positiveIdOrNull(compact.model.id) || positiveIdOrNull(compact.model.id) === modelId)) {
       records.push({
         key: `model:${modelId}`,
-        value: compactModelPayload(compact.model),
+        value: compactModelPayload({ ...compact.model, id: modelId }),
         ttl: CACHE_TTL,
         groupId: `model:${modelId}`
       });
@@ -7366,13 +7588,15 @@ dialog::backdrop {
     const modelId = positiveIdOrNull(data?.modelId ?? data?.model?.id);
     if (!modelId) return data;
     const embedded = data.model && typeof data.model === "object" ? data.model : {};
-    const hasCreator = Boolean(embedded.creator?.username || embedded.username);
-    const hasLicense = ["allowNoCredit", "allowCommercialUse", "allowDerivatives", "allowDifferentLicense"]
-      .every((key) => isPresent(embedded[key]));
-    if (hasCreator && hasLicense) return data;
+    if (positiveIdOrNull(embedded.id) && positiveIdOrNull(embedded.id) !== modelId) throw new Error("Civitai returned conflicting parent model IDs for a model version.");
+    if (hasModelDetails(embedded)) return data;
 
     let model;
     try {
+      const cachedModel = await cachedValue(`model:${modelId}`);
+      if (cachedModel.hit && cachedModel.value && (positiveIdOrNull(cachedModel.value.id) !== modelId || !hasModelDetails(cachedModel.value))) {
+        await Studio.identityCache.deleteMany([`model:${modelId}`]);
+      }
       model = await request(`/models/${modelId}`, {
         signal,
         metrics,
@@ -7391,7 +7615,7 @@ dialog::backdrop {
       ...data,
       model: {
         ...model,
-        ...embedded,
+        ...Object.fromEntries(Object.entries(embedded).filter(([, value]) => isPresent(value))),
         id: modelId
       }
     };
@@ -7652,45 +7876,9 @@ dialog::backdrop {
     return versionIds;
   }
 
-  async function prefetchVersions(versionIds, { signal, metrics } = {}) {
-    const unique = [...new Set(versionIds.map(positiveIdOrNull).filter(Boolean))];
-    const cached = await Studio.identityCache.getMany(unique.map((id) => `version:${id}`));
-    const needed = unique.filter((id) => !cached.get(`version:${id}`)?.hit);
-    for (const group of chunks(needed, MODEL_BATCH_SIZE)) {
-      const data = await request(`/models?limit=100&modelVersionIds=${group.join(",")}`, {
-        signal,
-        metrics,
-        compact: (value) => value,
-        batch: true
-      });
-      const expected = new Set(group);
-      const matched = new Set();
-      const records = [];
-      for (const model of Array.isArray(data?.items) ? data.items : []) {
-        const compactModel = compactModelPayload(model);
-        for (const version of Array.isArray(model?.modelVersions) ? model.modelVersions : []) {
-          const id = positiveIdOrNull(version?.id ?? version?.modelVersionId);
-          if (!id || !expected.has(id)) continue;
-          records.push(...versionCacheRecords({
-            ...version,
-            id,
-            modelId: positiveIdOrNull(version.modelId) || positiveIdOrNull(model.id),
-            model: compactModel
-          }));
-          matched.add(id);
-        }
-      }
-      await Studio.identityCache.setMany(records);
-    }
-  }
-
   async function prefetchResources(resources, { signal, metrics } = {}) {
-    const versionIds = new Set();
     const sha256Hashes = new Set();
     for (const resource of resources) {
-      const versionId = positiveIdOrNull(resource.modelVersionId);
-      if (versionId) versionIds.add(versionId);
-      if (versionId) continue;
       const sha256 = normalizeHash(resource.hashes?.SHA256 ?? resource.hashes?.sha256);
       if (!/^[A-F0-9]{64}$/.test(sha256)) continue;
       sha256Hashes.add(sha256);
@@ -7702,33 +7890,21 @@ dialog::backdrop {
       const cachedMapping = hashCandidateKeys(sha256, "SHA256")
         .map((key) => cachedHashes.get(key))
         .find((entry) => entry?.hit);
-      if (cachedMapping?.hit) {
-        for (const candidate of Array.isArray(cachedMapping.value?.candidates) ? cachedMapping.value.candidates : []) {
-          const cachedId = positiveIdOrNull(candidate?.modelVersionId);
-          if (cachedId) versionIds.add(cachedId);
-        }
-      } else {
+      if (!cachedMapping?.hit) {
         missingHashes.push(sha256);
       }
     }
 
     if (missingHashes.length) {
       try {
-        const mapped = await prefetchHashCandidates(missingHashes, { signal, metrics });
-        for (const id of mapped) versionIds.add(id);
+        await prefetchHashCandidates(missingHashes, { signal, metrics });
       } catch (error) {
         if (error.name === "AbortError") throw error;
         increment(metrics, "batchFallbacks");
       }
     }
-    if (versionIds.size) {
-      try {
-        await prefetchVersions([...versionIds], { signal, metrics });
-      } catch (error) {
-        if (error.name === "AbortError") throw error;
-        increment(metrics, "batchFallbacks");
-      }
-    }
+    // Version-only resources use their exact endpoint during verification.
+    // This avoids an undocumented models-list filter and sends no name text.
   }
 
   function identityConflict(resource, identity, evidence) {
@@ -8083,7 +8259,7 @@ dialog::backdrop {
   async function lookupImage(value, { signal, metrics } = {}) {
     const imageId = parseCivitaiImageId(value);
     if (!imageId) throw new Error("Enter a numeric Civitai image ID or a civitai.com/images/… URL.");
-    const response = await request(`/images?imageId=${imageId}&limit=1`, {
+    const response = await request(`/images?imageId=${imageId}&limit=1&withMeta=true&browsingLevel=31`, {
       signal,
       metrics,
       compact: (data) => data
@@ -8098,7 +8274,7 @@ dialog::backdrop {
     const query = sanitizeText(name, 200).trim();
     if (query.length < 2) return [];
     const cacheKey = `search:${query.toLowerCase()}`;
-    const data = await request(`/models?limit=10&query=${encodeURIComponent(query)}`, {
+    const data = await request(`/models?limit=10&nsfw=true&query=${encodeURIComponent(query)}`, {
       signal,
       metrics,
       cacheKey,
@@ -8112,9 +8288,18 @@ dialog::backdrop {
       type: sanitizeText(model.type || "Other", 80),
       creator: sanitizeText(model.creator?.username || "", 512),
       versions: Array.isArray(model.modelVersions)
-        ? model.modelVersions.slice(0, 10).map((version) => normalizeVersion({ ...version, model }))
+        ? model.modelVersions.slice(0, 10).map((version) => normalizeVersion({ ...version, model })).filter(Boolean)
         : []
     }));
+  }
+
+  async function referenceData({ signal } = {}) {
+    if (referenceSnapshot && Date.now() < referenceExpires) return structuredClone(referenceSnapshot);
+    const data = await request("/enums", { signal, compact: (value) => value });
+    if (!data || typeof data !== "object" || !Array.isArray(data.ModelType) || !Array.isArray(data.BaseModel)) throw new Error("Civitai returned an invalid reference list.");
+    referenceSnapshot = Object.fromEntries(["ModelType", "ModelFileType", "BaseModel", "ActiveBaseModel", "BaseModelType"].map((key) => [key, Array.isArray(data[key]) ? [...new Set(data[key].filter((value) => typeof value === "string").slice(0, 2000).map((value) => sanitizeText(value, 160)))] : []]));
+    referenceExpires = Date.now() + 15 * 60_000;
+    return structuredClone(referenceSnapshot);
   }
 
   Studio.civitai = Object.freeze({
@@ -8128,6 +8313,7 @@ dialog::backdrop {
     normalizeVersion,
     parseCivitaiImageId,
     prefetchResources,
+    referenceData,
     searchCandidates,
     verifyRecord,
     verifyResource
@@ -8256,6 +8442,124 @@ dialog::backdrop {
 
 (() => {
   "use strict";
+  const Studio = globalThis.CMStudio ||= {};
+  const mutableKeys = ["fields", "resources", "metadataSelections", "conflicts", "verification", "dirty", "civitaiImports"];
+
+  function capture(record) {
+    return structuredClone(Object.fromEntries(mutableKeys.filter((key) => key in record).map((key) => [key, record[key]])));
+  }
+
+  function restore(record, snapshot) {
+    for (const key of mutableKeys) {
+      if (key in snapshot) record[key] = structuredClone(snapshot[key]);
+      else delete record[key];
+    }
+  }
+
+  function invalidate(resource, record) {
+    resource.verification = "unresolved";
+    resource.verificationMessage = "Identity evidence changed. Verify this resource again.";
+    for (const key of ["verificationEvidence", "apiCandidate", "apiReference", "lookupDiagnostics", "verifiedAt", "creator", "trainedWords", "license"]) delete resource[key];
+    resource.parserFacing = false;
+    resource.parserExclusionReason = "Identity evidence has not been reverified.";
+    if (record) record.verification = { status: "unverified", checked: 0, verified: 0, unresolved: record.resources.filter((item) => !item.removed).length, errors: [] };
+  }
+
+  // A matching name is a clue, never authority to import an identity.
+  function exactOverlap(left, right) {
+    if (left.role !== right.role) return false;
+    if (left.modelVersionId && right.modelVersionId) return left.modelVersionId === right.modelVersionId;
+    return Object.entries(left.hashes || {}).some(([algorithm, hash]) =>
+      hash && Studio.util.normalizeHash(hash) === Studio.util.normalizeHash(right.hashes?.[algorithm])
+    );
+  }
+
+  class History {
+    constructor() { this.undo = []; this.redo = []; this.bytes = 0; this.lastGroup = ""; this.lastTime = 0; }
+    push(record, label, group = "") {
+      const now = Date.now();
+      if (group && group === this.lastGroup && now - this.lastTime < 750) { this.lastTime = now; this.redo = []; return; }
+      const snapshot = capture(record);
+      const bytes = new TextEncoder().encode(JSON.stringify(snapshot)).length;
+      this.redo = [];
+      this.lastGroup = group; this.lastTime = now;
+      if (bytes > 8 * 1024 * 1024) { this.undo = []; this.bytes = 0; return; }
+      this.undo.push({ snapshot, label, bytes }); this.trim();
+    }
+    trim() {
+      this.bytes = [...this.undo, ...this.redo].reduce((sum, item) => sum + item.bytes, 0);
+      while (this.undo.length + this.redo.length > 60 || this.bytes > 8 * 1024 * 1024) {
+        const list = this.undo.length > this.redo.length ? this.undo : this.redo;
+        const item = list.shift();
+        if (!item) break;
+        this.bytes -= item.bytes;
+      }
+    }
+    move(record, direction) {
+      const from = direction === "undo" ? this.undo : this.redo;
+      const to = direction === "undo" ? this.redo : this.undo;
+      const item = from.pop();
+      if (!item) return "";
+      const snapshot = capture(record);
+      const bytes = new TextEncoder().encode(JSON.stringify(snapshot)).length;
+      if (bytes <= 8 * 1024 * 1024) to.push({ snapshot, label: item.label, bytes });
+      else to.length = 0;
+      restore(record, item.snapshot);
+      this.trim();
+      this.lastGroup = "";
+      return item.label;
+    }
+  }
+  Studio.editing = Object.freeze({ capture, restore, invalidate, exactOverlap, History });
+})();
+
+
+(() => {
+  "use strict";
+  const Studio = globalThis.CMStudio ||= {};
+  const PNG = new Set(["IHDR", "IDAT", "PLTE", "tRNS", "acTL", "fcTL", "fdAT"]);
+  const WEBP = new Set(["VP8 ", "VP8L", "ALPH", "ANIM", "ANMF"]);
+
+  function ranges(file, inspection) {
+    if (inspection.format === "jpeg") return inspection.segments
+      .filter((segment) => segment.scan || (!(segment.marker >= 0xE0 && segment.marker <= 0xEF) && segment.marker !== 0xFE))
+      .map((segment) => [segment.offset, segment.offset + segment.totalLength]);
+    const types = inspection.format === "png" ? PNG : WEBP;
+    return inspection.chunks.filter((chunk) => types.has(chunk.type)).map((chunk) => [chunk.offset, chunk.offset + chunk.totalLength]);
+  }
+
+  async function digest(file, inspection, { signal, onProgress } = {}) {
+    const hash = new Studio.sha256.SHA256();
+    const selected = ranges(file, inspection);
+    const total = selected.reduce((sum, [start, end]) => sum + end - start, 0);
+    let processed = 0;
+    for (const [start, end] of selected) {
+      for (let offset = start; offset < end; offset += Studio.constants.HASH_CHUNK_SIZE) {
+        signal?.throwIfAborted();
+        const chunk = await file.slice(offset, Math.min(end, offset + Studio.constants.HASH_CHUNK_SIZE)).arrayBuffer();
+        hash.update(new Uint8Array(chunk)); processed += chunk.byteLength;
+        onProgress?.(processed, total);
+        await Studio.util.yieldToBrowser();
+      }
+    }
+    return { algorithm: "SHA256", digest: hash.hex(), bytes: total, chunks: selected.length };
+  }
+
+  async function verifyExport(record, output, options = {}) {
+    const reopened = await Studio.canonical.inspectFile(output);
+    const before = await digest(record.file, record.inspection, options);
+    const after = await digest(output, reopened, options);
+    const preserved = before.digest === after.digest && before.bytes === after.bytes
+      && record.inspection.width === reopened.width && record.inspection.height === reopened.height;
+    if (!preserved) throw new Error("Export integrity check failed. The encoded image payload differs; no output was saved.");
+    return { preserved, format: record.format, before, after, checkedAt: new Date().toISOString() };
+  }
+  Studio.integrity = Object.freeze({ digest, verifyExport });
+})();
+
+
+(() => {
+  "use strict";
 
   const Studio = globalThis.CMStudio ||= {};
   const {
@@ -8282,6 +8586,10 @@ dialog::backdrop {
       this.verificationController = null;
       this.verificationEntry = null;
       this.verificationEntries = new Set();
+      this.histories = new WeakMap();
+      this.verifyExports = true;
+      this.hashingController = null;
+      this.hashingEntry = null;
     }
 
     emit() {
@@ -8299,6 +8607,24 @@ dialog::backdrop {
 
     get current() {
       return this.currentEntry?.record || null;
+    }
+
+    history(record = this.current) {
+      if (!record) return null;
+      if (!this.histories.has(record)) this.histories.set(record, new Studio.editing.History());
+      return this.histories.get(record);
+    }
+
+    checkpoint(label, group = "", record = this.current) {
+      if (record) this.history(record).push(record, label, group);
+    }
+
+    travelHistory(direction) {
+      if (!this.current || this.busy || ["verifying", "hashing"].includes(this.currentEntry.state)) return false;
+      const label = this.history().move(this.current, direction);
+      if (!label) return false;
+      this.announce(`${direction === "undo" ? "Undid" : "Redid"}: ${label}.`, "info");
+      return true;
     }
 
     async addFiles(fileList) {
@@ -8353,6 +8679,7 @@ dialog::backdrop {
       const number = Number(index);
       if (!Number.isInteger(number) || number < 0 || number >= this.entries.length) return false;
       const [removed] = this.entries.splice(number, 1);
+      if (removed === this.hashingEntry) this.hashingController?.abort();
       if (removed === this.verificationEntry || this.verificationEntries.has(removed)) {
         this.verificationController?.abort();
       }
@@ -8371,6 +8698,7 @@ dialog::backdrop {
       if (this.busy || !this.entries.length) return false;
       const count = this.entries.length;
       this.verificationController?.abort();
+      this.hashingController?.abort();
       this.verificationController = null;
       this.verificationEntry = null;
       this.verificationEntries.clear();
@@ -8398,7 +8726,8 @@ dialog::backdrop {
 
     updateField(key, value) {
       const record = this.current;
-      if (!record) return;
+      if (!record?.fields[key] || record.fields[key].value === this.parseField(key, value)) return;
+      this.checkpoint(`Edit ${key}`, `field:${key}`);
       Studio.canonical.setField(record, key, this.parseField(key, value));
       this.syncResourceFromFields(record, key);
       this.emit();
@@ -8429,11 +8758,12 @@ dialog::backdrop {
           : {};
       }
       resource.identitySource = "manual";
-      resource.verification = "unresolved";
+      Studio.editing.invalidate(resource, record);
     }
 
     updateMetadataSelection(id, preserve) {
       if (!this.current || !(id in this.current.metadataSelections)) return;
+      this.checkpoint("Change metadata preservation");
       this.current.metadataSelections[id] = Boolean(preserve);
       this.current.dirty = true;
       this.emit();
@@ -8442,6 +8772,7 @@ dialog::backdrop {
     addResource() {
       const record = this.current;
       if (!record) return null;
+      this.checkpoint("Add resource");
       const resource = Studio.canonical.normalizeResource({
         name: "New resource",
         role: "other",
@@ -8469,6 +8800,8 @@ dialog::backdrop {
       const record = this.current;
       const resource = record?.resources.find((item) => item.key === key);
       if (!resource) return null;
+      this.checkpoint("Edit resource");
+      Studio.editing.invalidate(resource, record);
       const parsedAir = Studio.air.parseAir(data.rawAir || data.canonicalAir || "");
       resource.name = sanitizeText(data.name || "Unidentified resource", 512);
       resource.role = sanitizeText(data.role || "other", 80);
@@ -8525,12 +8858,13 @@ dialog::backdrop {
       if (!mapping) return;
       Studio.canonical.setField(record, mapping.name, resource.name);
       const hash = strongestHash(resource.hashes);
-      if (hash) Studio.canonical.setField(record, mapping.hash, hash);
+      Studio.canonical.setField(record, mapping.hash, hash || "");
     }
 
     removeResource(key) {
       const resource = this.current?.resources.find((item) => item.key === key);
       if (!resource) return;
+      this.checkpoint("Remove resource");
       resource.removed = true;
       this.current.dirty = true;
       this.emit();
@@ -8541,7 +8875,9 @@ dialog::backdrop {
       const conflict = record?.conflicts.find((item) => item.id === conflictId);
       const option = conflict?.alternatives[Number(optionIndex)];
       if (!conflict || !option) return;
+      this.checkpoint("Resolve field conflict");
       Studio.canonical.setField(record, conflict.field, option.value);
+      this.syncResourceFromFields(record, conflict.field);
       conflict.resolved = true;
       this.emit();
     }
@@ -8550,29 +8886,53 @@ dialog::backdrop {
       const record = this.current;
       const resource = record?.resources.find((item) => item.key === key);
       if (!resource || !(file instanceof File)) return null;
+      const entry = this.currentEntry;
+      if (this.busy || this.hashingController || entry.state === "verifying") throw new Error("Wait for the current operation to finish before hashing a model.");
+      const before = clone(resource);
+      const beforeVerification = clone(record.verification);
+      const controller = new AbortController();
+      this.hashingController = controller;
+      this.hashingEntry = entry;
+      entry.state = "hashing";
+      this.checkpoint("Hash model file");
+      Studio.editing.invalidate(resource, record);
       resource.verification = "hashing";
       resource.verificationMessage = "Hashing local model file…";
       this.emit();
-      const hashes = await Studio.sha256.hashModelFile(file, {
-        onProgress: (processed, total) => {
-          resource.verificationMessage = `Hashing ${Math.round(processed / Math.max(1, total) * 100)}%`;
-          onProgress?.(processed, total);
-          this.emit();
-        }
-      });
-      resource.hashes = { ...resource.hashes, ...hashes };
-      resource.filename ||= Studio.util.basename(file.name);
-      resource.verification = "unresolved";
-      resource.verificationMessage = "Local hash complete. Ready for Civitai verification.";
-      record.dirty = true;
-      this.emit();
-      return hashes;
+      try {
+        const hashes = await Studio.sha256.hashModelFile(file, {
+          signal: controller.signal,
+          onProgress: (processed, total) => {
+            resource.verificationMessage = `Hashing ${Math.round(processed / Math.max(1, total) * 100)}%`;
+            onProgress?.(processed, total);
+            this.emit();
+          }
+        });
+        controller.signal.throwIfAborted();
+        resource.hashes = { ...resource.hashes, ...hashes };
+        resource.filename ||= Studio.util.basename(file.name);
+        resource.verification = "unresolved";
+        resource.verificationMessage = "Local hash complete. Ready for Civitai verification.";
+        record.dirty = true;
+        this.emit();
+        return hashes;
+      } catch (error) {
+        for (const key of Object.keys(resource)) delete resource[key];
+        Object.assign(resource, before);
+        record.verification = beforeVerification;
+        throw error;
+      } finally {
+        if (entry.state === "hashing") entry.state = "ready";
+        if (this.hashingController === controller) { this.hashingController = null; this.hashingEntry = null; }
+        this.emit();
+      }
     }
 
     async verifyEntry(entry, automatic = false) {
-      if (!entry?.record || entry.state === "verifying" || !this.entries.includes(entry)) return;
+      if (!entry?.record || ["verifying", "hashing"].includes(entry.state) || !this.entries.includes(entry)) return;
       this.verificationController?.abort();
       const controller = new AbortController();
+      this.checkpoint("Verify resource identities", "", entry.record);
       this.verificationController = controller;
       this.verificationEntry = entry;
       this.verificationEntries = new Set([entry]);
@@ -8600,6 +8960,7 @@ dialog::backdrop {
         if (!this.entries.includes(entry)) return;
         if (error.name === "AbortError") {
           entry.state = "ready";
+          if (entry.record.verification.status === "checking") entry.record.verification.status = "unverified";
         } else {
           entry.state = "ready";
           entry.record.verification.status = "warning";
@@ -8619,7 +8980,7 @@ dialog::backdrop {
     async verifyEntries(entries, automatic = false) {
       const candidates = [...new Set(entries)].filter((entry) =>
         entry?.record
-        && entry.state !== "verifying"
+        && !["verifying", "hashing"].includes(entry.state)
         && this.entries.includes(entry)
       );
       if (!candidates.length) return;
@@ -8634,6 +8995,7 @@ dialog::backdrop {
       this.verificationEntry = null;
       this.verificationEntries = new Set(candidates);
       for (const entry of candidates) entry.state = "verifying";
+      for (const entry of candidates) this.checkpoint("Verify resource identities", "", entry.record);
       this.emit();
 
       const sharedMetrics = {
@@ -8684,7 +9046,10 @@ dialog::backdrop {
         }
       } catch (error) {
         for (const entry of candidates) {
-          if (this.entries.includes(entry) && entry.state === "verifying") entry.state = "ready";
+          if (this.entries.includes(entry) && entry.state === "verifying") {
+            entry.state = "ready";
+            if (entry.record.verification.status === "checking") entry.record.verification.status = "unverified";
+          }
         }
         if (error.name !== "AbortError" && !automatic) this.announce(error.message, "error");
         this.emit();
@@ -8701,10 +9066,12 @@ dialog::backdrop {
       if (this.currentEntry) await this.verifyEntry(this.currentEntry, false);
     }
 
-    async importCivitaiImage(value) {
+    async importCivitaiImage(value, { signal } = {}) {
       const record = this.current;
       if (!record) throw new Error("Open an image before importing Civitai image metadata.");
-      const remote = await Studio.civitai.lookupImage(value);
+      const remote = await Studio.civitai.lookupImage(value, { signal });
+      signal?.throwIfAborted();
+      this.checkpoint("Import Civitai image metadata", "", record);
       let importedFields = 0;
       let matchingFields = 0;
       let fieldConflicts = 0;
@@ -8787,6 +9154,7 @@ dialog::backdrop {
 
     resetCurrent() {
       if (!this.current) return;
+      this.checkpoint("Reset edits");
       Studio.canonical.reset(this.current);
       this.announce("Edits for the current image were reset.", "info");
     }
@@ -8849,20 +9217,17 @@ dialog::backdrop {
       }
       const record = this.current;
       if (!record) throw new Error("Open an image before importing identity data.");
+      this.checkpoint("Import identity evidence");
       let imported = 0;
       for (const raw of document.resources.slice(0, 5000)) {
         const candidate = Studio.canonical.normalizeResource({ ...raw, verification: "claimed", identitySource: "imported" }, "imported");
-        const match = record.resources.find((resource) => {
-          if (candidate.modelVersionId && resource.modelVersionId === candidate.modelVersionId) return true;
-          const candidateHashes = new Set(Object.values(candidate.hashes || {}));
-          if (Object.values(resource.hashes || {}).some((hash) => candidateHashes.has(hash))) return true;
-          return resource.role === candidate.role && resource.name.toLowerCase() === candidate.name.toLowerCase();
-        });
+        const match = record.resources.find((resource) => Studio.editing.exactOverlap(candidate, resource));
         if (!match) {
           record.resources.push(candidate);
           imported += 1;
           continue;
         }
+        Studio.editing.invalidate(match, record);
         for (const key of [
           "modelId",
           "modelVersionId",
@@ -8882,7 +9247,13 @@ dialog::backdrop {
             match.apiCandidate = candidate;
           }
         }
-        match.hashes = { ...candidate.hashes, ...match.hashes };
+        for (const [algorithm, hash] of Object.entries(candidate.hashes || {})) {
+          if (match.hashes[algorithm] && normalizeHash(match.hashes[algorithm]) !== normalizeHash(hash)) {
+            match.verification = "conflict";
+            match.verificationMessage = `Imported ${algorithm} conflicts with the existing value.`;
+            match.apiCandidate = candidate;
+          } else match.hashes[algorithm] = hash;
+        }
         imported += 1;
       }
       record.dirty = true;
@@ -8921,11 +9292,11 @@ dialog::backdrop {
       );
     }
 
-    async save(suffix, onProgress) {
-      if (this.entries.some((entry) => ["queued", "inspecting", "verifying"].includes(entry.state))) {
+    async save(suffix, onProgress, { currentOnly = false } = {}) {
+      if (this.entries.some((entry) => ["queued", "inspecting", "verifying", "hashing"].includes(entry.state))) {
         throw new Error("Wait for inspection and verification to finish before saving.");
       }
-      const ready = this.entries.filter((entry) => entry.record && entry.state !== "error");
+      const ready = (currentOnly ? [this.currentEntry] : this.entries).filter((entry) => entry?.record && entry.state !== "error");
       if (!ready.length) throw new Error("There are no inspected images to save.");
       const invalid = ready.flatMap((entry) =>
         Studio.canonical.validate(entry.record).map((message) => `${entry.record.fileName}: ${message}`)
@@ -8935,14 +9306,22 @@ dialog::backdrop {
       this.emit();
       try {
         const outputs = [];
+        const usedNames = new Set();
         for (let index = 0; index < ready.length; index += 1) {
           const entry = ready[index];
           onProgress?.(`Preparing ${entry.record.fileName}`, index, ready.length);
           const blob = Studio.canonical.rewrite(entry.record);
+          if (this.verifyExports) {
+            onProgress?.(`Checking original pixel payload · ${entry.record.fileName}`, index, ready.length);
+            entry.record.exportIntegrity = await Studio.integrity.verifyExport(entry.record, blob);
+          }
           const formatExtension = { png: "png", jpeg: "jpg", webp: "webp" }[entry.record.format];
           const baseOutputName = `${Studio.util.withoutExtension(entry.record.fileName)}.${formatExtension}`;
+          let name = Studio.util.outputName(baseOutputName, suffix);
+          for (let copy = 2; usedNames.has(name.toLowerCase()); copy += 1) name = Studio.util.outputName(baseOutputName, `${suffix || "_edited"}_${copy}`);
+          usedNames.add(name.toLowerCase());
           outputs.push({
-            name: Studio.util.outputName(baseOutputName, suffix),
+            name,
             blob,
             date: new Date(entry.file.lastModified || Date.now())
           });
@@ -9022,16 +9401,59 @@ dialog::backdrop {
       this.activeSection = "generationSection";
       this.workspaceActive = Boolean(state.entries.length);
       this.workspaceFocusPending = false;
+      this.lastNoticeId = "";
+      this.renderQueued = false;
       this.nodes = Object.fromEntries(
         [...document.querySelectorAll("[id]")].map((node) => [node.id, node])
       );
+      this.saveObserver = new ResizeObserver(([entry]) => {
+        document.documentElement.style.setProperty("--save-height", `${entry.target.getBoundingClientRect().height}px`);
+      });
+      this.saveObserver.observe(this.nodes.saveBar);
       this.bind();
-      state.addEventListener("change", () => this.render());
+      state.addEventListener("change", () => {
+        if (this.renderQueued) return;
+        this.renderQueued = true;
+        requestAnimationFrame(() => { this.renderQueued = false; this.render(); });
+      });
       this.render();
     }
 
     bind() {
       const n = this.nodes;
+      n.undoButton.addEventListener("click", () => this.state.travelHistory("undo"));
+      n.redoButton.addEventListener("click", () => this.state.travelHistory("redo"));
+      n.verifyExport.addEventListener("change", () => { this.state.verifyExports = n.verifyExport.checked; });
+      n.verifyAllButton.addEventListener("click", () => this.state.verifyEntries(this.state.entries));
+      n.cancelVerificationButton.addEventListener("click", () => this.state.verificationController?.abort());
+      n.cancelHashButton.addEventListener("click", () => this.state.hashingController?.abort());
+      n.resourceFilter.addEventListener("input", () => { if (this.state.current) this.renderResources(this.state.current); });
+      n.resourceStatusFilter.addEventListener("change", () => { if (this.state.current) this.renderResources(this.state.current); });
+      n.commandsButton.addEventListener("click", () => this.openCommands());
+      n.closeCommandDialog.addEventListener("click", () => n.commandDialog.close());
+      n.closeAutomationDialog.addEventListener("click", () => n.automationDialog.close());
+      n.commandSearch.addEventListener("input", () => this.renderCommands());
+      n.commandList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-command]");
+        const command = this.commands().find((item) => item.id === button?.dataset.command);
+        if (command) { n.commandDialog.close(); command.run(); }
+      });
+      n.commandDialog.addEventListener("keydown", (event) => {
+        const buttons = [...n.commandList.querySelectorAll("button")];
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const index = buttons.indexOf(document.activeElement);
+          buttons[(index + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]?.focus();
+        } else if (event.key === "Enter" && document.activeElement === n.commandSearch) { event.preventDefault(); buttons[0]?.click(); }
+      });
+      document.addEventListener("keydown", (event) => {
+        const modifier = event.ctrlKey || event.metaKey;
+        if (modifier && event.key.toLowerCase() === "k" && !document.querySelector("dialog[open]:not(#commandDialog)")) { event.preventDefault(); this.openCommands(); return; }
+        if (document.querySelector("dialog[open]")) return;
+        const editing = event.target.closest("input, textarea, select, [contenteditable='true']");
+        if (modifier && event.key.toLowerCase() === "s" && this.state.current) { event.preventDefault(); if (!n.saveButton.disabled) n.saveButton.click(); }
+        if (!editing && modifier && event.key.toLowerCase() === "z") { event.preventDefault(); this.state.travelHistory(event.shiftKey ? "redo" : "undo"); }
+      });
       const openPicker = () => n.fileInput.click();
       n.openButton.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -9052,12 +9474,6 @@ dialog::backdrop {
       });
       n.dropZone.addEventListener("click", (event) => {
         if (event.target !== n.openButton) openPicker();
-      });
-      n.dropZone.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openPicker();
-        }
       });
       for (const eventName of ["dragenter", "dragover"]) {
         n.dropZone.addEventListener(eventName, (event) => {
@@ -9175,15 +9591,17 @@ dialog::backdrop {
           this.state.announce(error.message, "error");
         }
       });
-      n.saveButton.addEventListener("click", async () => {
+      const save = async (currentOnly = false) => {
         try {
           await this.state.save(n.outputSuffix.value, (message) => {
             n.outputSummary.textContent = message;
-          });
+          }, { currentOnly });
         } catch (error) {
           this.state.announce(error.message, "error");
         }
-      });
+      };
+      n.saveButton.addEventListener("click", () => save());
+      n.saveCurrentButton.addEventListener("click", () => save(true));
       n.themeButton.addEventListener("click", () => this.toggleTheme());
       n.closeResourceDialog.addEventListener("click", () => n.resourceDialog.close("cancel"));
       n.saveResourceButton.addEventListener("click", () => {
@@ -9195,6 +9613,19 @@ dialog::backdrop {
         n.resourceDialog.close("remove");
       });
       n.searchResourceButton.addEventListener("click", () => this.searchResource());
+      n.refreshReferenceButton.addEventListener("click", async () => {
+        n.refreshReferenceButton.disabled = true;
+        try {
+          const reference = await Studio.civitai.referenceData();
+          replace(n.resourceBaseModels, reference.BaseModel.map((value) => el("option", { value })));
+          const currentType = n.resourceType.value;
+          const types = [...new Set([...Studio.constants.RESOURCE_TYPES.map(([value]) => value), ...reference.ModelType])];
+          this.fillOptions(n.resourceType, types.map((value) => [value, value]));
+          n.resourceType.value = currentType;
+          n.resourceDialogStatus.textContent = `Updated ${reference.BaseModel.length} base-model families and ${reference.ModelType.length} resource types from Civitai.`;
+        } catch (error) { n.resourceDialogStatus.textContent = error.message; }
+        finally { n.refreshReferenceButton.disabled = false; }
+      });
       n.resourceModelFile.addEventListener("change", async () => {
         const [file] = n.resourceModelFile.files;
         if (!file || !this.resourceKey) return;
@@ -9320,10 +9751,32 @@ dialog::backdrop {
       this.renderResources(record);
       this.renderMetadata(record);
       this.renderReview(record);
+      const locked = this.state.busy || ["verifying", "hashing"].includes(entry.state);
+      this.nodes.addResourceButton.disabled = locked;
+      this.nodes.importIdentityButton.disabled = locked;
+      this.nodes.importCivitaiImageButton.disabled = locked;
+      this.nodes.resourceDialog.querySelectorAll("input, select, button").forEach((control) => {
+        if (!control.matches("#closeResourceDialog, #cancelHashButton, button[value='cancel']")) control.disabled = locked;
+      });
+      this.nodes.cancelHashButton.hidden = !this.state.hashingController;
+      const hashing = record.resources.find((item) => item.key === this.resourceKey && item.verification === "hashing");
+      if (hashing) this.nodes.resourceDialogStatus.textContent = hashing.verificationMessage;
+      const history = this.state.history();
+      this.nodes.undoButton.disabled = locked || !history.undo.length;
+      this.nodes.redoButton.disabled = locked || !history.redo.length;
+      this.nodes.editStatus.textContent = record.dirty ? "Edited · held in memory" : "Original metadata";
+      this.nodes.verifyAllButton.hidden = this.state.entries.length < 2;
+      this.nodes.verifyAllButton.disabled = this.state.busy || Boolean(this.state.verificationController);
+      this.nodes.cancelVerificationButton.hidden = !this.state.verificationController;
+      for (const input of this.nodes.generationForm.querySelectorAll("input, textarea")) input.disabled = locked;
       this.nodes.saveButton.disabled = this.state.busy
-        || this.state.entries.some((item) => ["queued", "inspecting", "verifying"].includes(item.state));
-      this.nodes.verifyButton.disabled = entry.state === "verifying";
-      this.nodes.resetButton.disabled = this.state.busy;
+        || this.state.entries.some((item) => ["queued", "inspecting", "verifying", "hashing"].includes(item.state) || (item.record && Studio.canonical.validate(item.record).length));
+      const readyCount = this.state.entries.filter((item) => item.record).length;
+      this.nodes.saveButton.textContent = readyCount > 1 ? `Save ${readyCount} new copies` : "Save new copy";
+      this.nodes.saveCurrentButton.hidden = readyCount < 2;
+      this.nodes.saveCurrentButton.disabled = locked || Studio.canonical.validate(record).length > 0;
+      this.nodes.verifyButton.disabled = locked;
+      this.nodes.resetButton.disabled = locked;
       this.nodes.outputSummary.textContent = this.state.busy
         ? this.nodes.outputSummary.textContent
         : `${this.state.entries.filter((item) => item.record).length} new ${this.state.entries.filter((item) => item.record).length === 1 ? "copy" : "copies"} · original pixels retained`;
@@ -9369,6 +9822,7 @@ dialog::backdrop {
           queued: "Queued",
           inspecting: "Inspecting",
           verifying: "Verifying",
+          hashing: "Hashing model",
           ready: entry.record?.verification?.status === "verified" ? "Verified" : "Ready",
           error: "Error"
         }[entry.state] || entry.state;
@@ -9397,6 +9851,7 @@ dialog::backdrop {
 
     renderNotice() {
       const notice = this.state.notice;
+      if (notice?.id === this.lastNoticeId) return;
       if (!notice) {
         replace(this.nodes.alertRegion, []);
         return;
@@ -9407,6 +9862,7 @@ dialog::backdrop {
         text: notice.message
       }));
       this.nodes.statusAnnouncer.textContent = notice.message;
+      this.lastNoticeId = notice.id;
     }
 
     renderPreview(record) {
@@ -9478,13 +9934,18 @@ dialog::backdrop {
         const invalid = value !== "" && (
           (definition.kind === "integer" && !Number.isSafeInteger(Number(value)))
           || (definition.kind === "number" && !Number.isFinite(Number(value)))
-          || (definition.kind === "hash" && !/^[A-Fa-f0-9]{8,128}$/.test(String(value).replace(/\s+/g, "")))
+          || (["width", "height"].includes(definition.key) && Number(value) < 1)
+          || (["steps", "cfgScale", "guidance", "clipSkip", "denoise"].includes(definition.key) && Number(value) < 0)
+          || (definition.key === "denoise" && Number(value) > 1)
+          || (definition.key === "seed" && !/^-?\d+$/.test(String(value)))
+          || (definition.kind === "hash" && !/^(?:[A-Fa-f0-9]{8}|[A-Fa-f0-9]{10}|[A-Fa-f0-9]{12}|[A-Fa-f0-9]{64})$/.test(String(value).replace(/\s+/g, "")))
         );
         input.setAttribute("aria-invalid", invalid ? "true" : "false");
+        input.setAttribute("aria-describedby", `${definition.key}Meta`);
         const meta = this.nodes[`${definition.key}Meta`];
         if (meta) {
           const source = SOURCE_LABELS[field.source] || field.source || "Unknown";
-          meta.textContent = invalid ? "Review this value before saving" : `${source}${field.evidence ? ` · ${field.evidence}` : ""}`;
+          meta.textContent = invalid ? "Review this value before saving" : `${source}${field.evidence && field.evidence !== source ? ` · ${field.evidence}` : ""}`;
         }
       }
     }
@@ -9590,9 +10051,14 @@ dialog::backdrop {
     }
 
     renderResources(record) {
-      const resources = record.resources.filter((resource) => !resource.removed);
+      const all = record.resources.filter((resource) => !resource.removed);
+      const query = this.nodes.resourceFilter.value.trim().toLowerCase();
+      const status = this.nodes.resourceStatusFilter.value;
+      const resources = all.filter((resource) => (!query || [resource.name, resource.role, resource.canonicalAir, resource.rawAir, resource.versionName, resource.baseModel, ...Object.values(resource.hashes || {})].join(" ").toLowerCase().includes(query))
+        && (status === "all" || (status === "unresolved" ? !["verified", "conflict"].includes(resource.verification) : resource.verification === status)));
+      this.nodes.resourceResultCount.textContent = `${resources.length} of ${all.length}`;
       if (!resources.length) {
-        replace(this.nodes.resourcesList, empty("No resources were identified. Add one when you know what was used."));
+        replace(this.nodes.resourcesList, empty(all.length ? "No resources match these filters." : "No resources were identified. Add one when you know what was used."));
         return;
       }
       replace(this.nodes.resourcesList, resources.map((resource) => {
@@ -9776,6 +10242,8 @@ dialog::backdrop {
       }) : []);
 
       const diff = Studio.canonical.diff(record);
+      this.nodes.integrityResult.hidden = !record.exportIntegrity;
+      this.nodes.integrityResult.textContent = record.exportIntegrity ? `Last export · pixel integrity verified · ${record.exportIntegrity.before.bytes.toLocaleString()} encoded bytes unchanged · SHA-256 ${record.exportIntegrity.before.digest}` : "";
       replace(this.nodes.diffList, diff.length ? diff.map((row) => el("div", { className: "diff-row" }, [
         el("div", { className: "diff-label", text: row.label }),
         el("div", { className: "diff-value", text: `Original\n${valueText(row.before)}` }),
@@ -9951,6 +10419,36 @@ dialog::backdrop {
       } catch {
         // Theme persistence is optional.
       }
+    }
+
+    commands() {
+      const n = this.nodes, hasImage = Boolean(this.state.current);
+      return [
+        { id: "open", title: "Open images", hint: "PNG, JPEG, WebP", run: () => n.fileInput.click() },
+        ...hasImage ? [
+          { id: "generation", title: "Edit generation recipe", hint: "Prompts and settings", run: () => this.selectEditorSection("generationSection", { focusPanel: true }) },
+          { id: "resources", title: "Find a resource", hint: "Models, LoRAs, AIRs", run: () => { this.selectEditorSection("resourcesSection"); n.resourceFilter.focus(); } },
+          { id: "review", title: "Review changes", hint: "Evidence and conflicts", run: () => this.selectEditorSection("reviewSection", { focusPanel: true }) },
+          { id: "verify", title: "Verify with Civitai", hint: "Exact IDs and hashes", run: () => n.verifyButton.click() },
+          { id: "import", title: "Import a Civitai image recipe", hint: "Public image URL or ID", run: () => n.importCivitaiImageButton.click() },
+          { id: "save", title: "Save new image copies", hint: "Originals stay unchanged", run: () => n.saveButton.click() }
+        ] : [],
+        { id: "theme", title: "Switch color theme", hint: "Light / dark", run: () => this.toggleTheme() },
+        { id: "automation", title: "Connect scripts or an assistant", hint: "Optional API + MCP", run: () => n.automationDialog.showModal() }
+      ];
+    }
+
+    openCommands() {
+      this.nodes.commandSearch.value = "";
+      this.renderCommands();
+      if (!this.nodes.commandDialog.open) this.nodes.commandDialog.showModal();
+      this.nodes.commandSearch.focus();
+    }
+
+    renderCommands() {
+      const query = this.nodes.commandSearch.value.trim().toLowerCase();
+      const commands = this.commands().filter((item) => `${item.title} ${item.hint}`.toLowerCase().includes(query));
+      replace(this.nodes.commandList, commands.length ? commands.map((command) => el("li", {}, el("button", { type: "button", dataset: { command: command.id } }, [el("strong", { text: command.title }), el("span", { text: command.hint })]))) : el("li", { className: "empty-state", text: "No matching actions. Try a different word." }));
     }
   }
 

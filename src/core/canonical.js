@@ -565,7 +565,8 @@
     record.original = {
       fields: clone(record.fields),
       resources: clone(record.resources),
-      metadataSelections: clone(record.metadataSelections)
+      metadataSelections: clone(record.metadataSelections),
+      conflicts: clone(record.conflicts)
     };
     return record;
   }
@@ -615,7 +616,7 @@
     record.fields = clone(record.original.fields);
     record.resources = clone(record.original.resources);
     record.metadataSelections = clone(record.original.metadataSelections);
-    record.conflicts.forEach((conflict) => { conflict.resolved = false; });
+    record.conflicts = clone(record.original.conflicts || []);
     record.dirty = false;
     record.verification = { status: "unverified", checked: 0, verified: 0, unresolved: 0, errors: [] };
     return record;
@@ -712,7 +713,7 @@
       generator: {
         name: Studio.constants.APP_NAME,
         version: Studio.constants.APP_VERSION,
-        processing: "local-browser"
+        processing: record.processingContext || "local-browser"
       },
       prompt: {
         positive: valueOf("positivePrompt") || "",

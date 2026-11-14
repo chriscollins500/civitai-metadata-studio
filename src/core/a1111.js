@@ -242,14 +242,13 @@
 
     const resources = Studio.civitaiContract.parserResourceItems(activeResources);
     if (resources.length) add("Civitai resources", stableStringify(resources, 0));
-    add("Civitai metadata", stableStringify({
-      outputFormat: record.format || "unknown",
-      generator: {
-        name: Studio.constants.APP_NAME,
-        version: Studio.constants.APP_VERSION
-      },
-      resources
-    }, 0));
+    // Keep all canonical claims in the Studio carrier; the separate parser-facing
+    // list intentionally contains only identities suitable for Civitai ingestion.
+    const metadata = Studio.canonical?.buildManifest ? Studio.canonical.buildManifest(record) : {
+      generator: { name: Studio.constants.APP_NAME, version: Studio.constants.APP_VERSION },
+      resources: activeResources.map(resourceProjection)
+    };
+    add("Civitai metadata", stableStringify({ outputFormat: record.format || "unknown", ...metadata }, 0));
 
     const lines = [positive];
     if (negative || settings.length) lines.push(`Negative prompt: ${negative}`);

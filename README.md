@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/chriscollins500/civitai-metadata-studio/raw/refs/heads/main/dist/civitai-metadata-studio.zip"><img alt="Download the app as a ZIP" src="https://img.shields.io/badge/Download-The_App-006b59?style=for-the-badge&logo=files&logoColor=white"></a>
+  <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><img alt="Download the app as a ZIP" src="https://img.shields.io/badge/Download-The_App-006b59?style=for-the-badge&logo=files&logoColor=white"></a>
   <a href="dist/civitai-metadata-studio.html"><img alt="View the standalone HTML file" src="https://img.shields.io/badge/View-Standalone_HTML-17211d?style=for-the-badge&logo=html5&logoColor=white"></a>
 </p>
 
@@ -48,7 +48,7 @@ That recipe is useful—but it is often incomplete, duplicated, or simply wrong.
 
 ## Use it in 30 seconds
 
-1. **[Download the app](https://github.com/chriscollins500/civitai-metadata-studio/raw/refs/heads/main/dist/civitai-metadata-studio.zip).** It is a tiny ZIP containing one HTML file.
+1. **[Download the app](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip).** It is a tiny ZIP containing one HTML file.
 2. **Unzip it, then double-click the HTML file.** It opens in your current web browser like a small desktop app.
 3. **Drop in one image or a whole batch.** PNG, JPEG, and WebP are supported.
 4. **Review, edit, and save.** Every result is a new copy; your originals stay exactly where they are.
@@ -73,7 +73,7 @@ There is no installer and nothing to configure. Keep the HTML file anywhere you 
 | The saved width and height are wrong | Starts with the image's real pixel dimensions—the objective truth—while still letting you edit the fields. |
 | Positive text appears in the negative prompt | Reads prompt meaning from the active workflow instead of copying text from an empty or disabled branch. |
 | A turned-off LoRA is listed as used | Traces only nodes that lead to the real output and excludes muted, bypassed, disabled, and zero-strength resources. |
-| The same checkpoint or LoRA appears twice | Combines entries only when exact evidence proves they are the same resource. |
+| The same checkpoint or LoRA appears twice | Consolidates compatible entries while keeping conflicting IDs, hashes, and LoRA strengths separate. |
 | A resource has a name but no reliable identity | Checks AIR values, numeric version IDs, and exact hashes against Civitai. It never invents an ID from a filename. |
 | Two metadata sources disagree | Shows the conflict for review instead of silently choosing one. |
 | Saving metadata damages the image | Copies the original encoded pixel and animation data unchanged into a new file. |
@@ -113,7 +113,7 @@ Your images, prompts, workflows, model files, and local paths stay in your brows
 
 Automatic Civitai verification sends only exact hashes or numeric version IDs. A resource name is sent only when **you** press the search button, and a public image ID is sent only when **you** choose to import that image's public metadata.
 
-The tool has:
+The portable editor has:
 
 - no server component;
 - no account or sign-in;
@@ -123,6 +123,22 @@ The tool has:
 - no image-upload feature.
 
 Exact public identity results are cached locally to make repeat lookups faster. The cache is bounded, disposable, never stores prompts or image data, and can be cleared at any time. Read the full [security and privacy notes](SECURITY.md) for the precise boundary.
+
+## A workspace that keeps up with you
+
+Undo an edit. Redo it. Find a resource by name, AIR, or hash. Use **Ctrl / ⌘ K** to find an action without hunting through menus. Move between the recipe, resources, other metadata, and review with the keyboard or a click.
+
+Before a new copy is downloaded, **Verify pixel integrity** reopens it and compares the encoded image or animation payload with the original using SHA-256. The result appears in Review. Save one image or the whole batch, with validation catching bad values before saving.
+
+## Give your scripts and assistants the same tools
+
+The optional local companion adds an **HTTP API** and **MCP tools**. An assistant or script can inspect selected images, review exact resource evidence, edit generation details, and save a verified new copy using the same engine as the editor.
+
+Choose the folders it may read, the folder for new exports, and whether it may contact Civitai. Revision checks keep two clients from silently replacing each other's work. The browser editor still works on its own with no installation.
+
+[Set up the API and MCP companion →](docs/automation.md)
+
+[See the tested builds, browser coverage, and validation limits →](docs/validation-1.0.md)
 
 ## Your pixels stay your pixels
 
@@ -209,7 +225,7 @@ Use a current desktop browser. The project intentionally targets current web sta
 
 ## For developers and auditors
 
-The distributed app has no runtime dependencies. Node.js is used only to assemble and test the portable release.
+The portable HTML has no runtime dependencies. Node.js assembles and tests it, and also runs the optional API/MCP companion. Companion dependencies are isolated under `automation/` and pinned in its lockfile.
 
 ```powershell
 npm run check

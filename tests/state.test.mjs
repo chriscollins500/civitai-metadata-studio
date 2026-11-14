@@ -8,6 +8,7 @@ for (const module of [
   "../src/core/air.js",
   "../src/core/civitai-contract.js",
   "../src/core/canonical.js",
+  "../src/core/editing.js",
   "../src/app/state.js"
 ]) {
   await import(module);

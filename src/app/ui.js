@@ -47,16 +47,59 @@
       this.activeSection = "generationSection";
       this.workspaceActive = Boolean(state.entries.length);
       this.workspaceFocusPending = false;
+      this.lastNoticeId = "";
+      this.renderQueued = false;
       this.nodes = Object.fromEntries(
         [...document.querySelectorAll("[id]")].map((node) => [node.id, node])
       );
+      this.saveObserver = new ResizeObserver(([entry]) => {
+        document.documentElement.style.setProperty("--save-height", `${entry.target.getBoundingClientRect().height}px`);
+      });
+      this.saveObserver.observe(this.nodes.saveBar);
       this.bind();
-      state.addEventListener("change", () => this.render());
+      state.addEventListener("change", () => {
+        if (this.renderQueued) return;
+        this.renderQueued = true;
+        requestAnimationFrame(() => { this.renderQueued = false; this.render(); });
+      });
       this.render();
     }
 
     bind() {
       const n = this.nodes;
+      n.undoButton.addEventListener("click", () => this.state.travelHistory("undo"));
+      n.redoButton.addEventListener("click", () => this.state.travelHistory("redo"));
+      n.verifyExport.addEventListener("change", () => { this.state.verifyExports = n.verifyExport.checked; });
+      n.verifyAllButton.addEventListener("click", () => this.state.verifyEntries(this.state.entries));
+      n.cancelVerificationButton.addEventListener("click", () => this.state.verificationController?.abort());
+      n.cancelHashButton.addEventListener("click", () => this.state.hashingController?.abort());
+      n.resourceFilter.addEventListener("input", () => { if (this.state.current) this.renderResources(this.state.current); });
+      n.resourceStatusFilter.addEventListener("change", () => { if (this.state.current) this.renderResources(this.state.current); });
+      n.commandsButton.addEventListener("click", () => this.openCommands());
+      n.closeCommandDialog.addEventListener("click", () => n.commandDialog.close());
+      n.closeAutomationDialog.addEventListener("click", () => n.automationDialog.close());
+      n.commandSearch.addEventListener("input", () => this.renderCommands());
+      n.commandList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-command]");
+        const command = this.commands().find((item) => item.id === button?.dataset.command);
+        if (command) { n.commandDialog.close(); command.run(); }
+      });
+      n.commandDialog.addEventListener("keydown", (event) => {
+        const buttons = [...n.commandList.querySelectorAll("button")];
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const index = buttons.indexOf(document.activeElement);
+          buttons[(index + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length]?.focus();
+        } else if (event.key === "Enter" && document.activeElement === n.commandSearch) { event.preventDefault(); buttons[0]?.click(); }
+      });
+      document.addEventListener("keydown", (event) => {
+        const modifier = event.ctrlKey || event.metaKey;
+        if (modifier && event.key.toLowerCase() === "k" && !document.querySelector("dialog[open]:not(#commandDialog)")) { event.preventDefault(); this.openCommands(); return; }
+        if (document.querySelector("dialog[open]")) return;
+        const editing = event.target.closest("input, textarea, select, [contenteditable='true']");
+        if (modifier && event.key.toLowerCase() === "s" && this.state.current) { event.preventDefault(); if (!n.saveButton.disabled) n.saveButton.click(); }
+        if (!editing && modifier && event.key.toLowerCase() === "z") { event.preventDefault(); this.state.travelHistory(event.shiftKey ? "redo" : "undo"); }
+      });
       const openPicker = () => n.fileInput.click();
       n.openButton.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -77,12 +120,6 @@
       });
       n.dropZone.addEventListener("click", (event) => {
         if (event.target !== n.openButton) openPicker();
-      });
-      n.dropZone.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openPicker();
-        }
       });
       for (const eventName of ["dragenter", "dragover"]) {
         n.dropZone.addEventListener(eventName, (event) => {
@@ -200,15 +237,17 @@
           this.state.announce(error.message, "error");
         }
       });
-      n.saveButton.addEventListener("click", async () => {
+      const save = async (currentOnly = false) => {
         try {
           await this.state.save(n.outputSuffix.value, (message) => {
             n.outputSummary.textContent = message;
-          });
+          }, { currentOnly });
         } catch (error) {
           this.state.announce(error.message, "error");
         }
-      });
+      };
+      n.saveButton.addEventListener("click", () => save());
+      n.saveCurrentButton.addEventListener("click", () => save(true));
       n.themeButton.addEventListener("click", () => this.toggleTheme());
       n.closeResourceDialog.addEventListener("click", () => n.resourceDialog.close("cancel"));
       n.saveResourceButton.addEventListener("click", () => {
@@ -220,6 +259,19 @@
         n.resourceDialog.close("remove");
       });
       n.searchResourceButton.addEventListener("click", () => this.searchResource());
+      n.refreshReferenceButton.addEventListener("click", async () => {
+        n.refreshReferenceButton.disabled = true;
+        try {
+          const reference = await Studio.civitai.referenceData();
+          replace(n.resourceBaseModels, reference.BaseModel.map((value) => el("option", { value })));
+          const currentType = n.resourceType.value;
+          const types = [...new Set([...Studio.constants.RESOURCE_TYPES.map(([value]) => value), ...reference.ModelType])];
+          this.fillOptions(n.resourceType, types.map((value) => [value, value]));
+          n.resourceType.value = currentType;
+          n.resourceDialogStatus.textContent = `Updated ${reference.BaseModel.length} base-model families and ${reference.ModelType.length} resource types from Civitai.`;
+        } catch (error) { n.resourceDialogStatus.textContent = error.message; }
+        finally { n.refreshReferenceButton.disabled = false; }
+      });
       n.resourceModelFile.addEventListener("change", async () => {
         const [file] = n.resourceModelFile.files;
         if (!file || !this.resourceKey) return;
@@ -345,10 +397,32 @@
       this.renderResources(record);
       this.renderMetadata(record);
       this.renderReview(record);
+      const locked = this.state.busy || ["verifying", "hashing"].includes(entry.state);
+      this.nodes.addResourceButton.disabled = locked;
+      this.nodes.importIdentityButton.disabled = locked;
+      this.nodes.importCivitaiImageButton.disabled = locked;
+      this.nodes.resourceDialog.querySelectorAll("input, select, button").forEach((control) => {
+        if (!control.matches("#closeResourceDialog, #cancelHashButton, button[value='cancel']")) control.disabled = locked;
+      });
+      this.nodes.cancelHashButton.hidden = !this.state.hashingController;
+      const hashing = record.resources.find((item) => item.key === this.resourceKey && item.verification === "hashing");
+      if (hashing) this.nodes.resourceDialogStatus.textContent = hashing.verificationMessage;
+      const history = this.state.history();
+      this.nodes.undoButton.disabled = locked || !history.undo.length;
+      this.nodes.redoButton.disabled = locked || !history.redo.length;
+      this.nodes.editStatus.textContent = record.dirty ? "Edited · held in memory" : "Original metadata";
+      this.nodes.verifyAllButton.hidden = this.state.entries.length < 2;
+      this.nodes.verifyAllButton.disabled = this.state.busy || Boolean(this.state.verificationController);
+      this.nodes.cancelVerificationButton.hidden = !this.state.verificationController;
+      for (const input of this.nodes.generationForm.querySelectorAll("input, textarea")) input.disabled = locked;
       this.nodes.saveButton.disabled = this.state.busy
-        || this.state.entries.some((item) => ["queued", "inspecting", "verifying"].includes(item.state));
-      this.nodes.verifyButton.disabled = entry.state === "verifying";
-      this.nodes.resetButton.disabled = this.state.busy;
+        || this.state.entries.some((item) => ["queued", "inspecting", "verifying", "hashing"].includes(item.state) || (item.record && Studio.canonical.validate(item.record).length));
+      const readyCount = this.state.entries.filter((item) => item.record).length;
+      this.nodes.saveButton.textContent = readyCount > 1 ? `Save ${readyCount} new copies` : "Save new copy";
+      this.nodes.saveCurrentButton.hidden = readyCount < 2;
+      this.nodes.saveCurrentButton.disabled = locked || Studio.canonical.validate(record).length > 0;
+      this.nodes.verifyButton.disabled = locked;
+      this.nodes.resetButton.disabled = locked;
       this.nodes.outputSummary.textContent = this.state.busy
         ? this.nodes.outputSummary.textContent
         : `${this.state.entries.filter((item) => item.record).length} new ${this.state.entries.filter((item) => item.record).length === 1 ? "copy" : "copies"} · original pixels retained`;
@@ -394,6 +468,7 @@
           queued: "Queued",
           inspecting: "Inspecting",
           verifying: "Verifying",
+          hashing: "Hashing model",
           ready: entry.record?.verification?.status === "verified" ? "Verified" : "Ready",
           error: "Error"
         }[entry.state] || entry.state;
@@ -422,6 +497,7 @@
 
     renderNotice() {
       const notice = this.state.notice;
+      if (notice?.id === this.lastNoticeId) return;
       if (!notice) {
         replace(this.nodes.alertRegion, []);
         return;
@@ -432,6 +508,7 @@
         text: notice.message
       }));
       this.nodes.statusAnnouncer.textContent = notice.message;
+      this.lastNoticeId = notice.id;
     }
 
     renderPreview(record) {
@@ -503,13 +580,18 @@
         const invalid = value !== "" && (
           (definition.kind === "integer" && !Number.isSafeInteger(Number(value)))
           || (definition.kind === "number" && !Number.isFinite(Number(value)))
-          || (definition.kind === "hash" && !/^[A-Fa-f0-9]{8,128}$/.test(String(value).replace(/\s+/g, "")))
+          || (["width", "height"].includes(definition.key) && Number(value) < 1)
+          || (["steps", "cfgScale", "guidance", "clipSkip", "denoise"].includes(definition.key) && Number(value) < 0)
+          || (definition.key === "denoise" && Number(value) > 1)
+          || (definition.key === "seed" && !/^-?\d+$/.test(String(value)))
+          || (definition.kind === "hash" && !/^(?:[A-Fa-f0-9]{8}|[A-Fa-f0-9]{10}|[A-Fa-f0-9]{12}|[A-Fa-f0-9]{64})$/.test(String(value).replace(/\s+/g, "")))
         );
         input.setAttribute("aria-invalid", invalid ? "true" : "false");
+        input.setAttribute("aria-describedby", `${definition.key}Meta`);
         const meta = this.nodes[`${definition.key}Meta`];
         if (meta) {
           const source = SOURCE_LABELS[field.source] || field.source || "Unknown";
-          meta.textContent = invalid ? "Review this value before saving" : `${source}${field.evidence ? ` · ${field.evidence}` : ""}`;
+          meta.textContent = invalid ? "Review this value before saving" : `${source}${field.evidence && field.evidence !== source ? ` · ${field.evidence}` : ""}`;
         }
       }
     }
@@ -615,9 +697,14 @@
     }
 
     renderResources(record) {
-      const resources = record.resources.filter((resource) => !resource.removed);
+      const all = record.resources.filter((resource) => !resource.removed);
+      const query = this.nodes.resourceFilter.value.trim().toLowerCase();
+      const status = this.nodes.resourceStatusFilter.value;
+      const resources = all.filter((resource) => (!query || [resource.name, resource.role, resource.canonicalAir, resource.rawAir, resource.versionName, resource.baseModel, ...Object.values(resource.hashes || {})].join(" ").toLowerCase().includes(query))
+        && (status === "all" || (status === "unresolved" ? !["verified", "conflict"].includes(resource.verification) : resource.verification === status)));
+      this.nodes.resourceResultCount.textContent = `${resources.length} of ${all.length}`;
       if (!resources.length) {
-        replace(this.nodes.resourcesList, empty("No resources were identified. Add one when you know what was used."));
+        replace(this.nodes.resourcesList, empty(all.length ? "No resources match these filters." : "No resources were identified. Add one when you know what was used."));
         return;
       }
       replace(this.nodes.resourcesList, resources.map((resource) => {
@@ -801,6 +888,8 @@
       }) : []);
 
       const diff = Studio.canonical.diff(record);
+      this.nodes.integrityResult.hidden = !record.exportIntegrity;
+      this.nodes.integrityResult.textContent = record.exportIntegrity ? `Last export · pixel integrity verified · ${record.exportIntegrity.before.bytes.toLocaleString()} encoded bytes unchanged · SHA-256 ${record.exportIntegrity.before.digest}` : "";
       replace(this.nodes.diffList, diff.length ? diff.map((row) => el("div", { className: "diff-row" }, [
         el("div", { className: "diff-label", text: row.label }),
         el("div", { className: "diff-value", text: `Original\n${valueText(row.before)}` }),
@@ -976,6 +1065,36 @@
       } catch {
         // Theme persistence is optional.
       }
+    }
+
+    commands() {
+      const n = this.nodes, hasImage = Boolean(this.state.current);
+      return [
+        { id: "open", title: "Open images", hint: "PNG, JPEG, WebP", run: () => n.fileInput.click() },
+        ...hasImage ? [
+          { id: "generation", title: "Edit generation recipe", hint: "Prompts and settings", run: () => this.selectEditorSection("generationSection", { focusPanel: true }) },
+          { id: "resources", title: "Find a resource", hint: "Models, LoRAs, AIRs", run: () => { this.selectEditorSection("resourcesSection"); n.resourceFilter.focus(); } },
+          { id: "review", title: "Review changes", hint: "Evidence and conflicts", run: () => this.selectEditorSection("reviewSection", { focusPanel: true }) },
+          { id: "verify", title: "Verify with Civitai", hint: "Exact IDs and hashes", run: () => n.verifyButton.click() },
+          { id: "import", title: "Import a Civitai image recipe", hint: "Public image URL or ID", run: () => n.importCivitaiImageButton.click() },
+          { id: "save", title: "Save new image copies", hint: "Originals stay unchanged", run: () => n.saveButton.click() }
+        ] : [],
+        { id: "theme", title: "Switch color theme", hint: "Light / dark", run: () => this.toggleTheme() },
+        { id: "automation", title: "Connect scripts or an assistant", hint: "Optional API + MCP", run: () => n.automationDialog.showModal() }
+      ];
+    }
+
+    openCommands() {
+      this.nodes.commandSearch.value = "";
+      this.renderCommands();
+      if (!this.nodes.commandDialog.open) this.nodes.commandDialog.showModal();
+      this.nodes.commandSearch.focus();
+    }
+
+    renderCommands() {
+      const query = this.nodes.commandSearch.value.trim().toLowerCase();
+      const commands = this.commands().filter((item) => `${item.title} ${item.hint}`.toLowerCase().includes(query));
+      replace(this.nodes.commandList, commands.length ? commands.map((command) => el("li", {}, el("button", { type: "button", dataset: { command: command.id } }, [el("strong", { text: command.title }), el("span", { text: command.hint })]))) : el("li", { className: "empty-state", text: "No matching actions. Try a different word." }));
     }
   }
 

@@ -117,7 +117,7 @@ const [directResponse, candidateResponse, imageResponse] = await Promise.all([
     method: "POST",
     body: JSON.stringify([sha256])
   }),
-  request(`/images?imageId=${imageId}&limit=1`)
+  request(`/images?imageId=${imageId}&limit=1&withMeta=true&browsingLevel=31`)
 ]);
 
 const candidates = versions(candidateResponse.value);

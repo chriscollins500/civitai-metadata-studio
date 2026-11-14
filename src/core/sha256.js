@@ -196,6 +196,7 @@
         options.onProgress?.(processed, file.size);
       }
     } finally {
+      if (options.signal?.aborted) await reader.cancel().catch(() => {});
       reader.releaseLock();
     }
     const sha256 = sha.hex();

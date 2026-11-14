@@ -15,14 +15,15 @@ for (const module of [
   "../src/core/canonical.js",
   "../src/core/identity-cache.js",
   "../src/core/civitai.js",
+  "../src/core/editing.js",
   "../src/app/state.js"
 ]) {
   await import(module);
 }
 
 const Studio = globalThis.CMStudio;
-const SOURCE_URL = "https://api.github.com/repos/civitai/civitai/contents/src/shared/constants/basemodel.constants.ts";
-const LIVE_MODELS_URL = "https://civitai.com/api/v1/models?limit=10&types=Checkpoint&sort=Most%20Downloaded&period=AllTime&primaryFileOnly=true";
+const ENUMS_URL = "https://civitai.com/api/v1/enums";
+const LIVE_MODELS_URL = "https://civitai.com/api/v1/models?limit=10&types=Checkpoint&sort=Most%20Downloaded&period=AllTime&primaryFileOnly=true&nsfw=true";
 const MAX_JSON_BYTES = 8 * 1024 * 1024;
 
 async function boundedJson(response) {
@@ -65,113 +66,6 @@ async function getJson(url, headers = {}) {
   });
   if (!response.ok) throw new Error(`${new URL(url).hostname} returned HTTP ${response.status}.`);
   return boundedJson(response);
-}
-
-function matchingDelimiter(source, start, open, close) {
-  let depth = 0;
-  let quote = "";
-  let escaped = false;
-  let lineComment = false;
-  let blockComment = false;
-  for (let index = start; index < source.length; index += 1) {
-    const character = source[index];
-    const next = source[index + 1];
-    if (lineComment) {
-      if (character === "\n") lineComment = false;
-      continue;
-    }
-    if (blockComment) {
-      if (character === "*" && next === "/") {
-        blockComment = false;
-        index += 1;
-      }
-      continue;
-    }
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (character === "\\") escaped = true;
-      else if (character === quote) quote = "";
-      continue;
-    }
-    if (character === "/" && next === "/") {
-      lineComment = true;
-      index += 1;
-      continue;
-    }
-    if (character === "/" && next === "*") {
-      blockComment = true;
-      index += 1;
-      continue;
-    }
-    if (["'", "\"", "`"].includes(character)) {
-      quote = character;
-      continue;
-    }
-    if (character === open) depth += 1;
-    if (character === close) {
-      depth -= 1;
-      if (depth === 0) return index;
-    }
-  }
-  throw new Error(`Could not find the closing ${close} in Civitai's base-model source.`);
-}
-
-function propertyString(block, property) {
-  const match = new RegExp(`\\b${property}\\s*:\\s*`, "u").exec(block);
-  if (!match) return "";
-  const start = match.index + match[0].length;
-  const quote = block[start];
-  if (!["'", "\""].includes(quote)) return "";
-  let value = "";
-  let escaped = false;
-  for (let index = start + 1; index < block.length; index += 1) {
-    const character = block[index];
-    if (escaped) {
-      const simple = { n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v" };
-      value += simple[character] ?? character;
-      escaped = false;
-    } else if (character === "\\") {
-      escaped = true;
-    } else if (character === quote) {
-      return value;
-    } else {
-      value += character;
-    }
-  }
-  throw new Error(`Civitai's ${property} value was not terminated.`);
-}
-
-function propertyBoolean(block, property) {
-  const match = new RegExp(`\\b${property}\\s*:\\s*(true|false)\\b`, "u").exec(block);
-  return match ? match[1] === "true" : false;
-}
-
-function parseBaseModelRecords(source) {
-  const marker = source.indexOf("baseModelRecords");
-  if (marker < 0) throw new Error("Civitai's baseModelRecords declaration was not found.");
-  const assignment = source.indexOf("=", marker);
-  if (assignment < 0) throw new Error("Civitai's baseModelRecords assignment was not found.");
-  const arrayStart = source.indexOf("[", assignment);
-  if (arrayStart < 0) throw new Error("Civitai's baseModelRecords array was not found.");
-  const arrayEnd = matchingDelimiter(source, arrayStart, "[", "]");
-  const body = source.slice(arrayStart + 1, arrayEnd);
-  const records = [];
-  for (let index = 0; index < body.length; index += 1) {
-    if (body[index] !== "{") continue;
-    const end = matchingDelimiter(body, index, "{", "}");
-    const block = body.slice(index, end + 1);
-    const name = propertyString(block, "name");
-    if (name) {
-      records.push({
-        name,
-        hidden: propertyBoolean(block, "hidden"),
-        disabled: propertyBoolean(block, "disabled")
-      });
-    }
-    index = end;
-  }
-  if (!records.length) throw new Error("No Civitai base-model records were parsed.");
-  return records;
 }
 
 function blankFields() {
@@ -243,15 +137,12 @@ function testFamily(record, index) {
   }
 }
 
-const sourceDocument = await getJson(SOURCE_URL, {
-  "User-Agent": "Civitai-Metadata-Studio-Regression"
-});
-if (sourceDocument.type !== "file" || typeof sourceDocument.content !== "string") {
-  throw new Error("GitHub did not return Civitai's base-model source file.");
+const enums = await getJson(ENUMS_URL);
+if (!Array.isArray(enums.BaseModel) || !enums.BaseModel.length || enums.BaseModel.some((name) => typeof name !== "string")) {
+  throw new Error("Civitai's official enums endpoint did not return base-model names.");
 }
-const source = Buffer.from(sourceDocument.content.replace(/\s/gu, ""), "base64").toString("utf8");
-const families = parseBaseModelRecords(source);
-families.forEach(testFamily);
+const enumFamilies = [...new Set(enums.BaseModel)].map((name) => ({ name }));
+enumFamilies.forEach(testFamily);
 
 const liveDocument = await getJson(LIVE_MODELS_URL);
 const liveModels = Array.isArray(liveDocument.items) ? liveDocument.items : [];
@@ -266,7 +157,7 @@ if (liveIdentities.length !== 10) {
   throw new Error(`Expected 10 live checkpoint versions, found ${liveIdentities.length}.`);
 }
 
-Studio.civitai.clearCache();
+await Studio.civitai.clearCache();
 const liveRecords = [liveIdentities.slice(0, 5), liveIdentities.slice(5)].map((identities) => ({
   dirty: false,
   resources: identities.map((identity) => Studio.canonical.normalizeResource({
@@ -303,7 +194,8 @@ if (
   || verification.checked !== 10
   || verification.verified !== 10
   || verification.unresolved !== 0
-  || verification.networkCalls !== 1
+  || verification.networkCalls < 1
+  || verification.networkCalls > 1 + new Set(liveIdentities.map((identity) => identity.modelId)).size
   || verification.batchCalls !== 1
   || verification.batchFallbacks !== 0
   || verification.images !== 2
@@ -312,19 +204,12 @@ if (
 }
 
 const report = {
-  officialBaseModelSource: {
-    repository: "civitai/civitai",
-    path: sourceDocument.path,
-    blobSha: sourceDocument.sha,
-    fetchedAt: new Date().toISOString()
-  },
-  families: {
-    total: families.length,
-    currentSelectable: families.filter((item) => !item.hidden && !item.disabled).length,
-    hidden: families.filter((item) => item.hidden).length,
-    disabled: families.filter((item) => item.disabled).length,
-    structurallyPassed: families.length,
-    labels: families.map((item) => item.name)
+  officialApiEnums: {
+    url: ENUMS_URL,
+    fetchedAt: new Date().toISOString(),
+    total: enumFamilies.length,
+    structurallyPassed: enumFamilies.length,
+    labels: enumFamilies.map((item) => item.name)
   },
   liveCheckpointVerification: {
     models: liveIdentities.map((item) => ({

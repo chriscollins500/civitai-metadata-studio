@@ -100,8 +100,11 @@ const zip = Buffer.concat([localHeader, compressed, centralHeader, end]);
 
 await mkdir(dirname(zipPath), { recursive: true });
 await writeFile(zipPath, zip);
+const htmlHash = createHash("sha256").update(html).digest("hex");
+const zipHash = createHash("sha256").update(zip).digest("hex");
+await writeFile(join(root, "dist/SHA256SUMS.txt"), `${htmlHash}  ${entryName}\n${zipHash}  civitai-metadata-studio.zip\n`, "utf8");
 
 console.log(`Packaged ${zipPath}`);
 console.log(`${zip.length.toLocaleString()} bytes`);
-console.log(`HTML SHA256 ${createHash("sha256").update(html).digest("hex")}`);
-console.log(`ZIP SHA256 ${createHash("sha256").update(zip).digest("hex")}`);
+console.log(`HTML SHA256 ${htmlHash}`);
+console.log(`ZIP SHA256 ${zipHash}`);

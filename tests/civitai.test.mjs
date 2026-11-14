@@ -73,6 +73,52 @@ function response(value, status = 200) {
   });
 }
 
+test("canceling one consumer does not cancel a shared exact-version request", async () => {
+  await clearCaches();
+  let release;
+  let calls = 0;
+  let underlyingSignal;
+  globalThis.fetch = async (_url, options) => {
+    calls += 1;
+    underlyingSignal = options.signal;
+    return new Promise((resolve) => { release = () => resolve(response(payload)); });
+  };
+  const firstController = new AbortController();
+  const secondController = new AbortController();
+  const metrics = {};
+  const first = Studio.civitai.lookupByVersion(34, { signal: firstController.signal });
+  const second = Studio.civitai.lookupByVersion(34, { signal: secondController.signal, metrics });
+  const canceled = assert.rejects(first, { name: "AbortError" });
+  await new Promise(setImmediate);
+  assert.equal(metrics.coalesced, 1);
+  assert.equal(calls, 1);
+  firstController.abort();
+  await canceled;
+  assert.equal(underlyingSignal.aborted, false);
+  release();
+  assert.equal((await second).identity.modelVersionId, 34);
+});
+
+test("canceling the last consumer aborts its request and a fresh lookup can proceed", async () => {
+  await clearCaches();
+  let calls = 0;
+  let underlyingSignal;
+  globalThis.fetch = async (_url, options) => {
+    calls += 1;
+    if (calls > 1) return response(payload);
+    underlyingSignal = options.signal;
+    return new Promise((_resolve, reject) => options.signal.addEventListener("abort", () => reject(new DOMException("Canceled", "AbortError")), { once: true }));
+  };
+  const controller = new AbortController();
+  const canceled = assert.rejects(Studio.civitai.lookupByVersion(34, { signal: controller.signal }), { name: "AbortError" });
+  await new Promise(setImmediate);
+  controller.abort();
+  await canceled;
+  assert.equal(underlyingSignal.aborted, true);
+  assert.equal((await Studio.civitai.lookupByVersion(34)).identity.modelVersionId, 34);
+  assert.equal(calls, 2);
+});
+
 test("hash lookup requires the queried hash in a returned file", async () => {
   await clearCaches();
   let requested = "";
@@ -297,7 +343,7 @@ test("claimed IDs that disagree with exact API evidence remain a conflict", () =
   assert.equal(resource.apiCandidate.modelId, 12);
 });
 
-test("record verification batches multiple model version IDs into one API request", async () => {
+test("known version IDs with full SHA256 evidence share one documented batch lookup", async () => {
   await clearCaches();
   const second = {
     ...payload,
@@ -314,21 +360,13 @@ test("record verification batches multiple model version IDs into one API reques
   const requested = [];
   globalThis.fetch = async (url, options) => {
     requested.push({ url: String(url), method: options.method });
-    return response({
-      items: [{
-        ...payload.model,
-        modelVersions: [
-          { ...payload, model: undefined },
-          { ...second, model: undefined }
-        ]
-      }]
-    });
+    return response([payload, second]);
   };
   const record = {
     dirty: false,
     resources: [
-      { name: "one", type: "Checkpoint", role: "checkpoint", modelVersionId: 34, hashes: {} },
-      { name: "two", type: "Checkpoint", role: "checkpoint", modelVersionId: 35, hashes: {} }
+      { name: "one", type: "Checkpoint", role: "checkpoint", modelId: 12, modelVersionId: 34, hashes: payload.files[0].hashes },
+      { name: "two", type: "Checkpoint", role: "checkpoint", modelId: 12, modelVersionId: 35, hashes: second.files[0].hashes }
     ]
   };
 
@@ -338,11 +376,11 @@ test("record verification batches multiple model version IDs into one API reques
   assert.equal(verification.networkCalls, 1);
   assert.equal(verification.batchCalls, 1);
   assert.equal(requested.length, 1);
-  assert.equal(requested[0].method, "GET");
-  assert.match(requested[0].url, /models\?limit=100&modelVersionIds=34,35$/);
+  assert.equal(requested[0].method, "POST");
+  assert.match(requested[0].url, /model-versions\/by-hash$/);
 });
 
-test("a model-version batch omission falls back to one direct exact lookup", async () => {
+test("a version-only resource goes straight to its exact endpoint without a list probe", async () => {
   await clearCaches();
   const requested = [];
   globalThis.fetch = async (url) => {
@@ -369,13 +407,12 @@ test("a model-version batch omission falls back to one direct exact lookup", asy
   const second = await Studio.civitai.verifyRecord(record);
 
   assert.equal(first.verified, 1);
-  assert.equal(first.networkCalls, 2);
-  assert.equal(first.batchCalls, 1);
+  assert.equal(first.networkCalls, 1);
+  assert.equal(first.batchCalls, 0);
   assert.equal(resource.canonicalAir, payload.air);
   assert.equal(firstMessage, "Exact model version ID 34");
   assert.equal(firstEvidence.kind, "modelVersionId");
   assert.deepEqual(requested.map((url) => new URL(url).pathname), [
-    "/api/v1/models",
     "/api/v1/model-versions/34"
   ]);
   assert.equal(second.verified, 1);
@@ -533,6 +570,24 @@ test("version responses cross-fill the hash cache", async () => {
   assert.equal(calls, 1);
 });
 
+test("partial batch model summaries do not poison parent metadata or mask enrichment", async () => {
+  await clearCaches();
+  await Studio.identityCache.set("model:12", { name: payload.model.name, type: "Checkpoint" }, { groupId: "model:12" });
+  const requested = [];
+  const partial = { ...payload, model: { name: payload.model.name, type: "Checkpoint" } };
+  globalThis.fetch = async (url) => {
+    requested.push(new URL(url).pathname);
+    return response(String(url).endsWith("/by-hash") ? [partial] : payload.model);
+  };
+  const record = { dirty: false, resources: [{ name: "Local checkpoint", role: "checkpoint", type: "Checkpoint", modelVersionId: 34, hashes: { SHA256: "A".repeat(64) } }] };
+  const result = await Studio.civitai.verifyRecord(record);
+  assert.equal(result.verified, 1);
+  assert.equal(record.resources[0].creator, "creator");
+  assert.match(record.resources[0].license, /credit required/);
+  assert.deepEqual(requested, ["/api/v1/model-versions/by-hash", "/api/v1/models/12"]);
+  assert.equal((await Studio.civitai.verifyRecord(record)).networkCalls, 0);
+});
+
 test("algorithm-qualified hash mappings keep CRC32 and AutoV1 identities separate", async () => {
   await clearCaches();
   const sharedHash = "DEADBEEF";
@@ -614,8 +669,9 @@ test("404 misses are negatively cached for repeated lookups", async () => {
   assert.equal(calls, 1);
 });
 
-test("HTTP 429 is not retried and opens a shared cooldown", async () => {
+test("HTTP 429 is not retried and cache clearing cannot bypass its shared cooldown", async (t) => {
   await clearCaches();
+  t.mock.method(Date, "now", () => 1_700_000_000_000);
   let calls = 0;
   globalThis.fetch = async () => {
     calls += 1;
@@ -627,6 +683,7 @@ test("HTTP 429 is not retried and opens a shared cooldown", async () => {
     /rate-limited/i
   );
   assert.equal(calls, 1);
+  await Studio.civitai.clearCache();
   await assert.rejects(
     Studio.civitai.lookupByVersion(35),
     /no additional requests/i
@@ -660,7 +717,7 @@ test("explicit Civitai image lookup normalizes aliases without caching prompt da
 
   const result = await Studio.civitai.lookupImage("https://civitai.com/images/123456");
 
-  assert.match(requested, /\/images\?imageId=123456&limit=1$/u);
+  assert.match(requested, /\/images\?imageId=123456&limit=1&withMeta=true&browsingLevel=31$/u);
   assert.equal(result.fields.positivePrompt, "public prompt");
   assert.equal(result.fields.negativePrompt, "public negative");
   assert.equal(result.fields.cfgScale, 4.5);

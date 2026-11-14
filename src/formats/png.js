@@ -37,9 +37,22 @@
   async function inflate(bytes) {
     if (typeof DecompressionStream !== "function") throw new Error("This browser does not provide DecompressionStream.");
     const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"));
-    const result = await new Response(stream).arrayBuffer();
-    if (result.byteLength > METADATA_VALUE_LIMIT) throw new Error("Compressed metadata expands beyond the safety limit.");
-    return new Uint8Array(result);
+    const reader = stream.getReader();
+    const parts = [];
+    let size = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > METADATA_VALUE_LIMIT) {
+          await reader.cancel();
+          throw new Error("Compressed metadata expands beyond the safety limit.");
+        }
+        parts.push(value);
+      }
+    } finally { reader.releaseLock(); }
+    return concatBytes(...parts);
   }
 
   async function decodeTextChunk(type, data) {

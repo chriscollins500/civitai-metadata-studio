@@ -6,7 +6,9 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const output = join(root, "dist/civitai-metadata-studio.html");
 const html = await readFile(output, "utf8");
+const license = (await readFile(join(root, "LICENSE"), "utf8")).trim();
 const failures = [];
+if (!html.includes(license)) failures.push("portable build is missing the full project license notice");
 
 const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 const cspMatch = html.match(/script-src 'sha256-([^']+)'/);
@@ -24,7 +26,9 @@ const requiredText = [
   "Generation fields",
   "Resources",
   "Other metadata",
-  "Save verified copy"
+  "Save new copy",
+  "Undo last edit",
+  "Verify pixel integrity"
 ];
 for (const text of requiredText) {
   if (!html.includes(text)) failures.push(`portable build is missing: ${text}`);

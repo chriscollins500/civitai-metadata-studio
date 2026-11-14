@@ -26,6 +26,10 @@
       this.verificationController = null;
       this.verificationEntry = null;
       this.verificationEntries = new Set();
+      this.histories = new WeakMap();
+      this.verifyExports = true;
+      this.hashingController = null;
+      this.hashingEntry = null;
     }
 
     emit() {
@@ -43,6 +47,24 @@
 
     get current() {
       return this.currentEntry?.record || null;
+    }
+
+    history(record = this.current) {
+      if (!record) return null;
+      if (!this.histories.has(record)) this.histories.set(record, new Studio.editing.History());
+      return this.histories.get(record);
+    }
+
+    checkpoint(label, group = "", record = this.current) {
+      if (record) this.history(record).push(record, label, group);
+    }
+
+    travelHistory(direction) {
+      if (!this.current || this.busy || ["verifying", "hashing"].includes(this.currentEntry.state)) return false;
+      const label = this.history().move(this.current, direction);
+      if (!label) return false;
+      this.announce(`${direction === "undo" ? "Undid" : "Redid"}: ${label}.`, "info");
+      return true;
     }
 
     async addFiles(fileList) {
@@ -97,6 +119,7 @@
       const number = Number(index);
       if (!Number.isInteger(number) || number < 0 || number >= this.entries.length) return false;
       const [removed] = this.entries.splice(number, 1);
+      if (removed === this.hashingEntry) this.hashingController?.abort();
       if (removed === this.verificationEntry || this.verificationEntries.has(removed)) {
         this.verificationController?.abort();
       }
@@ -115,6 +138,7 @@
       if (this.busy || !this.entries.length) return false;
       const count = this.entries.length;
       this.verificationController?.abort();
+      this.hashingController?.abort();
       this.verificationController = null;
       this.verificationEntry = null;
       this.verificationEntries.clear();
@@ -142,7 +166,8 @@
 
     updateField(key, value) {
       const record = this.current;
-      if (!record) return;
+      if (!record?.fields[key] || record.fields[key].value === this.parseField(key, value)) return;
+      this.checkpoint(`Edit ${key}`, `field:${key}`);
       Studio.canonical.setField(record, key, this.parseField(key, value));
       this.syncResourceFromFields(record, key);
       this.emit();
@@ -173,11 +198,12 @@
           : {};
       }
       resource.identitySource = "manual";
-      resource.verification = "unresolved";
+      Studio.editing.invalidate(resource, record);
     }
 
     updateMetadataSelection(id, preserve) {
       if (!this.current || !(id in this.current.metadataSelections)) return;
+      this.checkpoint("Change metadata preservation");
       this.current.metadataSelections[id] = Boolean(preserve);
       this.current.dirty = true;
       this.emit();
@@ -186,6 +212,7 @@
     addResource() {
       const record = this.current;
       if (!record) return null;
+      this.checkpoint("Add resource");
       const resource = Studio.canonical.normalizeResource({
         name: "New resource",
         role: "other",
@@ -213,6 +240,8 @@
       const record = this.current;
       const resource = record?.resources.find((item) => item.key === key);
       if (!resource) return null;
+      this.checkpoint("Edit resource");
+      Studio.editing.invalidate(resource, record);
       const parsedAir = Studio.air.parseAir(data.rawAir || data.canonicalAir || "");
       resource.name = sanitizeText(data.name || "Unidentified resource", 512);
       resource.role = sanitizeText(data.role || "other", 80);
@@ -269,12 +298,13 @@
       if (!mapping) return;
       Studio.canonical.setField(record, mapping.name, resource.name);
       const hash = strongestHash(resource.hashes);
-      if (hash) Studio.canonical.setField(record, mapping.hash, hash);
+      Studio.canonical.setField(record, mapping.hash, hash || "");
     }
 
     removeResource(key) {
       const resource = this.current?.resources.find((item) => item.key === key);
       if (!resource) return;
+      this.checkpoint("Remove resource");
       resource.removed = true;
       this.current.dirty = true;
       this.emit();
@@ -285,7 +315,9 @@
       const conflict = record?.conflicts.find((item) => item.id === conflictId);
       const option = conflict?.alternatives[Number(optionIndex)];
       if (!conflict || !option) return;
+      this.checkpoint("Resolve field conflict");
       Studio.canonical.setField(record, conflict.field, option.value);
+      this.syncResourceFromFields(record, conflict.field);
       conflict.resolved = true;
       this.emit();
     }
@@ -294,29 +326,53 @@
       const record = this.current;
       const resource = record?.resources.find((item) => item.key === key);
       if (!resource || !(file instanceof File)) return null;
+      const entry = this.currentEntry;
+      if (this.busy || this.hashingController || entry.state === "verifying") throw new Error("Wait for the current operation to finish before hashing a model.");
+      const before = clone(resource);
+      const beforeVerification = clone(record.verification);
+      const controller = new AbortController();
+      this.hashingController = controller;
+      this.hashingEntry = entry;
+      entry.state = "hashing";
+      this.checkpoint("Hash model file");
+      Studio.editing.invalidate(resource, record);
       resource.verification = "hashing";
       resource.verificationMessage = "Hashing local model file…";
       this.emit();
-      const hashes = await Studio.sha256.hashModelFile(file, {
-        onProgress: (processed, total) => {
-          resource.verificationMessage = `Hashing ${Math.round(processed / Math.max(1, total) * 100)}%`;
-          onProgress?.(processed, total);
-          this.emit();
-        }
-      });
-      resource.hashes = { ...resource.hashes, ...hashes };
-      resource.filename ||= Studio.util.basename(file.name);
-      resource.verification = "unresolved";
-      resource.verificationMessage = "Local hash complete. Ready for Civitai verification.";
-      record.dirty = true;
-      this.emit();
-      return hashes;
+      try {
+        const hashes = await Studio.sha256.hashModelFile(file, {
+          signal: controller.signal,
+          onProgress: (processed, total) => {
+            resource.verificationMessage = `Hashing ${Math.round(processed / Math.max(1, total) * 100)}%`;
+            onProgress?.(processed, total);
+            this.emit();
+          }
+        });
+        controller.signal.throwIfAborted();
+        resource.hashes = { ...resource.hashes, ...hashes };
+        resource.filename ||= Studio.util.basename(file.name);
+        resource.verification = "unresolved";
+        resource.verificationMessage = "Local hash complete. Ready for Civitai verification.";
+        record.dirty = true;
+        this.emit();
+        return hashes;
+      } catch (error) {
+        for (const key of Object.keys(resource)) delete resource[key];
+        Object.assign(resource, before);
+        record.verification = beforeVerification;
+        throw error;
+      } finally {
+        if (entry.state === "hashing") entry.state = "ready";
+        if (this.hashingController === controller) { this.hashingController = null; this.hashingEntry = null; }
+        this.emit();
+      }
     }
 
     async verifyEntry(entry, automatic = false) {
-      if (!entry?.record || entry.state === "verifying" || !this.entries.includes(entry)) return;
+      if (!entry?.record || ["verifying", "hashing"].includes(entry.state) || !this.entries.includes(entry)) return;
       this.verificationController?.abort();
       const controller = new AbortController();
+      this.checkpoint("Verify resource identities", "", entry.record);
       this.verificationController = controller;
       this.verificationEntry = entry;
       this.verificationEntries = new Set([entry]);
@@ -344,6 +400,7 @@
         if (!this.entries.includes(entry)) return;
         if (error.name === "AbortError") {
           entry.state = "ready";
+          if (entry.record.verification.status === "checking") entry.record.verification.status = "unverified";
         } else {
           entry.state = "ready";
           entry.record.verification.status = "warning";
@@ -363,7 +420,7 @@
     async verifyEntries(entries, automatic = false) {
       const candidates = [...new Set(entries)].filter((entry) =>
         entry?.record
-        && entry.state !== "verifying"
+        && !["verifying", "hashing"].includes(entry.state)
         && this.entries.includes(entry)
       );
       if (!candidates.length) return;
@@ -378,6 +435,7 @@
       this.verificationEntry = null;
       this.verificationEntries = new Set(candidates);
       for (const entry of candidates) entry.state = "verifying";
+      for (const entry of candidates) this.checkpoint("Verify resource identities", "", entry.record);
       this.emit();
 
       const sharedMetrics = {
@@ -428,7 +486,10 @@
         }
       } catch (error) {
         for (const entry of candidates) {
-          if (this.entries.includes(entry) && entry.state === "verifying") entry.state = "ready";
+          if (this.entries.includes(entry) && entry.state === "verifying") {
+            entry.state = "ready";
+            if (entry.record.verification.status === "checking") entry.record.verification.status = "unverified";
+          }
         }
         if (error.name !== "AbortError" && !automatic) this.announce(error.message, "error");
         this.emit();
@@ -445,10 +506,12 @@
       if (this.currentEntry) await this.verifyEntry(this.currentEntry, false);
     }
 
-    async importCivitaiImage(value) {
+    async importCivitaiImage(value, { signal } = {}) {
       const record = this.current;
       if (!record) throw new Error("Open an image before importing Civitai image metadata.");
-      const remote = await Studio.civitai.lookupImage(value);
+      const remote = await Studio.civitai.lookupImage(value, { signal });
+      signal?.throwIfAborted();
+      this.checkpoint("Import Civitai image metadata", "", record);
       let importedFields = 0;
       let matchingFields = 0;
       let fieldConflicts = 0;
@@ -531,6 +594,7 @@
 
     resetCurrent() {
       if (!this.current) return;
+      this.checkpoint("Reset edits");
       Studio.canonical.reset(this.current);
       this.announce("Edits for the current image were reset.", "info");
     }
@@ -593,20 +657,17 @@
       }
       const record = this.current;
       if (!record) throw new Error("Open an image before importing identity data.");
+      this.checkpoint("Import identity evidence");
       let imported = 0;
       for (const raw of document.resources.slice(0, 5000)) {
         const candidate = Studio.canonical.normalizeResource({ ...raw, verification: "claimed", identitySource: "imported" }, "imported");
-        const match = record.resources.find((resource) => {
-          if (candidate.modelVersionId && resource.modelVersionId === candidate.modelVersionId) return true;
-          const candidateHashes = new Set(Object.values(candidate.hashes || {}));
-          if (Object.values(resource.hashes || {}).some((hash) => candidateHashes.has(hash))) return true;
-          return resource.role === candidate.role && resource.name.toLowerCase() === candidate.name.toLowerCase();
-        });
+        const match = record.resources.find((resource) => Studio.editing.exactOverlap(candidate, resource));
         if (!match) {
           record.resources.push(candidate);
           imported += 1;
           continue;
         }
+        Studio.editing.invalidate(match, record);
         for (const key of [
           "modelId",
           "modelVersionId",
@@ -626,7 +687,13 @@
             match.apiCandidate = candidate;
           }
         }
-        match.hashes = { ...candidate.hashes, ...match.hashes };
+        for (const [algorithm, hash] of Object.entries(candidate.hashes || {})) {
+          if (match.hashes[algorithm] && normalizeHash(match.hashes[algorithm]) !== normalizeHash(hash)) {
+            match.verification = "conflict";
+            match.verificationMessage = `Imported ${algorithm} conflicts with the existing value.`;
+            match.apiCandidate = candidate;
+          } else match.hashes[algorithm] = hash;
+        }
         imported += 1;
       }
       record.dirty = true;
@@ -665,11 +732,11 @@
       );
     }
 
-    async save(suffix, onProgress) {
-      if (this.entries.some((entry) => ["queued", "inspecting", "verifying"].includes(entry.state))) {
+    async save(suffix, onProgress, { currentOnly = false } = {}) {
+      if (this.entries.some((entry) => ["queued", "inspecting", "verifying", "hashing"].includes(entry.state))) {
         throw new Error("Wait for inspection and verification to finish before saving.");
       }
-      const ready = this.entries.filter((entry) => entry.record && entry.state !== "error");
+      const ready = (currentOnly ? [this.currentEntry] : this.entries).filter((entry) => entry?.record && entry.state !== "error");
       if (!ready.length) throw new Error("There are no inspected images to save.");
       const invalid = ready.flatMap((entry) =>
         Studio.canonical.validate(entry.record).map((message) => `${entry.record.fileName}: ${message}`)
@@ -679,14 +746,22 @@
       this.emit();
       try {
         const outputs = [];
+        const usedNames = new Set();
         for (let index = 0; index < ready.length; index += 1) {
           const entry = ready[index];
           onProgress?.(`Preparing ${entry.record.fileName}`, index, ready.length);
           const blob = Studio.canonical.rewrite(entry.record);
+          if (this.verifyExports) {
+            onProgress?.(`Checking original pixel payload · ${entry.record.fileName}`, index, ready.length);
+            entry.record.exportIntegrity = await Studio.integrity.verifyExport(entry.record, blob);
+          }
           const formatExtension = { png: "png", jpeg: "jpg", webp: "webp" }[entry.record.format];
           const baseOutputName = `${Studio.util.withoutExtension(entry.record.fileName)}.${formatExtension}`;
+          let name = Studio.util.outputName(baseOutputName, suffix);
+          for (let copy = 2; usedNames.has(name.toLowerCase()); copy += 1) name = Studio.util.outputName(baseOutputName, `${suffix || "_edited"}_${copy}`);
+          usedNames.add(name.toLowerCase());
           outputs.push({
-            name: Studio.util.outputName(baseOutputName, suffix),
+            name,
             blob,
             date: new Date(entry.file.lastModified || Date.now())
           });

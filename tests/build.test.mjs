@@ -5,6 +5,8 @@ import { readFile } from "node:fs/promises";
 
 test("portable build is self-contained and its CSP hash matches", async () => {
   const html = await readFile(new URL("../dist/civitai-metadata-studio.html", import.meta.url), "utf8");
+  const license = (await readFile(new URL("../LICENSE", import.meta.url), "utf8")).trim();
+  assert.ok(html.includes(license), "The standalone download must carry the complete project license.");
   const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   const expected = html.match(/script-src 'sha256-([^']+)'/)?.[1];
   assert.ok(script);

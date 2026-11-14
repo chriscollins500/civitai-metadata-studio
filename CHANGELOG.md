@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.0 - 2026-11-14
+
+- Ships a license-bearing standalone HTML, a matching portable ZIP, and a verified SHA-256 checksum manifest.
+- Adds a redesigned portable workspace with a command palette, searchable resources, edit history, clearer validation, selected-image saves, and batch actions.
+- Adds streaming SHA-256 export proofs that reopen and compare encoded pixels/frames before saving, with results visible in Review.
+- Adds an optional local companion with OpenAPI 3.2.1 HTTP endpoints and 14 official-SDK MCP tools over stdio and Streamable HTTP using the 2026-07-28 protocol.
+- Enforces explicit filesystem roots, new-file-only exports, local bearer authentication, revision checks, atomic edits, bounded sessions, cancellation, and network opt-in in automation.
+- Refreshes Civitai contracts from the current official documentation: full image metadata, mature-inclusive discovery, full SHA-256 batching, direct version-only reads, and live enum loading.
+- Removes name-based identity-import matching and stale verification proof after identity edits.
+- Preserves unresolved resource claims in JPEG/WebP metadata and repairs incomplete parent-model cache entries without discarding the whole cache.
+- Enforces compressed-metadata limits during streaming decompression and preserves the shared rate-limit cooldown when the cache is cleared.
+- Adds source-wide syntax checking, shared engine loading, and automation/browser regression coverage.
+
 ## 0.5.0 - 2026-07-30
 
 - Adds explicit Civitai image-ID/URL metadata import. Missing values are imported, disagreements become review conflicts, and header-derived pixel dimensions remain the initial editable width/height values.

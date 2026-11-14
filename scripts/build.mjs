@@ -4,44 +4,28 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const sources = [
-  "src/core/constants.js",
-  "src/core/util.js",
-  "src/core/binary.js",
-  "src/core/crc32.js",
-  "src/core/sha256.js",
-  "src/core/air.js",
-  "src/core/civitai-contract.js",
-  "src/core/a1111.js",
-  "src/core/exif.js",
-  "src/formats/png.js",
-  "src/formats/jpeg.js",
-  "src/formats/webp.js",
-  "src/core/comfy.js",
-  "src/core/canonical.js",
-  "src/core/identity-cache.js",
-  "src/core/civitai.js",
-  "src/core/zip.js",
-  "src/app/state.js",
-  "src/app/ui.js",
-  "src/app/main.js"
-];
+const engine = await readFile(join(root, "src/engine.mjs"), "utf8");
+const sources = [...engine.matchAll(/^import "\.\/(.+)";/gm)].map((match) => `src/${match[1]}`);
+sources.push("src/app/ui.js", "src/app/main.js");
+const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 
-const [template, css, ...modules] = await Promise.all([
+const [template, css, license, ...modules] = await Promise.all([
   readFile(join(root, "src/index.template.html"), "utf8"),
   readFile(join(root, "src/styles.css"), "utf8"),
+  readFile(join(root, "LICENSE"), "utf8"),
   ...sources.map((path) => readFile(join(root, path), "utf8"))
 ]);
 
 const banner = [
   "/* Civitai Metadata Studio",
   " * Generated portable build. Source modules and tests are retained in the project.",
-  ` * Version 0.5.0 · ${new Date().toISOString().slice(0, 10)}`,
+  ` * Version ${pkg.version} · ${new Date().toISOString().slice(0, 10)}`,
   " */"
 ].join("\n");
 const script = `${banner}\n${modules.join("\n\n")}\n`;
 const scriptHash = createHash("sha256").update(script, "utf8").digest("base64");
 const html = template
+  .replace("%%LICENSE%%", license.trim())
   .replace("%%SCRIPT_HASH%%", scriptHash)
   .replace("%%STYLES%%", css)
   .replace("%%SCRIPT%%", script);
