@@ -118,10 +118,14 @@ if (isMain(import.meta.url)) {
   try {
     const options = config();
     if (options.help) console.error(help);
+    else if (!process.env.STUDIO_API_TOKEN) {
+      console.error("Set STUDIO_API_TOKEN in this terminal before starting the HTTP API. See docs/automation.md or --help. Tokens are never printed or saved.");
+      process.exitCode = 1;
+    }
     else {
       const api = await createApi(options);
       const address = await api.listen(options.port);
-      console.error(`Civitai Metadata Studio API: http://127.0.0.1:${address.port}\nOpenAPI: http://127.0.0.1:${address.port}/openapi.json\nLocal bearer token: ${api.token}`);
+      console.error(`Civitai Metadata Studio API: http://127.0.0.1:${address.port}\nOpenAPI: http://127.0.0.1:${address.port}/openapi.json\nAuthentication: STUDIO_API_TOKEN from the process environment (not logged).`);
       for (const event of ["SIGINT", "SIGTERM"]) process.once(event, () => { api.server.close(); api.server.closeAllConnections(); });
     }
   } catch { console.error("Unable to start Studio API. Check configured roots, port, token length, and permissions. Use --help."); process.exitCode = 1; }

@@ -42,7 +42,7 @@ Privacy-sensitive GPS directories, device/lens serials, and MakerNotes are not c
 
 ## Optional automation companion
 
-The HTTP API binds only to `127.0.0.1` and uses a random process bearer token or a token supplied through `STUDIO_API_TOKEN`. Tokens are not persisted. Host headers must match the active loopback address; requests carrying an Origin header are rejected. No CORS access is granted. JSON body limits, request/connection/concurrency bounds, and request timeouts apply. HTTP errors omit stack traces and local paths.
+The HTTP API binds only to `127.0.0.1`. CLI startup requires `STUDIO_API_TOKEN` in the process environment; the documented setup generates a random value without printing it. Tokens are never logged or persisted. Programmatic callers may supply a token directly or use the in-memory generated token returned by `createApi`. Host headers must match the active loopback address; requests carrying an Origin header are rejected. No CORS access is granted. JSON body limits, request/connection/concurrency bounds, and request timeouts apply. HTTP errors omit stack traces and local paths.
 
 File reads require explicit roots, resolved through `realpath`. Symlinks outside those roots, device paths, and NTFS alternate streams are rejected. Exports require an existing write root, a same-format plain filename, and exclusive creation (`wx`). Originals and existing outputs are never overwritten. Exports are reopened and their encoded pixel/frame SHA-256 is compared before a file is created. Partial files from a failed write are removed only when that operation created them.
 

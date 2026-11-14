@@ -5,6 +5,8 @@ import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/cli
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 import { fileURLToPath } from "node:url";
 import { request as httpRequest } from "node:http";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
 import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -24,6 +26,25 @@ async function apiFixture(t, options = {}) {
   t.after(() => new Promise((resolve) => { api.server.close(resolve); api.server.closeAllConnections(); }));
   return { api, base: `http://127.0.0.1:${address.port}` };
 }
+test("HTTP CLI requires a process token and never logs its value", async (t) => {
+  const script = fileURLToPath(new URL("../http.mjs", import.meta.url));
+  const missing = spawnSync(process.execPath, [script, "--port", "0"], { env: { ...process.env, STUDIO_API_TOKEN: "" }, encoding: "utf8", timeout: 10_000, windowsHide: true });
+  assert.equal(missing.status, 1);
+  assert.match(missing.stderr, /Set STUDIO_API_TOKEN/);
+  const child = spawn(process.execPath, [script, "--port", "0"], { env: { ...process.env, STUDIO_API_TOKEN: testToken }, stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+  t.after(() => { if (child.exitCode === null) child.kill(); });
+  let output = "";
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("CLI did not start within ten seconds.")), 10_000);
+    const finish = (error) => { clearTimeout(timeout); error ? reject(error) : resolve(); };
+    child.once("error", finish);
+    child.once("exit", () => { if (!output.includes("not logged")) finish(new Error("CLI exited before startup.")); });
+    for (const stream of [child.stdout, child.stderr]) stream.on("data", (chunk) => { output += chunk.toString(); if (output.includes("not logged")) finish(); });
+  });
+  const closed = once(child, "close"); child.kill(); await closed;
+  assert.equal(output.includes(testToken), false);
+  assert.match(output, /not logged/);
+});
 test("HTTP auth, Host/Origin checks, body types, and OpenAPI discovery enforce the local boundary", async (t) => {
   const { base } = await apiFixture(t);
   assert.equal((await fetch(`${base}/health`)).status, 200);

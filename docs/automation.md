@@ -15,16 +15,17 @@ npm ci --prefix automation --ignore-scripts
 Choose an existing image folder and a separate existing export folder. Start the API:
 
 ```powershell
+$env:STUDIO_API_TOKEN = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 npm run api -- --read-root "C:\Images" --write-root "C:\Images\Edited" --network
 ```
 
-The companion prints a loopback URL and a temporary local bearer token to the terminal. Keep the token in a local client or its process environment. Do not paste it into chat or commit it. This is a Studio token, not a Civitai credential.
+The first line generates a random token in this terminal's process environment without printing or saving it. The companion prints its loopback URL, never the token. Configure your local client from the same environment or a local secret mechanism; do not paste the token into chat, put it in command arguments, commit it, or save it in a shell profile. This is a Studio token, not a Civitai credential. HTTP startup refuses a missing token; stdio MCP does not need one.
 
 - The API binds to **127.0.0.1 only**, on port 4318 by default. Use `--port` to change it.
 - Repeat `--read-root` to allow additional folders.
 - Omit `--write-root` for inspection and editing without disk exports.
 - Omit `--network` to disable Civitai requests entirely.
-- Stop the companion with Ctrl+C. Sessions and the generated token disappear.
+- Stop the companion with Ctrl+C to discard sessions. Close the terminal, or run `Remove-Item Env:STUDIO_API_TOKEN` when your clients no longer need the temporary token.
 
 ## HTTP API
 

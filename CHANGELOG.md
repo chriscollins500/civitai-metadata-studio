@@ -3,6 +3,7 @@
 ## 1.0.0 - 2026-11-14
 
 - Ships a license-bearing standalone HTML, a matching portable ZIP, and a verified SHA-256 checksum manifest.
+- Keeps local API bearer tokens out of startup logs and strengthens case-insensitive CSP build validation.
 - Adds a redesigned portable workspace with a command palette, searchable resources, edit history, clearer validation, selected-image saves, and batch actions.
 - Adds streaming SHA-256 export proofs that reopen and compare encoded pixels/frames before saving, with results visible in Review.
 - Adds an optional local companion with OpenAPI 3.2.1 HTTP endpoints and 14 official-SDK MCP tools over stdio and Streamable HTTP using the 2026-07-28 protocol.

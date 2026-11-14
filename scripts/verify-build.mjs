@@ -10,7 +10,7 @@ const license = (await readFile(join(root, "LICENSE"), "utf8")).trim();
 const failures = [];
 if (!html.includes(license)) failures.push("portable build is missing the full project license notice");
 
-const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
+const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/i);
 const cspMatch = html.match(/script-src 'sha256-([^']+)'/);
 if (!scriptMatch || !cspMatch) {
   failures.push("portable build is missing its inline script or CSP hash");

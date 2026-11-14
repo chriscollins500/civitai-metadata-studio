@@ -1061,7 +1061,7 @@
       "localBearer": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Ephemeral process token printed to stderr on startup, or supplied in STUDIO_API_TOKEN. Never a Civitai token."
+        "description": "Local process token supplied in STUDIO_API_TOKEN. Never printed, persisted, or used as a Civitai token."
       }
     },
     "schemas": {

@@ -44,6 +44,6 @@ export function openapi(serverUrl = "http://127.0.0.1:4318") {
   }
   return { openapi: "3.2.1", info: { title: "Civitai Metadata Studio local API", version: Studio.constants.APP_VERSION, description: "Local, authenticated automation using the portable editor's canonical engine. Configured filesystem roots only. No original overwrites." },
     servers: [{ url: serverUrl }], security: [{ localBearer: [] }], paths,
-    components: { securitySchemes: { localBearer: { type: "http", scheme: "bearer", description: "Ephemeral process token printed to stderr on startup, or supplied in STUDIO_API_TOKEN. Never a Civitai token." } },
+    components: { securitySchemes: { localBearer: { type: "http", scheme: "bearer", description: "Local process token supplied in STUDIO_API_TOKEN. Never printed, persisted, or used as a Civitai token." } },
       schemas: { ...resultSchemas, Problem: { type: "object", required: ["type", "title", "status", "code", "requestId"], properties: { type: { type: "string" }, title: { type: "string" }, status: { type: "integer" }, code: { type: "string" }, requestId: { type: "string" } } } } } };
 }

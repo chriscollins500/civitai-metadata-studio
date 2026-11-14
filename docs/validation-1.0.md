@@ -4,7 +4,7 @@ Local verification completed on **2026-11-14**. This records local test evidence
 
 ## Portable artifacts
 
-The final release-candidate build was produced at **2026-11-14 23:02:00 UTC** with version **1.0.0**.
+The verified portable build date is **2026-11-14 UTC**, version **1.0.0**. Rebuilding during release validation reproduced the exact artifact bytes below.
 
 | Artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
@@ -21,7 +21,7 @@ The embedded script CSP passed verification: `sha256-loOEYMxXO/T8qrz0eUAndb7dF4N
 | --- | --- |
 | Source, script, and test syntax | 56 modules passed |
 | Core engine and portable artifact tests | 80 passed, 0 failed |
-| HTTP and MCP integration tests | 11 passed, 0 failed |
+| HTTP and MCP integration tests | 12 passed, 0 failed |
 | Built-HTML browser tests | 36 passed, 0 failed |
 | Optional companion dependency audit | 0 known vulnerabilities reported |
 | Live Civitai endpoint contract | 4 endpoint cases passed |
@@ -32,7 +32,7 @@ The embedded script CSP passed verification: `sha256-loOEYMxXO/T8qrz0eUAndb7dF4N
 
 The public-image run queried 20 exact version IDs: 19 resolved, one unavailable version stayed unresolved, and no lookup errors occurred. Repeating verification made **zero** network requests. The checkpoint batch used one full-candidate SHA-256 request plus ten distinct parent-model reads for creator/license details; requests are not per editable field.
 
-The HTTP/MCP tests cover real local-file inspection, atomic edits, revision/ETag checks, idempotency, allowed roots, new-file-only exports, payload integrity, cancellation rollback, prompt omission, denied network access, current stdio discovery, and current Streamable HTTP discovery/calls. They use the official MCP client against the actual companion.
+The HTTP/MCP tests cover real local-file inspection, atomic edits, revision/ETag checks, idempotency, allowed roots, new-file-only exports, payload integrity, cancellation rollback, prompt omission, denied network access, current stdio discovery, and current Streamable HTTP discovery/calls. They use the official MCP client against the actual companion. A CLI regression verifies that HTTP startup requires a process token and never logs its value.
 
 Browser tests open the actual `file://` portable HTML using installed **Chrome 157.0.8103.79** and **Edge 157.0.4341.60**. Chrome viewports are 390×844, 1440×1000, and 2560×1440; Edge uses 1440×1000. Tests cover measured overflow/save-button geometry, light/dark switching, keyboard tabs/dialogs/commands, undo/redo, invalid fields, queue removal, resource filtering, exact resource links, malformed input, mocked API batching/cache/429 behavior, and downloads reopened with pixel-integrity checks. JPEG and WebP export tests use valid browser-encoded synthetic fixtures. Desktop and narrow screenshots were visually reviewed.
 
