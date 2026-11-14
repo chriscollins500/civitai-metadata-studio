@@ -124,6 +124,12 @@ The portable editor has:
 
 Exact public identity results are cached locally to make repeat lookups faster. The cache is bounded, disposable, never stores prompts or image data, and can be cleared at any time. Read the full [security and privacy notes](SECURITY.md) for the precise boundary.
 
+## Verify your download
+
+Release downloads have SHA-256 checksums and cryptographically signed GitHub/Sigstore build attestations. These connect the downloaded bytes to this repository and the workflow that built them—without adding an installer or changing the HTML file.
+
+[How to verify a download →](docs/provenance.md)
+
 ## A workspace that keeps up with you
 
 Undo an edit. Redo it. Find a resource by name, AIR, or hash. Use **Ctrl / ⌘ K** to find an action without hunting through menus. Move between the recipe, resources, other metadata, and review with the keyboard or a click.

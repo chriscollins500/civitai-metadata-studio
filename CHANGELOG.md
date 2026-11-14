@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Adds keyless GitHub/Sigstore build attestations for the portable HTML, ZIP, and checksum manifest, gated by Windows/Linux CI and verified against existing release bytes when requested manually.
+- Adds reproducible build dates through SOURCE_DATE_EPOCH and documented CLI signature verification without changing the portable app or existing release downloads.
+
 ## 1.0.0 - 2026-11-14
 
 - Ships a license-bearing standalone HTML, a matching portable ZIP, and a verified SHA-256 checksum manifest.

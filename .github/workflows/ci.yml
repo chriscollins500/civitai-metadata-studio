@@ -3,6 +3,12 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published release tag to reproduce, compare, and attest
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -21,11 +27,19 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Use Node.js 24
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
+
+      - name: Prepare reproducible release date
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: node scripts/release-attestation.mjs --prepare
 
       - name: Check source syntax
         run: npm run check
@@ -46,7 +60,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: civitai-metadata-studio-v1.0.0
+          name: civitai-metadata-studio-portable
           path: |
             dist/civitai-metadata-studio.html
             dist/civitai-metadata-studio.zip
@@ -54,3 +68,64 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
+  attest:
+    name: Attest verified release
+    needs: verify
+    if: >-
+      github.repository == 'chriscollins500/civitai-metadata-studio' &&
+      ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+      ATTEST_EXISTING_RELEASE: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Check out verifier
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Download tested Linux artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: civitai-metadata-studio-portable
+          path: dist
+
+      - name: Verify artifacts and existing release bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/verify-build.mjs
+          node scripts/verify-release.mjs
+          node scripts/release-attestation.mjs --verify
+
+      - name: Attest portable release assets
+        id: provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            dist/civitai-metadata-studio.html
+            dist/civitai-metadata-studio.zip
+            dist/SHA256SUMS.txt
+
+      - name: Verify the new signatures
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for asset in dist/civitai-metadata-studio.html dist/civitai-metadata-studio.zip dist/SHA256SUMS.txt; do
+            gh attestation verify "$asset" \
+              --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-digest "$GITHUB_SHA" \
+              --deny-self-hosted-runners
+          done

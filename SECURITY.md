@@ -55,3 +55,11 @@ The official MCP SDK implements current stdio and Streamable HTTP transport. Std
 ## Reporting a problem
 
 Keep private images, API keys, passwords, recovery codes, and identifying metadata out of issue reports. A minimal synthetic file and the exported audit report are preferred.
+
+## Release provenance
+
+The official CI workflow attests the portable HTML, ZIP, and checksum manifest using GitHub's Sigstore integration. A dedicated Ubuntu job holds short-lived OIDC and attestation-write permissions only for version-tag builds or an explicit manual run on main, after both platform test jobs pass. Pull requests and ordinary branch pushes do not sign artifacts. No long-lived signing key or new repository secret is used.
+
+Manual attestation of an existing release requires its tag to match package.json, regenerates the recorded build date through SOURCE_DATE_EPOCH, and compares GitHub's published asset sizes/digests and actual downloaded bytes with the tested rebuild. A mismatch stops signing. The workflow cannot overwrite release files or move tags; its contents permission is read-only.
+
+An attestation authenticates build origin, not safety or Windows/macOS publisher trust. Consumers should verify the repository, signer workflow, and optionally the source commit. See [download verification](docs/provenance.md).

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildDate } from "./release-attestation.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const engine = await readFile(join(root, "src/engine.mjs"), "utf8");
@@ -19,7 +20,7 @@ const [template, css, license, ...modules] = await Promise.all([
 const banner = [
   "/* Civitai Metadata Studio",
   " * Generated portable build. Source modules and tests are retained in the project.",
-  ` * Version ${pkg.version} · ${new Date().toISOString().slice(0, 10)}`,
+  ` * Version ${pkg.version} · ${buildDate(process.env.SOURCE_DATE_EPOCH)}`,
   " */"
 ].join("\n");
 const script = `${banner}\n${modules.join("\n\n")}\n`;
