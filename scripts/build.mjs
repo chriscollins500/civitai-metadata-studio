@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildDate } from "./release-attestation.mjs";
+import { buildDate, normalizeBuildText } from "./release-attestation.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const engine = await readFile(join(root, "src/engine.mjs"), "utf8");
@@ -10,12 +10,12 @@ const sources = [...engine.matchAll(/^import "\.\/(.+)";/gm)].map((match) => `sr
 sources.push("src/app/ui.js", "src/app/main.js");
 const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 
-const [template, css, license, ...modules] = await Promise.all([
+const [template, css, license, ...modules] = (await Promise.all([
   readFile(join(root, "src/index.template.html"), "utf8"),
   readFile(join(root, "src/styles.css"), "utf8"),
   readFile(join(root, "LICENSE"), "utf8"),
   ...sources.map((path) => readFile(join(root, path), "utf8"))
-]);
+])).map(normalizeBuildText);
 
 const banner = [
   "/* Civitai Metadata Studio",

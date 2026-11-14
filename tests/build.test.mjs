@@ -2,10 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { normalizeBuildText } from "../scripts/release-attestation.mjs";
 
 test("portable build is self-contained and its CSP hash matches", async () => {
   const html = await readFile(new URL("../dist/civitai-metadata-studio.html", import.meta.url), "utf8");
-  const license = (await readFile(new URL("../LICENSE", import.meta.url), "utf8")).trim();
+  const license = normalizeBuildText(await readFile(new URL("../LICENSE", import.meta.url), "utf8")).trim();
   assert.ok(html.includes(license), "The standalone download must carry the complete project license.");
   const script = html.match(/<script>([\s\S]*?)<\/script>/i)?.[1];
   const expected = html.match(/script-src 'sha256-([^']+)'/)?.[1];

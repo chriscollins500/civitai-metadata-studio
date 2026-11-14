@@ -8,6 +8,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 export const RELEASE_ASSETS = Object.freeze(["civitai-metadata-studio.html", "civitai-metadata-studio.zip", "SHA256SUMS.txt"]);
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 
+export const normalizeBuildText = (text) => text.replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+
 export function buildDate(epoch, now = new Date()) {
   if (epoch === undefined) return now.toISOString().slice(0, 10);
   if (typeof epoch !== "string" || !/^\d+$/u.test(epoch)) throw new Error("SOURCE_DATE_EPOCH must be whole Unix seconds.");

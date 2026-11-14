@@ -2,11 +2,12 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizeBuildText } from "./release-attestation.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const output = join(root, "dist/civitai-metadata-studio.html");
 const html = await readFile(output, "utf8");
-const license = (await readFile(join(root, "LICENSE"), "utf8")).trim();
+const license = normalizeBuildText(await readFile(join(root, "LICENSE"), "utf8")).trim();
 const failures = [];
 if (!html.includes(license)) failures.push("portable build is missing the full project license notice");
 

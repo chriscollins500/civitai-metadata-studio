@@ -36,7 +36,7 @@ Its tag and downloadable assets remain unchanged. Because v1.0.0 predates this w
 
 ### Reproducible dates
 
-The portable build includes a UTC date. For an attested release, CI validates the version/date recorded in the committed HTML and exports its midnight Unix timestamp as `SOURCE_DATE_EPOCH`. The build honors that timestamp, so a later-day rebuild can reproduce the same bytes. Normal local builds still default to the current UTC date. Invalid timestamps, mismatched versions, invalid dates, and changed release bytes are rejected.
+The portable build includes a UTC date. For an attested release, CI validates the version/date recorded in the committed HTML and exports its midnight Unix timestamp as `SOURCE_DATE_EPOCH`. The build honors that timestamp, so a later-day rebuild can reproduce the same bytes. Text inputs are normalized to LF so Windows checkout settings cannot change the output or CSP hash. Normal local builds still default to the current UTC date. Invalid timestamps, mismatched versions, invalid dates, and changed release bytes are rejected.
 
 If the app's source changes after a release, a manual run targeting that older release will fail the byte comparison. Use the matching reviewed source and workflow for a new release; never retag an old version to manufacture a match.
 

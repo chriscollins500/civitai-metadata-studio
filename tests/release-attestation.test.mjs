@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { RELEASE_ASSETS, buildDate, recordedBuildEpoch, validateReleaseTag, assetManifest, validatePublishedRelease, compareAssets } from "../scripts/release-attestation.mjs";
+import { RELEASE_ASSETS, buildDate, recordedBuildEpoch, validateReleaseTag, assetManifest, validatePublishedRelease, compareAssets, normalizeBuildText } from "../scripts/release-attestation.mjs";
+
+test("build input normalization produces the same LF bytes on every platform", () => {
+  assert.equal(normalizeBuildText("one\r\ntwo\rthree\n"), "one\ntwo\nthree\n");
+  assert.equal(normalizeBuildText("one\ntwo\n"), "one\ntwo\n");
+});
 
 test("release dates honor SOURCE_DATE_EPOCH without changing the default UTC date", () => {
   assert.equal(buildDate(undefined, new Date("2026-11-14T23:59:59Z")), "2026-11-14");
@@ -50,10 +55,13 @@ test("attestations are gated by both platforms and never sign pull-request or or
   assert.match(workflow, /github\.event_name == 'workflow_dispatch'/u);
   assert.match(workflow, /github\.event_name == 'push' && startsWith\(github\.ref, 'refs\/tags\/v'\)/u);
   assert.match(workflow, /--source-digest "\$GITHUB_SHA"/u);
-  const [testing, signing] = workflow.split("  attest:\n");
-  assert.doesNotMatch(testing, /id-token: write|attestations: write/u);
-  assert.match(signing, /id-token: write/u);
-  assert.doesNotMatch(signing, /contents: write/u);
-  assert.match(signing, /--deny-self-hosted-runners/u);
-  for (const name of RELEASE_ASSETS) assert.ok(signing.includes(`dist/${name}`));
+  for (const text of [workflow, normalizeBuildText(workflow).replaceAll("\n", "\r\n")]) {
+    const [testing, signing] = normalizeBuildText(text).split("  attest:\n");
+    assert.ok(signing, "The signing job must be found with either line-ending convention.");
+    assert.doesNotMatch(testing, /id-token: write|attestations: write/u);
+    assert.match(signing, /id-token: write/u);
+    assert.doesNotMatch(signing, /contents: write/u);
+    assert.match(signing, /--deny-self-hosted-runners/u);
+    for (const name of RELEASE_ASSETS) assert.ok(signing.includes(`dist/${name}`));
+  }
 });
