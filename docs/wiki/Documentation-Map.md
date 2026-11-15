@@ -47,7 +47,7 @@ This wiki is organized in layers: a friendly start, task-oriented guides, exact 
 
 ## Documentation evidence and freshness
 
-This edition was checked against application **1.0.0** source and official references on **2026-11-14**. API/provider behavior, browser support, host configuration, and SDK versions can drift. The running companion's schema is authoritative for its contract; a badge or historical test count is not a substitute for current evidence.
+The original full documentation review covered application **1.0.0** and official references on **2026-11-14**. Maintenance/version checks cover **1.0.1** on **2026-11-15**, with no generation-field or API-operation changes. API/provider behavior, browser support, host configuration, and SDK versions can drift. The running companion's schema is authoritative for its contract; a badge or historical test count is not a substitute for current evidence.
 
 Primary references:
 

@@ -10,7 +10,7 @@ import { once } from "node:events";
 import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { imageFixture } from "../../tests/fixtures.mjs";
+import { imageFixture, Studio } from "../../tests/fixtures.mjs";
 
 async function fileRoots(t) {
   const root = await mkdtemp(join(tmpdir(), "studio-transport-"));
@@ -111,7 +111,7 @@ test("the official MCP client discovers and calls structured tools over current 
   const result = await client.callTool({ name: "capabilities", arguments: {} });
   assert.equal(result.isError, undefined);
   assert.equal(result.structuredContent.permissions.network, false);
-  assert.equal(result.structuredContent.version, "1.0.0");
+  assert.equal(result.structuredContent.version, Studio.constants.APP_VERSION);
   const resources = await client.listResources(); assert.equal(resources.resources.length, 2);
   const resource = await client.readResource({ uri: "studio://capabilities" }); assert.equal(JSON.parse(resource.contents[0].text).name, "Civitai Metadata Studio");
   const prompts = await client.listPrompts(); assert.equal(prompts.prompts[0].name, "audit-image");

@@ -16,6 +16,10 @@ Substitute `civitai-metadata-studio.html` or `SHA256SUMS.txt` to verify the othe
 
 Checksums detect byte changes against a trusted expected value. Attestations additionally bind the digest to authenticated provenance. Neither is a malware-safety guarantee, Windows Authenticode signature, macOS notarization, browser trust badge, or a claim of certified SLSA level.
 
+## v1.0.1 maintenance release
+
+The maintenance release contains the reviewed dependency/native-SDK/reconnect fixes and keeps the browser workflow unchanged. Its final HTML/ZIP, source-tag provenance, exact hashes, and validation limits are recorded in the [versioned release notes](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.1/docs/releases/v1.0.1.md). Verify against `--source-ref refs/tags/v1.0.1` to require that release's source reference. Historical 1.0.0 hashes below do not apply to 1.0.1.
+
 ## v1.0.0 evidence
 
 These are the published **2026-11-14** assets, not hashes for every future build:
