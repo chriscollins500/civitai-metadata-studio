@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Installs a reproducible, integrity-pinned Node-only SDK repack with six unused standalone spawning dependencies removed (20 dependency packages to 14), preserving upstream license/modification notices and leaving Playwright unchanged.
+- Verifies archive provenance and every installed SDK file before automation tests, and adds clean-install, repack reproduction, and Chrome/Edge gates on Windows/Linux for Node.js 24 and 26.
 - Uses native Node spawning for the repository's Node-only MCP test launcher through a version- and SHA-256-pinned managed SDK patch, with no shell or legacy-spawn fallback and no installation hooks.
 - Adds patch drift/rollback/link-safety tests, ESM/CommonJS MCP and lifecycle regressions, and full Windows/Linux CI on Node.js 24 and 26 without changing the portable app or dependency versions.
 - Adds a public GitHub Pages entry point using the byte-identical portable artifact, privacy-aware support/contribution forms, community guidance, roadmap, scheduled dependency proposals, and reviewed repository/release protection profiles.

@@ -3,9 +3,15 @@ import { createHash, randomUUID } from "node:crypto";
 import { dirname, isAbsolute, join, relative, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-export const SDK_VERSION = "2.4.0";
-export const PATCH_ID = "studio-mcp-client-2.4.0-native-node-v1";
+export const UPSTREAM_SDK_VERSION = "2.4.0";
+export const UPSTREAM_URL = "https://registry.npmjs.org/@modelcontextprotocol/client/-/client-2.4.0.tgz";
+export const UPSTREAM_INTEGRITY = "sha512-LgrD2OphHuG12vfKFKz6SOnq7bKHQmhGJIAYdD+MZBn2npHEyry6uD8zvktodtl5CQM85MO0anUyD9JwmUmxww==";
+export const SDK_VERSION = "2.4.0-studio-native.1";
+export const REPACK_FILENAME = `modelcontextprotocol-client-${SDK_VERSION}.tgz`;
+export const SDK_SPEC = `file:vendor/${REPACK_FILENAME}`;
+export const PATCH_ID = "studio-mcp-client-2.4.0-native-node-v2";
 export const NODE_ONLY_MESSAGE = "Studio MCP client is Node-only; command must equal process.execPath.";
+const modificationNotice = "// Modified by Civitai Metadata Studio: native Node-only spawning (see STUDIO-PATCH.json).\n";
 const startAnchor = "\tasync start() {\n";
 const makeTarget = (name, binding, originalSHA256, patchedSHA256, from, to) => Object.freeze({
   name, originalSHA256, patchedSHA256,
@@ -17,12 +23,12 @@ const makeTarget = (name, binding, originalSHA256, patchedSHA256, from, to) => O
 export const PATCH_TARGETS = Object.freeze([
   makeTarget("stdio.mjs", "process",
     "d44adf6ca40eb7a9cafb35dec9658de2b9e17c7dea6be01c06fb8e0d594dc211",
-    "28ca1c0cb6a600a3490fe64d2c0cdb16f26aa3e180c18df19daf2b7351d2c093",
-    'import spawn from "cross-spawn";', 'import { spawn } from "node:child_process";'),
+    "f7d630bbc14181592b9a4c1a55ea009014a8ad39ffc712f6c2d44a8d69aae01d",
+    'import spawn from "cross-spawn";', modificationNotice + 'import { spawn } from "node:child_process";'),
   makeTarget("stdio.cjs", "node_process.default",
     "48de5b37b235ad86be60286b1bc8218dc42dd4e2fbb2d79d41534d55bc2f457b",
-    "edbdd64c1af33c89e6c23a2880b64ebca98bd4f54bbebfc575be5ed265fa7212",
-    'let cross_spawn = require("cross-spawn");', 'let cross_spawn = require("node:child_process").spawn;')
+    "d7e894439f93216f98f97617d9e720ccb1e5065a5029802d66c0a30b50f10eaf",
+    'let cross_spawn = require("cross-spawn");', modificationNotice + 'let cross_spawn = require("node:child_process").spawn;')
 ]);
 const defaultRoot = fileURLToPath(new URL("../automation/", import.meta.url));
 const digest = bytes => createHash("sha256").update(bytes).digest("hex");
@@ -35,8 +41,8 @@ function contains(root, target) {
 async function context(automationRoot, io) {
   const root = await io.realpath(automationRoot);
   const manifest = JSON.parse(await io.readFile(join(root, "package.json"), "utf8"));
-  if (manifest.devDependencies?.["@modelcontextprotocol/client"] !== SDK_VERSION) {
-    throw fail(`Managed MCP patch requires the exact client pin ${SDK_VERSION}; review the patch before changing it.`);
+  if (manifest.devDependencies?.["@modelcontextprotocol/client"] !== SDK_SPEC) {
+    throw fail(`Managed MCP patch requires the exact client pin ${SDK_SPEC}; review the patch before changing it.`);
   }
   const expected = join(root, "node_modules/@modelcontextprotocol/client");
   const info = await io.lstat(expected);
@@ -64,16 +70,23 @@ async function planPatches(packageRoot, io) {
     const hash = digest(before);
     if (hash === target.patchedSHA256) { plans.push({ ...target, path, before, changed: false }); continue; }
     if (hash !== target.originalSHA256) throw fail(`Unexpected SDK bytes in dist/${target.name}; no module will be patched. Review the SDK update or restore it with npm ci --ignore-scripts.`);
-    let text = before.toString("utf8");
-    for (const edit of target.edits) {
-      if (text.split(edit.from).length !== 2) throw fail(`Patch anchor drift in dist/${target.name}.`);
-      text = text.replace(edit.from, edit.to);
-    }
-    const after = Buffer.from(text);
-    if (digest(after) !== target.patchedSHA256) throw fail(`Managed patch output hash mismatch for dist/${target.name}.`);
+    const after = prepareMcpSdkModule(target, before);
     plans.push({ ...target, path, before, after, mode: info.mode, changed: true });
   }
   return plans;
+}
+
+/** The same byte-checked transform is used by the repack recipe and repair tests. */
+export function prepareMcpSdkModule(target, before) {
+  if (digest(before) !== target.originalSHA256) throw fail(`Unexpected SDK bytes in dist/${target.name}.`);
+  let text = before.toString("utf8");
+  for (const edit of target.edits) {
+    if (text.split(edit.from).length !== 2) throw fail(`Patch anchor drift in dist/${target.name}.`);
+    text = text.replace(edit.from, edit.to);
+  }
+  const after = Buffer.from(text);
+  if (digest(after) !== target.patchedSHA256) throw fail(`Managed patch output hash mismatch for dist/${target.name}.`);
+  return after;
 }
 
 async function replaceFile(plan, bytes, io) {

@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, isAbsolute, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { patchMcpSdk, PATCH_TARGETS, SDK_VERSION } from "../../scripts/patch-mcp-sdk.mjs";
+import { patchMcpSdk, PATCH_TARGETS, SDK_VERSION, SDK_SPEC } from "../../scripts/patch-mcp-sdk.mjs";
 
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const cli = fileURLToPath(new URL("../../scripts/patch-mcp-sdk.mjs", import.meta.url));
@@ -32,7 +32,7 @@ async function fixture(t, { packageLink = false, distLink = false } = {}) {
   const root = join(directory, "automation");
   const packageRoot = join(root, "node_modules/@modelcontextprotocol/client");
   await fs.mkdir(dirname(packageRoot), { recursive: true });
-  await fs.writeFile(join(root, "package.json"), JSON.stringify({ devDependencies: { "@modelcontextprotocol/client": SDK_VERSION } }));
+  await fs.writeFile(join(root, "package.json"), JSON.stringify({ devDependencies: { "@modelcontextprotocol/client": SDK_SPEC } }));
   const realPackage = packageLink ? join(directory, "linked-sdk") : packageRoot;
   const dist = distLink ? join(directory, "linked-dist") : join(realPackage, "dist");
   await fs.mkdir(realPackage, { recursive: true }); await fs.mkdir(dist, { recursive: true });
