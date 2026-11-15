@@ -45,4 +45,4 @@ The main app is **one portable HTML file**. No installer, account, or image uplo
 
 ## About this documentation
 
-This wiki documents the **1.0.0 application** and current release infrastructure. Guides distinguish implemented behavior, tested evidence, and limitations. The [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map) lists every chapter, its audience, primary sources, and maintenance process. Examples use synthetic data and illustrative paths—not private images or credentials.
+This wiki documents the **1.0.1 application** and current release infrastructure. The maintenance release keeps the same browser workflow and metadata contract while improving SDK/tooling reliability. Guides distinguish implemented behavior, tested evidence, and limitations. The [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map) lists every chapter, its audience, primary sources, and maintenance process. Examples use synthetic data and illustrative paths—not private images or credentials.

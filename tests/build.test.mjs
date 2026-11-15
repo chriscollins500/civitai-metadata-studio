@@ -3,6 +3,21 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { normalizeBuildText } from "../scripts/release-attestation.mjs";
+import Studio from "../src/engine.mjs";
+
+test("release version matches the engine, companion, lockfile, OpenAPI, wiki, and built artifact", async () => {
+  const json = async path => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
+  const [pkg, companion, lock, specification, wiki] = await Promise.all([
+    json("../package.json"), json("../automation/package.json"), json("../automation/package-lock.json"),
+    json("../docs/openapi.json"), json("../docs/wiki/manifest.json")
+  ]);
+  assert.deepEqual([
+    Studio.constants.APP_VERSION, companion.version, lock.version, lock.packages[""].version,
+    specification.info.version, wiki.applicationVersion
+  ], Array(6).fill(pkg.version));
+  const html = await readFile(new URL("../dist/civitai-metadata-studio.html", import.meta.url), "utf8");
+  assert.ok(html.includes(`Version ${pkg.version} · `));
+});
 
 test("portable build is self-contained and its CSP hash matches", async () => {
   const html = await readFile(new URL("../dist/civitai-metadata-studio.html", import.meta.url), "utf8");

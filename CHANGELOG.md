@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 - 2026-11-15
+
+- Synchronizes the portable editor, companion, OpenAPI, and documentation versions, with a release-version consistency regression and freshly verified portable assets.
 
 - Fixes the development SDK client's legacy-SSE reconnect cursor in ESM and CommonJS through a new integrity-pinned local repack, preserving live auth/protocol headers and the existing native-stdio patch.
 - Adds reconnect header-shape, cursor update/reset/UTF-8, POST separation, redirect safety, and four-module patch drift/rollback regressions to the Windows/Linux Node.js 24/26 gates.
