@@ -247,7 +247,7 @@ npm run verify
 
 The test suite covers exact hash vectors, AIR parsing, prompt boundaries, Unicode EXIF, active ComfyUI graph traversal, duplicate identity handling, API batching and caching, rate limits, 8K containers, ZIP output, CSP, accessibility contracts, and byte-identical preservation of PNG, JPEG, and WebP image payloads.
 
-The optional companion's test client uses a [managed Node-only SDK patch](docs/managed-sdk-patch.md): native spawning, exact source checks, and no shell or legacy-spawn fallback. `npm run test:automation` prepares it automatically. CI verifies the full project on Node.js 24 and 26 on Windows and Linux. The portable editor is unchanged.
+The optional companion's test client uses a [reviewed Node-only SDK repack](docs/managed-sdk-patch.md): native spawning, pinned archive/file checks, and no shell or legacy-spawn fallback. It removes six unused standalone dependencies without modifying Playwright. Clean installs are ready to use, with no installation hooks. CI reproduces the SDK and runs the full project plus Chrome/Edge checks on Node.js 24 and 26 on Windows and Linux. The portable editor is unchanged.
 
 - [Security and privacy model](SECURITY.md)
 - [Design and architecture audit](docs/design-audit.md)

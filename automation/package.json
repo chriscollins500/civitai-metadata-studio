@@ -8,7 +8,7 @@
   "scripts": {
     "api": "node --use-system-ca http.mjs",
     "mcp": "node --use-system-ca mcp.mjs",
-    "test": "node ../scripts/patch-mcp-sdk.mjs && node --import ./test-support/block-legacy-spawn.mjs --test tests/*.test.mjs",
+    "test": "node ../scripts/verify-mcp-sdk.mjs && node --import ./test-support/block-legacy-spawn.mjs --test tests/*.test.mjs",
     "schema": "node generate-openapi.mjs",
     "test:browser": "playwright test"
   },
@@ -17,5 +17,5 @@
     "@modelcontextprotocol/node": "2.1.2",
     "zod": "4.6.7"
   },
-  "devDependencies": { "@modelcontextprotocol/client": "2.4.0", "@playwright/test": "1.65.1" }
+  "devDependencies": { "@modelcontextprotocol/client": "file:vendor/modelcontextprotocol-client-2.4.0-studio-native.1.tgz", "@playwright/test": "1.65.1" }
 }

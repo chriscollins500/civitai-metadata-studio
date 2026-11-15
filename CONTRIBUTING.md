@@ -19,13 +19,14 @@ npm run verify
 
 ```powershell
 npm ci --prefix automation --ignore-scripts
-npm run sdk:patch
 npm run sdk:check
 npm run test:automation
 npm run test:browser
 ```
 
-`test:automation` also prepares and verifies the [managed Node-only SDK patch](docs/managed-sdk-patch.md) before importing the client. A fresh install restores upstream files, so reapply the patch after `npm ci`. Do not bypass a version or source-hash failure by changing the expected digests without reviewing the upstream source. There are no installation hooks. The suite blocks all six legacy spawning packages to detect fallback, and CI runs the full project on Node.js 24 and 26 on both Windows and Linux.
+`test:automation` verifies the [reviewed Node-only SDK repack](docs/managed-sdk-patch.md) before importing the client. A clean installation already contains the native patch; it does not need a post-install repair. There are no installation hooks. The suite blocks all six removed standalone spawning packages to detect fallback. CI reproduces the pinned SDK, performs clean installations, and runs the full project plus browser checks on Node.js 24 and 26 on both Windows and Linux. It provisions current Chrome/Edge only on the disposable CI runners; local tests use installed browsers.
+
+For SDK maintenance, `npm run sdk:repack` verifies byte-for-byte reproduction from the exact integrity-pinned upstream download. Only use `npm run sdk:repack -- --write` after reviewing a source/profile update; commit the archive, generated provenance/file hashes, and updated lockfile together. Never change expected hashes solely to silence a failure. Playwright's package, configuration, and internally bundled code are not part of this repack.
 
 The optional companion shares `src/engine.mjs` with the portable build. Keep operation validation in `automation/schemas.mjs`; regenerate the public OpenAPI description with `npm --prefix automation run schema`. Never introduce a second parser, metadata record, or writer for automation. Maintain explicit read/write roots, local authentication, revision checks, bounded state, network opt-in, and new-file-only exports.
 
