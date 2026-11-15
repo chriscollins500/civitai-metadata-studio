@@ -9,13 +9,13 @@ The priority is a trustworthy everyday tool: clear evidence, preserved originals
 - **Explore:** a question to investigate before committing to architecture or behavior.
 - **Done:** published and checked, with remaining limitations stated separately.
 
-No dates are invented to make the board look busy. Use [Ideas](https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/ideas) to discuss an outcome and [Issues](https://github.com/chriscollins500/civitai-metadata-studio/issues) for an actionable reproduction/proposal. The repository's linked **Projects** board is the live planning surface; this document explains its priorities and boundaries.
+No dates are invented to make the board look busy. Use [Ideas](https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/ideas) to discuss an outcome and [Issues](https://github.com/chriscollins500/civitai-metadata-studio/issues) for an actionable reproduction/proposal. The [public roadmap board](https://github.com/users/chriscollins500/projects/1) is the live planning surface; this document explains its priorities and boundaries.
 
 ## Current direction
 
 | Horizon | Work | What would count as progress? |
 | --- | --- | --- |
-| Now | Public project foundation | Helpful support/forms, dependable maintenance checks, protected release paths, and a verified hosted entry point. |
+| Done | Public project foundation | Support/forms, maintenance checks, protected release paths, and the byte-verified hosted entry point; see [setup PR](https://github.com/chriscollins500/civitai-metadata-studio/pull/2). |
 | Next | Browser portability evidence | Named current-browser/OS runs that distinguish actual coverage from portability aspirations. |
 | Next | Accessibility review | Manual keyboard and representative screen-reader checks, with concrete issues and retest evidence. |
 | Next | Complex workflow fixtures | Small, shareable tests for new loaders/switches, inactive branches, multi-output ambiguity, and identity conflicts. |
