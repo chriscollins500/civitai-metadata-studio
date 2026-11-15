@@ -14,7 +14,7 @@ npm run sdk:check
 npm run test:automation
 ```
 
-`sdk:check` is read-only. It verifies the exact archive spec, provenance, archive SHA-256/SHA-512, lockfile integrity, all 102 installed SDK file hashes, and absence of six legacy spawning packages. `test:automation` runs it before importing client code. A fresh `npm ci` installs the already prepared archive; there are no installation hooks, new helper dependencies, lockfile overrides, or global modifications.
+`sdk:check` is read-only. It verifies the exact archive spec, provenance, archive SHA-256/SHA-512, lockfile integrity, all 102 installed SDK file hashes, and absence of six legacy spawning packages. `test:automation` runs it before importing client code. A fresh `npm ci` installs the already prepared archive; there are no installation hooks, new helper dependencies, or global modifications. Three reviewed dependency overrides are documented below; they do not alter the archive or its file profile.
 
 The verifier CLI accepts no alternate path. `sdk:patch` remains an explicit low-level repair/development command, with its byte-checked transform and safety/fault-injection tests retained. Normal setup and tests never need it. Prefer reinstalling the integrity-pinned archive to repairing an unexpectedly altered dependency.
 
@@ -91,7 +91,29 @@ CI's existing required Windows and Linux jobs each reproduce the archive, clean-
 
 ## What this does not remove
 
-The six standalone packages (`cross-spawn`, `path-key`, `shebang-command`, `shebang-regex`, `which`, `isexe`) are removed from the lockfile and install tree, reducing dependency packages from 20 to 14. Playwright's separate bundled code is deliberately untouched. This is not a claim that all development tooling is free of legacy spawning code, or a change to unrelated SSE/PKCE dependencies.
+The six standalone packages (`cross-spawn`, `path-key`, `shebang-command`, `shebang-regex`, `which`, `isexe`) are removed from the lockfile and install tree, reducing dependency packages from 20 to 14. Playwright's separate bundled code is deliberately untouched. This is not a claim that all development tooling is free of legacy spawning code. The separate SSE/PKCE update below does not change the native-spawn patch.
+
+## Reviewed SSE and PKCE overrides
+
+The automation manifest pins three dependencies specifically beneath `@modelcontextprotocol/client`:
+
+| Package | Previous lock | Reviewed pin | Node requirement |
+| --- | --- | --- | --- |
+| `eventsource` | 3.0.7 | 5.1.5 | >=22.12.0 |
+| `eventsource-parser` | 3.1.1 | 4.1.3 | >=22.12 |
+| `pkce-challenge` | 5.0.1 | 6.0.0 | >=16.20.0 |
+
+These are deliberate major-version overrides beyond upstream SDK 2.4.0's declared ranges, not an upstream support guarantee. Keep them exact and coordinated: eventsource 5 needs parser 4; updating eventsource alone would retain a second parser and increase the package count to 15. The coordinated tree remains 14 packages. All three are development-client dependencies, not browser runtime dependencies. Playwright's version, dependency records, and installed files remain unchanged.
+
+Eventsource 5 and parser 4 are ESM-only; both the SDK's ESM and CommonJS entry points work on supported Node.js 24 and 26. Parser 4 intentionally discards invalid partial lines without an error callback and handles decoded/split leading BOMs. The SDK uses the public `eventsource-parser/stream` export. PKCE 6 adds a returned `code_challenge_method`; the SDK still uses the default S256 verifier/challenge pair, never a plain-method fallback. These compatibility checks are maintained in [sdk-http-dependencies.test.mjs](../automation/tests/sdk-http-dependencies.test.mjs) and run automatically through `npm run test:automation` on both CI platforms and runtimes.
+
+Tests use synthetic loopback SSE/MCP servers and an injected in-memory OAuth fetch, not real credentials, Civitai calls, or an account login. Coverage includes streamed initialization/tool discovery, malformed frames, byte-split Unicode, 401 handling, origin checks, reconnect/close, cancellation, buffer bounds, PKCE vectors, and the SDK's authorization/token/refresh helpers. This is not a real-provider OAuth interoperability guarantee.
+
+One pre-existing SDK limitation remains outside this update: its legacy-SSE fetch wrapper replaces EventSource request headers and drops `Last-Event-ID` during reconnect. EventSource itself retains that header, as a direct-package regression verifies. This does not affect the Node-only stdio launcher. No HTTP transport source was patched to address it, and the tests do not require that bug to remain.
+
+For future SDK updates, inspect its declared ranges before retaining these overrides. Remove an override when upstream supports an appropriate version; otherwise re-review the exact resolved tree and run clean installs plus every Windows/Linux Node 24/26 project and browser check. Do not loosen archive checks or broaden overrides to unrelated consumers.
+
+Primary release references, checked 2026-11-15: [eventsource](https://github.com/EventSource/eventsource/releases), [eventsource-parser](https://github.com/rexxars/eventsource-parser/releases), and [pkce-challenge](https://github.com/crouchcd/pkce-challenge/releases). Exact registry integrity values are recorded in `automation/package-lock.json`.
 
 ## Updating the SDK
 

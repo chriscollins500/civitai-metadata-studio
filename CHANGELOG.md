@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updates the MCP development client's eventsource, eventsource-parser, and pkce-challenge together through exact, SDK-scoped overrides; retains one parser and the 14-package tree without changing Playwright or the reviewed SDK archive.
+- Adds maintained ESM/CommonJS SSE, Streamable HTTP, and OAuth/PKCE compatibility regressions to the full Windows/Linux Node.js 24/26 gates.
 - Installs a reproducible, integrity-pinned Node-only SDK repack with six unused standalone spawning dependencies removed (20 dependency packages to 14), preserving upstream license/modification notices and leaving Playwright unchanged.
 - Verifies archive provenance and every installed SDK file before automation tests, and adds clean-install, repack reproduction, and Chrome/Edge gates on Windows/Linux for Node.js 24 and 26.
 - Uses native Node spawning for the repository's Node-only MCP test launcher through a version- and SHA-256-pinned managed SDK patch, with no shell or legacy-spawn fallback and no installation hooks.
