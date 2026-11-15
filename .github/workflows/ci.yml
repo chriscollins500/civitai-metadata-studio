@@ -44,6 +44,9 @@ jobs:
       - name: Check source syntax
         run: npm run check
 
+      - name: Check wiki navigation and contract coverage
+        run: npm run docs:check
+
       - name: Install optional automation tools
         run: npm ci --prefix automation --ignore-scripts
 

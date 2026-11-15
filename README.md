@@ -16,6 +16,7 @@
 <p align="center">
   <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><img alt="Download the app as a ZIP" src="https://img.shields.io/badge/Download-The_App-006b59?style=for-the-badge&logo=files&logoColor=white"></a>
   <a href="dist/civitai-metadata-studio.html"><img alt="View the standalone HTML file" src="https://img.shields.io/badge/View-Standalone_HTML-17211d?style=for-the-badge&logo=html5&logoColor=white"></a>
+  <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki"><img alt="Read the complete user and developer wiki" src="https://img.shields.io/badge/Explore-The_Wiki-4d7167?style=for-the-badge&logo=readthedocs&logoColor=white"></a>
 </p>
 
 <p align="center">
@@ -54,6 +55,8 @@ That recipe is useful—but it is often incomplete, duplicated, or simply wrong.
 4. **Review, edit, and save.** Every result is a new copy; your originals stay exactly where they are.
 
 There is no installer and nothing to configure. Keep the HTML file anywhere you like—even on a USB drive. If you prefer the loose file, open the [standalone HTML](dist/civitai-metadata-studio.html) and use GitHub's **Download raw file** button.
+
+Want a guided tour? The [complete wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki) covers first steps, every field, workflow detection, privacy, troubleshooting, HTTP/MCP automation, and release verification. Start with [Getting started](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started) or browse the [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map).
 
 ## Why would I use it?
 

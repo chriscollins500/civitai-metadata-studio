@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Adds a comprehensive 28-page GitHub wiki with user guides, complete HTTP/MCP references, privacy/preservation boundaries, and release-verification instructions; versioned sources and navigation/contract checks keep it maintainable.
 - Adds keyless GitHub/Sigstore build attestations for the portable HTML, ZIP, and checksum manifest, gated by Windows/Linux CI and verified against existing release bytes when requested manually.
 - Adds reproducible build dates through SOURCE_DATE_EPOCH and documented CLI signature verification without changing the portable app or existing release downloads.
 - Normalizes build inputs to LF and tests both line-ending conventions so Windows and Linux produce byte-identical portable artifacts.

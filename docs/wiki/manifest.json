@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "applicationVersion": "1.0.0",
+  "reviewed": "2026-11-14",
+  "wikiBase": "https://github.com/chriscollins500/civitai-metadata-studio/wiki/",
+  "pages": [
+    "Home", "Getting-Started", "Workspace-and-Keyboard", "Generation-Fields",
+    "Resources-and-Identity", "AIR-and-Hashes", "Civitai-Verification", "Civitai-Image-Import",
+    "ComfyUI-Workflow-Handling", "Conflicts-and-Provenance", "Saving-and-Pixel-Integrity",
+    "Batch-and-Identity-Exchange", "Privacy-and-Security", "Cache-and-Performance",
+    "Troubleshooting", "Formats-and-Limits", "Accessibility", "Automation-Setup",
+    "HTTP-API-Reference", "API-Cookbook", "MCP-Guide", "Architecture-and-Data-Model",
+    "Development-and-Testing", "Release-and-Provenance", "Contributing-and-Support",
+    "FAQ-and-Glossary", "Capabilities-and-Limitations", "Documentation-Map"
+  ],
+  "navigation": ["_Sidebar", "_Footer"],
+  "coverage": {
+    "generationFields": "Generation-Fields",
+    "resourceRoles": "Resources-and-Identity",
+    "httpOperations": "HTTP-API-Reference",
+    "mcpTools": "MCP-Guide"
+  }
+}
