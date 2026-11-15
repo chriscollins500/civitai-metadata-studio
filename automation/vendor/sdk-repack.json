@@ -1,7 +1,7 @@
 {
   "name": "@modelcontextprotocol/client",
-  "version": "2.4.0-studio-native.1",
-  "patch": "studio-mcp-client-2.4.0-native-node-v2",
+  "version": "2.4.0-studio-native.2",
+  "patch": "studio-mcp-client-2.4.0-native-node-sse-v3",
   "upstream": {
     "version": "2.4.0",
     "url": "https://registry.npmjs.org/@modelcontextprotocol/client/-/client-2.4.0.tgz",
@@ -9,6 +9,7 @@
   },
   "modifications": [
     "Native Node-only ESM/CommonJS spawning with modification notices",
+    "Preserve legacy SSE Last-Event-ID through the SDK fetch wrapper in ESM/CommonJS",
     "Remove the unused cross-spawn dependency",
     "Local prerelease version and this modification record"
   ],
@@ -22,18 +23,28 @@
       "name": "stdio.cjs",
       "originalSHA256": "48de5b37b235ad86be60286b1bc8218dc42dd4e2fbb2d79d41534d55bc2f457b",
       "patchedSHA256": "d7e894439f93216f98f97617d9e720ccb1e5065a5029802d66c0a30b50f10eaf"
+    },
+    {
+      "name": "index.mjs",
+      "originalSHA256": "b78923b9b9d342109f4fc2a03a9dcea7241fbb89bb2943ec4c9f05a23891b1cf",
+      "patchedSHA256": "9cd3d0133fb99389b48c0c1f8c63289a64aad5549520b0925f7d215629852808"
+    },
+    {
+      "name": "index.cjs",
+      "originalSHA256": "a77f4641ef2138baac0aa10c899e1a56e3f0c86369392a6197153ca75d61bf05",
+      "patchedSHA256": "76d64076ca1e6bdf4129900058348d4800ec04fd800f074fe237a9c4e553e5e7"
     }
   ],
   "archive": {
-    "filename": "modelcontextprotocol-client-2.4.0-studio-native.1.tgz",
-    "bytes": 1745197,
-    "sha256": "90f754a89191840331e3f576f43bb55bb14b457a4db9740221867b3f00792eaa",
-    "integrity": "sha512-ZHaxRRyCc19BlHvWx7a5kkTDF6izZ3/uRxARP3LI1oX+pOeHSPI/EqVHoeasTC98K0H7vt33wLrxmnxA8BFViA=="
+    "filename": "modelcontextprotocol-client-2.4.0-studio-native.2.tgz",
+    "bytes": 1745636,
+    "sha256": "c001a3f210b99c413226de39c5b7f285683172b7e9f4941ac2af20b7450baa3b",
+    "integrity": "sha512-DKNmZvUpJ3D2vW92gn/XeMX2XDzuqT6XlKwCx0eYefM0e4MOQ3Q1DT1zJpqCP9g3CDBMYkOKGkhDdCggbmEi2g=="
   },
   "files": {
     "LICENSE": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a",
     "README.md": "9b51e61cca2d4a7a4ec38f96d82f84920ba7b073a9d97aef09bc91bc396e3a51",
-    "dist/STUDIO-PATCH.json": "070a3dd1dbfdfd5f1c93d2d1c5d3073fb3ed798858f220f419fa0515b9ba1b0f",
+    "dist/STUDIO-PATCH.json": "c619de7fe4945912a3cfe2f2dc0f6fa70eec4eec5c81a4b2ce262d9c91c04176",
     "dist/ajvProvider-BIwGVY6G.mjs": "4bb1d3727e19de171f1c43dae687d2c52d10f1f7831a70145f0eb0dd4d7803b0",
     "dist/ajvProvider-BIwGVY6G.mjs.map": "e58ea0c58f1330afdab89de9eeb7380dc64e7867669e8602c7430f68a6e96296",
     "dist/ajvProvider-D1kNcRPE.cjs": "e22cce9fddf90f930311c55c34dca0747c7b53c079db93d3c9eca938339b3708",
@@ -72,13 +83,13 @@
     "dist/index-BCNZS4Ap.d.mts.map": "db2748f717858ee21957e908a65d6abe02f2584a716d8ab3a867076757429b4b",
     "dist/index-eUeYt8-s.d.cts": "75e2d32b29f0810b5e49eea5f0de9d29340e5c93f3b18e92c21700ac5c4ecefc",
     "dist/index-eUeYt8-s.d.cts.map": "fb14bca9d0d45062ef400998910ff6ef2fbf3215f286e55987869aad345e615e",
-    "dist/index.cjs": "a77f4641ef2138baac0aa10c899e1a56e3f0c86369392a6197153ca75d61bf05",
+    "dist/index.cjs": "76d64076ca1e6bdf4129900058348d4800ec04fd800f074fe237a9c4e553e5e7",
     "dist/index.cjs.map": "29b631e9bb1b13d70c353c887426b655992b00253b53e7bdaeaf74d079d9a0cf",
     "dist/index.d.cts": "00c6da0580dcd1d65bd5fb42b3fadd0e6121bf5a412c576b368111f671d261d5",
     "dist/index.d.cts.map": "707033f3db62d04555b18d163bb0cb1322b8c0bac8ec86d45dfbfa1a2db77828",
     "dist/index.d.mts": "314d358ab8a1a2a36d984e4bb5768c8a14ee9680ac80b37233a3c3b3b39d0468",
     "dist/index.d.mts.map": "f70dcad46ab2044c6a7246c5218e97ccee503479dfd265bb788bcac8081197ad",
-    "dist/index.mjs": "b78923b9b9d342109f4fc2a03a9dcea7241fbb89bb2943ec4c9f05a23891b1cf",
+    "dist/index.mjs": "9cd3d0133fb99389b48c0c1f8c63289a64aad5549520b0925f7d215629852808",
     "dist/index.mjs.map": "bacf4608ef385f08db97e3a7855b5c231f2b0b9fb82cbc499c0fe780d81aaca9",
     "dist/public-C-9H-ftO.cjs": "04a50007ceaa6ad66af27ab8f5b62c9351e6f8873a635b2e90b5e5b8b22c1fed",
     "dist/public-C-9H-ftO.cjs.map": "fcf631023e3255d9a2ebe0e1b4e68d21fd2d0294ac8e13592c5ce21cdcc6827b",
@@ -132,6 +143,6 @@
     "dist/validators/cfWorker.d.cts": "21ca58c31acff0327dd1dfc28c910fedd939f9df671710d70fcdbf8b8fd60d8a",
     "dist/validators/cfWorker.d.mts": "c21f212c2f49229eee662071147f29a583a8b3a5f8ef07ef7691d96f413e18f8",
     "dist/validators/cfWorker.mjs": "fcff2ccd28e7df91efeab704f85c35b5a456a37636cb2f5538d143fcf6ecc5d6",
-    "package.json": "41c910f79656f6f32883f05e80700f25c568c70504d74d25569f2a2643ca96f4"
+    "package.json": "136efd764ed9a7400c39946ba369e6f86a434225a991289ef094b218999c6be3"
   }
 }

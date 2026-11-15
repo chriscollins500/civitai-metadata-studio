@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { verifyMcpSdk, LEGACY_SPAWN_PACKAGES } from "../../scripts/verify-mcp-sdk.mjs";
-import { REPACK_FILENAME, SDK_SPEC } from "../../scripts/patch-mcp-sdk.mjs";
+import { REPACK_FILENAME, SDK_SPEC, PATCH_TARGETS } from "../../scripts/patch-mcp-sdk.mjs";
 
 const actual = fileURLToPath(new URL("../", import.meta.url));
 const json = async path => JSON.parse(await fs.readFile(path, "utf8"));
@@ -49,11 +49,13 @@ test("SDK repack rejects unknown provenance", async t => {
   await assert.rejects(verifyMcpSdk({ automationRoot: root }), /provenance/);
 });
 
-test("SDK repack refuses module hashes outside the reviewed patch profile", async t => {
-  const { root, profile } = await fixture(t), value = await json(profile);
-  value.files["dist/stdio.mjs"] = "0".repeat(64); await save(profile, value);
-  await assert.rejects(verifyMcpSdk({ automationRoot: root }), /module profile drift/);
-});
+for (const target of PATCH_TARGETS) {
+  test(`SDK repack refuses unreviewed module hashes for ${target.name}`, async t => {
+    const { root, profile } = await fixture(t), value = await json(profile);
+    value.files[`dist/${target.name}`] = "0".repeat(64); await save(profile, value);
+    await assert.rejects(verifyMcpSdk({ automationRoot: root }), /module profile drift/);
+  });
+}
 
 test("SDK repack rejects a changed lockfile integrity", async t => {
   const { root, lock } = await fixture(t), value = await json(lock);

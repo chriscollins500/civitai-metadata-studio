@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixes the development SDK client's legacy-SSE reconnect cursor in ESM and CommonJS through a new integrity-pinned local repack, preserving live auth/protocol headers and the existing native-stdio patch.
+- Adds reconnect header-shape, cursor update/reset/UTF-8, POST separation, redirect safety, and four-module patch drift/rollback regressions to the Windows/Linux Node.js 24/26 gates.
 - Updates the MCP development client's eventsource, eventsource-parser, and pkce-challenge together through exact, SDK-scoped overrides; retains one parser and the 14-package tree without changing Playwright or the reviewed SDK archive.
 - Adds maintained ESM/CommonJS SSE, Streamable HTTP, and OAuth/PKCE compatibility regressions to the full Windows/Linux Node.js 24/26 gates.
 - Installs a reproducible, integrity-pinned Node-only SDK repack with six unused standalone spawning dependencies removed (20 dependency packages to 14), preserving upstream license/modification notices and leaving Playwright unchanged.

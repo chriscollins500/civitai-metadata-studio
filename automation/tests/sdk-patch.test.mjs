@@ -52,14 +52,14 @@ test("managed SDK patch rejects --check on pristine files without changing them"
   assert.deepEqual(await hashes(dist), originals);
 });
 
-test("managed SDK patch applies both pinned formats and verifies their exact hashes", async t => {
+test("managed SDK patch applies all four pinned modules and verifies their exact hashes", async t => {
   const { root, dist, packageRoot } = await fixture(t);
   const result = await patchMcpSdk({ automationRoot: root });
-  assert.equal(result.changed.length, 2);
+  assert.equal(result.changed.length, 4);
   assert.deepEqual(await hashes(dist), patched);
   assert.equal((await patchMcpSdk({ automationRoot: root, checkOnly: true })).changed.length, 0);
   assert.deepEqual((await fs.readdir(packageRoot)).sort(), ["dist", "package.json"]);
-  assert.deepEqual((await fs.readdir(dist)).sort(), ["stdio.cjs", "stdio.mjs"]);
+  assert.deepEqual((await fs.readdir(dist)).sort(), PATCH_TARGETS.map(target => target.name).sort());
 });
 
 test("managed SDK patch is idempotent without rewriting verified modules", async t => {
@@ -71,13 +71,15 @@ test("managed SDK patch is idempotent without rewriting verified modules", async
   assert.deepEqual(after.map(stat => stat.mtimeMs), before.map(stat => stat.mtimeMs));
 });
 
-test("managed SDK patch repairs a known partial application", async t => {
-  const { root, dist } = await fixture(t);
-  await patchMcpSdk({ automationRoot: root });
-  await fs.writeFile(join(dist, PATCH_TARGETS[1].name), await originalBytes(PATCH_TARGETS[1]));
-  assert.deepEqual((await patchMcpSdk({ automationRoot: root })).changed, ["dist/stdio.cjs"]);
-  assert.deepEqual(await hashes(dist), patched);
-});
+for (const target of PATCH_TARGETS) {
+  test(`managed SDK patch repairs a known partial application in ${target.name}`, async t => {
+    const { root, dist } = await fixture(t);
+    await patchMcpSdk({ automationRoot: root });
+    await fs.writeFile(join(dist, target.name), await originalBytes(target));
+    assert.deepEqual((await patchMcpSdk({ automationRoot: root })).changed, [`dist/${target.name}`]);
+    assert.deepEqual(await hashes(dist), patched);
+  });
+}
 
 test("managed SDK patch refuses a non-exact project pin", async t => {
   const { root, dist } = await fixture(t);
@@ -95,8 +97,8 @@ for (const [name, value] of [["version", "2.5.0"], ["name", "different-package"]
   });
 }
 
-for (const index of [0, 1]) {
-  test(`managed SDK patch preflights source drift in format ${index + 1} before any write`, async t => {
+for (const [index, target] of PATCH_TARGETS.entries()) {
+  test(`managed SDK patch preflights source drift in ${target.name} before any write`, async t => {
     const { root, dist } = await fixture(t);
     await fs.appendFile(join(dist, PATCH_TARGETS[index].name), "\n// unreviewed change\n");
     const before = await hashes(dist);
@@ -135,7 +137,7 @@ test("managed SDK patch rolls back a failed second rename and removes owned temp
   } };
   await assert.rejects(patchMcpSdk({ automationRoot: root, io }), /simulated rename failure/);
   assert.deepEqual(await hashes(dist), originals);
-  assert.deepEqual((await fs.readdir(dist)).sort(), ["stdio.cjs", "stdio.mjs"]);
+  assert.deepEqual((await fs.readdir(dist)).sort(), PATCH_TARGETS.map(target => target.name).sort());
   assert.deepEqual((await fs.readdir(packageRoot)).sort(), ["dist", "package.json"]);
 });
 
@@ -153,6 +155,19 @@ test("managed SDK patch preserves concurrent unknown edits during rollback", asy
   await assert.rejects(patchMcpSdk({ automationRoot: root, io }), /concurrent changes were not overwritten/);
   assert.deepEqual(await fs.readFile(changedFile), unknown);
   assert.equal(hash(await fs.readFile(join(dist, "stdio.cjs"))), originals[1]);
+});
+
+test("managed SDK patch rolls back every module when the final SSE rename fails", async t => {
+  const { root, packageRoot, dist } = await fixture(t);
+  let injected = false;
+  const io = { ...fs, async rename(from, to) {
+    if (!injected && to === join(dist, "index.cjs")) { injected = true; throw new Error("simulated final SSE rename failure"); }
+    return fs.rename(from, to);
+  } };
+  await assert.rejects(patchMcpSdk({ automationRoot: root, io }), /simulated final SSE rename failure/);
+  assert.deepEqual(await hashes(dist), originals);
+  assert.deepEqual((await fs.readdir(dist)).sort(), PATCH_TARGETS.map(target => target.name).sort());
+  assert.deepEqual((await fs.readdir(packageRoot)).sort(), ["dist", "package.json"]);
 });
 
 test("managed SDK patch CLI refuses alternate targets and checks from an unrelated cwd", async t => {

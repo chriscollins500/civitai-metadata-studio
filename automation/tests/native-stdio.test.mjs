@@ -59,7 +59,9 @@ async function echoRequest(transport, value, method = "fixture/echo", id = 1) {
 }
 
 test("native stdio runs only after the exact managed SDK patch is verified", async () => {
-  assert.equal((await patchMcpSdk({ checkOnly: true })).verified.length, 2);
+  const result = await patchMcpSdk({ checkOnly: true });
+  assert.deepEqual(result.verified, ["dist/stdio.mjs", "dist/stdio.cjs", "dist/index.mjs", "dist/index.cjs"]);
+  assert.deepEqual(result.changed, []);
 });
 
 test("native stdio test tripwire blocks all six legacy spawn packages", () => {
