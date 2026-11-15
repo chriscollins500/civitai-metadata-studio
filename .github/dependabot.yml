@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /automation
+    schedule:
+      interval: weekly
+      day: monday
+      time: "10:00"
+      timezone: America/New_York
+    open-pull-requests-limit: 4
+    labels: [dependencies]
+    commit-message: {prefix: "deps(automation)"}
+    groups:
+      compatible-automation-updates:
+        patterns: ["*"]
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "10:30"
+      timezone: America/New_York
+    open-pull-requests-limit: 4
+    labels: [dependencies, infrastructure]
+    commit-message: {prefix: "deps(actions)"}
+    groups:
+      compatible-action-updates:
+        patterns: ["*"]
+        update-types: [minor, patch]

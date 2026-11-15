@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/q-a
+    about: Friendly usage help belongs in Q&A; use an issue for a reproducible defect.
+  - name: Read the complete guides
+    url: https://github.com/chriscollins500/civitai-metadata-studio/wiki
+    about: Getting started, field references, workflow handling, privacy, troubleshooting, API, and MCP.
+  - name: Report a security vulnerability privately
+    url: https://github.com/chriscollins500/civitai-metadata-studio/security/advisories/new
+    about: Never disclose a suspected exploit, secret, or private reproduction in a public issue.

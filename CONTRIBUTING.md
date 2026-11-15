@@ -2,12 +2,15 @@
 
 Thanks for helping improve Civitai Metadata Studio. The distributed application must remain a dependency-free, portable HTML file that keeps private image data on the user's device.
 
+New here? Start with [support](SUPPORT.md), the [wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki), or the [roadmap](ROADMAP.md). Please follow our [code of conduct](CODE_OF_CONDUCT.md). A helpful question, documentation correction, accessibility report, or minimal synthetic fixture is a valuable contribution.
+
 ## Development
 
 Use a current Node.js release matching `package.json`. No package installation is required for the portable editor's core checks. Install the optional companion's pinned dependencies to work on the API, MCP tools, or browser regression suite.
 
 ```powershell
 npm run check
+npm run docs:check
 npm test
 npm run verify
 ```
@@ -38,3 +41,11 @@ The optional companion shares `src/engine.mjs` with the portable build. Keep ope
 Do not commit personal images, private prompts, local workflows, machine paths, API credentials, or identifying metadata. Prefer synthetic fixtures. If a real artifact is essential to reproduce a defect, reduce it to the smallest safe test case before proposing it.
 
 When reporting a bug, include the application version, browser, image format, observable behavior, and a minimal reproduction. Do not post private source files in a public issue.
+
+## Pull requests and maintenance
+
+Use a focused branch and explain the user-visible outcome, shared implementation boundary, regression evidence, and untested surfaces in the pull-request template. Identity/privacy/payload invariants need tests, not just reassuring descriptions. PRs should pass the required Windows/Linux checks before merging. A second-person approval is not mandatory while the project has a solo maintainer; that does not make CI optional.
+
+Dependabot proposes weekly grouped minor/patch updates for `automation/` and GitHub Actions. Major updates remain separate review decisions. Dependencies stay pinned, Actions stay pinned to immutable commits, and no dependency PR is automatically merged. Security-update PRs remain distinct from routine version maintenance.
+
+Changes to the landing page use `npm run site:build` and `npm run site:check`; see [repository operations](docs/repository-operations.md) for hosting, protections, release immutability, and community maintenance. Deployment/publication is a deliberate maintainer action, not a side effect of submitting a PR.

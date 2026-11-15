@@ -42,6 +42,8 @@ Signing occurs on version-tag pushes or an explicit manual CI run on **main** wi
 
 ## Dates and reproducibility
 
+The repository enables immutable **future** releases: prepare a draft, attach and verify all assets, then publish. Published immutable assets/tags cannot be modified. This does not retroactively make the existing v1.0.0 release immutable, and it is not a reason to recreate it. Version-tag rules independently prevent moves/deletion. See [repository operations](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/docs/repository-operations.md).
+
 CI derives `SOURCE_DATE_EPOCH` from the reviewed committed release date/version, and build inputs are LF-normalized. A later rebuild can therefore reproduce the published date rather than silently changing bytes. A mismatch fails signing; it is never an instruction to replace old release assets.
 
 An application source change may intentionally prevent reproducing an older release. Make a new version through the normal review/release process; do not retag an old one to manufacture a match. Publishing a wiki is not a new application release.
