@@ -32,6 +32,8 @@
     "brand:render": "node scripts/render-social-preview.mjs",
     "api": "node --use-system-ca automation/http.mjs",
     "mcp": "node --use-system-ca automation/mcp.mjs",
+    "sdk:patch": "node scripts/patch-mcp-sdk.mjs",
+    "sdk:check": "node scripts/patch-mcp-sdk.mjs --check",
     "test:automation": "npm --prefix automation test",
     "test:browser": "npm --prefix automation run test:browser",
     "ci": "npm run check && npm run docs:check && npm test && npm run test:automation && npm run verify && npm run test:site && npm run site:build && npm run site:check",

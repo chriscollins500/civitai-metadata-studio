@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Uses native Node spawning for the repository's Node-only MCP test launcher through a version- and SHA-256-pinned managed SDK patch, with no shell or legacy-spawn fallback and no installation hooks.
+- Adds patch drift/rollback/link-safety tests, ESM/CommonJS MCP and lifecycle regressions, and full Windows/Linux CI on Node.js 24 and 26 without changing the portable app or dependency versions.
 - Adds a public GitHub Pages entry point using the byte-identical portable artifact, privacy-aware support/contribution forms, community guidance, roadmap, scheduled dependency proposals, and reviewed repository/release protection profiles.
 - Adds a comprehensive 28-page GitHub wiki with user guides, complete HTTP/MCP references, privacy/preservation boundaries, and release-verification instructions; versioned sources and navigation/contract checks keep it maintainable.
 - Adds keyless GitHub/Sigstore build attestations for the portable HTML, ZIP, and checksum manifest, gated by Windows/Linux CI and verified against existing release bytes when requested manually.

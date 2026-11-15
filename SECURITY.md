@@ -52,6 +52,8 @@ Civitai access is disabled unless `--network` is configured. Requests still use 
 
 The official MCP SDK implements current stdio and Streamable HTTP transport. Stdio stdout is reserved for protocol traffic. Embedded metadata is untrusted evidence, never an instruction or an authorization grant. MCP tool annotations are hints; actual filesystem and network restrictions are enforced by the shared service.
 
+The repository's development client has a [managed patch](docs/managed-sdk-patch.md) for the exact `@modelcontextprotocol/client@2.4.0` stdio modules. It uses native `node:child_process.spawn` and accepts only `command === process.execPath`; bare commands, shell shims, and other executables are rejected before spawning. Both input files and expected outputs have reviewed SHA-256 checks. Version/source drift stops preparation before either module is changed. The patch uses an exclusive lock, same-directory replacement, and rollback that preserves unknown concurrent edits. It runs explicitly, never as an installation hook. This does not patch external MCP hosts, the server SDK, HTTP transport, or the browser artifact, and does not remove the upstream SDK's declared legacy helper packages from the lockfile.
+
 ## Reporting a problem
 
 For a suspected vulnerability, use [GitHub's private vulnerability reporting form](https://github.com/chriscollins500/civitai-metadata-studio/security/advisories/new). Private reporting is enabled for this repository. Do not open a public issue containing exploit details, leaked credentials, private files, or identifying metadata.

@@ -50,6 +50,11 @@ jobs:
       - name: Install optional automation tools
         run: npm ci --prefix automation --ignore-scripts
 
+      - name: Apply and verify the managed Node-only SDK patch
+        run: |
+          npm run sdk:patch
+          npm run sdk:check
+
       - name: Run automated tests
         run: npm test
 
@@ -64,6 +69,16 @@ jobs:
           npm run test:site
           node scripts/build-site.mjs
           node scripts/check-site.mjs
+
+      - name: Use Node.js 26 for the second runtime gate
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+
+      - name: Verify the full project and managed patch on Node.js 26
+        run: |
+          npm run sdk:check
+          npm run ci
 
       - name: Upload verified release
         if: matrix.os == 'ubuntu-latest'
