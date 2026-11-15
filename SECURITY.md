@@ -54,7 +54,11 @@ The official MCP SDK implements current stdio and Streamable HTTP transport. Std
 
 ## Reporting a problem
 
-Keep private images, API keys, passwords, recovery codes, and identifying metadata out of issue reports. A minimal synthetic file and the exported audit report are preferred.
+For a suspected vulnerability, use [GitHub's private vulnerability reporting form](https://github.com/chriscollins500/civitai-metadata-studio/security/advisories/new). Private reporting is enabled for this repository. Do not open a public issue containing exploit details, leaked credentials, private files, or identifying metadata.
+
+Include the affected version/interface, expected versus observed security boundary, a minimal synthetic reproduction, and impact. Share only what is necessary; never include a working personal token, session cookie, recovery code, or unrelated user data. There is no guaranteed response time or paid bug bounty. Please coordinate public disclosure through the private report rather than publishing sensitive details while a fix is being investigated.
+
+Ordinary bugs and usage questions belong in the [support channels](SUPPORT.md). Browser audit reports can contain full prompts and conflicts: inspect/redact them before any public attachment. API/MCP prompt omission does not sanitize every arbitrary metadata string.
 
 ## Release provenance
 

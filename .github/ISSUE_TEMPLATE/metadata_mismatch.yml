@@ -1,0 +1,55 @@
+name: Metadata or identity mismatch
+description: A prompt, dimension, active resource, AIR/hash match, or saved record is incorrect.
+title: "[Metadata]: "
+labels: [bug, metadata]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us separate what the file claims from what can actually be verified.
+        Public Civitai IDs and resource hashes are useful; private prompts and full workflows are not needed by default.
+        Prefer a minimal synthetic fixture. Review screenshots and reports before posting.
+  - type: input
+    id: version
+    attributes: {label: Application version, placeholder: 1.0.0}
+    validations: {required: true}
+  - type: dropdown
+    id: mismatch
+    attributes:
+      label: What is wrong?
+      options:
+        - Prompt parsing or empty negative conditioning
+        - Actual dimensions versus editable metadata
+        - Disabled, bypassed, switched-off, or disconnected resource
+        - Duplicate-looking resource
+        - AIR, version, file, role, or hash resolution
+        - Metadata after export and reopen
+        - Other metadata interpretation
+    validations: {required: true}
+  - type: input
+    id: environment
+    attributes: {label: Browser or automation environment, description: Include current versions, not local paths.}
+    validations: {required: true}
+  - type: dropdown
+    id: format
+    attributes: {label: Container, options: [PNG or APNG, JPEG, WebP or animated WebP]}
+    validations: {required: true}
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Expected versus observed evidence
+      description: Describe the incorrect value/resource and why it is incorrect. Include safe source labels, exact public IDs/hashes, or relevant node classes and enabled states where applicable.
+    validations: {required: true}
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal steps and source context
+      description: Does this happen before verification, after verification/import, or only after export? For ComfyUI, compare the graph embedded in the image with the output branch—not just a subsequently edited canvas.
+    validations: {required: true}
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I reviewed every attachment and removed private prompts, workflows, paths, credentials, and identifying information.
+          required: true

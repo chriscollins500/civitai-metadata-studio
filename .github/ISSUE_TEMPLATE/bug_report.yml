@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible Metadata Studio problem without exposing private media or metadata.
+description: Something does not work in the browser editor, HTTP API, MCP companion, or documentation.
 title: "[Bug]: "
 labels:
   - bug
@@ -7,22 +7,39 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a problem. Do not attach private images, prompts, workflows, local paths, credentials, or tokens to a public issue.
+        Thanks for helping make Metadata Studio more dependable. A small, reproducible report is more useful than a large private file.
+        This is a public issue. Do not attach private images, prompts, workflows, local paths, credentials, tokens, or an unreviewed audit report.
+        Suspected security vulnerability? Use the private reporting link in the issue chooser instead.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Where did it happen?
+      options:
+        - Portable HTML editor
+        - Hosted editor on GitHub Pages
+        - Local HTTP API
+        - MCP over stdio
+        - MCP over Streamable HTTP
+        - Documentation, packaging, or download verification
+    validations:
+      required: true
 
   - type: input
     id: version
     attributes:
       label: Application version
-      description: The version shown in the build or release filename.
-      placeholder: 0.5.0
+      description: The application/release version; include a source commit when testing a development checkout.
+      placeholder: 1.0.0
     validations:
       required: true
 
   - type: input
     id: browser
     attributes:
-      label: Browser and version
-      placeholder: Chrome 140
+      label: Environment and versions
+      description: Browser and OS for the editor; Node, OS, and client/host versions for HTTP/MCP. Do not include personal paths.
+      placeholder: Current Chrome on Windows; or Node 24 with the MCP host name/version
     validations:
       required: true
 
@@ -53,6 +70,18 @@ body:
       description: List the smallest safe steps that reproduce the problem.
     validations:
       required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Safe diagnostics or screenshots
+      description: Optional warning/problem codes and redacted screenshots. Include the requestId for a companion error if useful. Never include Authorization headers or full private reports.
+
+  - type: textarea
+    id: checks
+    attributes:
+      label: What have you checked?
+      description: For example, whether the issue also occurs with automatic verification off, after reopening the saved copy, or in another current browser. Do not run destructive workarounds.
 
   - type: textarea
     id: expected

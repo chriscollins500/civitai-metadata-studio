@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="https://chriscollins500.github.io/civitai-metadata-studio/app/"><img alt="Try the editor in your browser" src="https://img.shields.io/badge/Try_It-In_Your_Browser-006b59?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
   <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><img alt="Download the app as a ZIP" src="https://img.shields.io/badge/Download-The_App-006b59?style=for-the-badge&logo=files&logoColor=white"></a>
   <a href="dist/civitai-metadata-studio.html"><img alt="View the standalone HTML file" src="https://img.shields.io/badge/View-Standalone_HTML-17211d?style=for-the-badge&logo=html5&logoColor=white"></a>
   <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki"><img alt="Read the complete user and developer wiki" src="https://img.shields.io/badge/Explore-The_Wiki-4d7167?style=for-the-badge&logo=readthedocs&logoColor=white"></a>
@@ -48,6 +49,8 @@ That recipe is useful—but it is often incomplete, duplicated, or simply wrong.
 </details>
 
 ## Use it in 30 seconds
+
+Want to try it before downloading? [Open the hosted editor](https://chriscollins500.github.io/civitai-metadata-studio/app/). It uses the same portable file, with local image processing. Download a copy below when you want offline use.
 
 1. **[Download the app](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip).** It is a tiny ZIP containing one HTML file.
 2. **Unzip it, then double-click the HTML file.** It opens in your current web browser like a small desktop app.
@@ -247,6 +250,10 @@ The test suite covers exact hash vectors, AIR parsing, prompt boundaries, Unicod
 - [Security and privacy model](SECURITY.md)
 - [Design and architecture audit](docs/design-audit.md)
 - [Contribution requirements](CONTRIBUTING.md)
+- [Get help and protect your privacy](SUPPORT.md)
+- [Roadmap and planning boundaries](ROADMAP.md)
+- [Community code of conduct](CODE_OF_CONDUCT.md)
+- [Repository operations and hosting](docs/repository-operations.md)
 - [Release history](CHANGELOG.md)
 
 ## License

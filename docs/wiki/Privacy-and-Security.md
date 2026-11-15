@@ -52,6 +52,6 @@ API/MCP prompt fields are omitted unless requested, but that is targeted minimiz
 
 ## Reporting responsibly
 
-Do not post credentials, personal images, raw private workflows, or unreviewed reports in public issues. Use a minimal synthetic reproduction. Do not assume a private security-report channel exists; check the repository's current security options before sending sensitive details.
+Do not post credentials, personal images, raw private workflows, or unreviewed reports in public issues. Use a minimal synthetic reproduction. [Private vulnerability reporting](https://github.com/chriscollins500/civitai-metadata-studio/security/advisories/new) is enabled for this repository; use it for suspected vulnerabilities, not ordinary support attachments. See [support guidance](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/SUPPORT.md) for other questions.
 
 **Source:** [Repository security policy](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/SECURITY.md) · [Release provenance](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance)

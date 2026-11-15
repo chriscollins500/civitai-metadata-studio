@@ -4,6 +4,8 @@
 
 ## Download and open
 
+You can [try the hosted editor](https://chriscollins500.github.io/civitai-metadata-studio/app/) first. It uses the same portable HTML, with local image processing and the same Civitai network controls. Browser cache storage belongs to its HTTPS origin/profile; it is separate from a downloaded file's storage. Download below for offline use.
+
 1. Open the [latest release](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest).
 2. Download `civitai-metadata-studio.zip` and extract it.
 3. Open `civitai-metadata-studio.html` in a current desktop browser.

@@ -1,0 +1,43 @@
+name: Feature or improvement
+description: Explain the outcome you need, without having to design the implementation.
+title: "[Idea]: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us the job you are trying to do and what gets in your way. Small quality-of-life improvements are welcome.
+        For an open-ended conversation, use Ideas in Discussions. This form is for a concrete, trackable proposal.
+        Keep all examples public-safe; do not attach private media or metadata.
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What would you like to accomplish?
+      description: Describe the practical outcome in your own words.
+    validations: {required: true}
+  - type: textarea
+    id: friction
+    attributes:
+      label: What is difficult today?
+      description: Include the current workflow and any workaround you use.
+    validations: {required: true}
+  - type: dropdown
+    id: area
+    attributes:
+      label: Main area
+      options: [Browser workflow, Metadata or resource identification, Accessibility, Privacy or integrity, HTTP API or MCP, Documentation or onboarding, Other]
+    validations: {required: true}
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: What would a successful result look like?
+      description: A short example or measurable acceptance condition is especially helpful. Implementation suggestions are optional.
+  - type: checkboxes
+    id: expectations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked existing issues and the roadmap for a similar proposal.
+          required: true
+        - label: My examples do not contain private media, prompts, paths, credentials, or identifying metadata.
+          required: true

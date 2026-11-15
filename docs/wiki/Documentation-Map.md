@@ -60,6 +60,8 @@ Primary references:
 
 The reviewed source of the wiki is [docs/wiki](https://github.com/chriscollins500/civitai-metadata-studio/tree/main/docs/wiki) in the main repository. Native GitHub Wiki pages live in a separate Git repository at `https://github.com/chriscollins500/civitai-metadata-studio.wiki.git`.
 
+For branch/tag protections, Pages deployment, issue forms, dependency proposals, branding, Discussions, and roadmap maintenance, use the [repository operations handbook](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/docs/repository-operations.md). Community entry points are [Support](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/SUPPORT.md), [Roadmap](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/ROADMAP.md), and the [Code of conduct](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/CODE_OF_CONDUCT.md).
+
 1. Edit the source pages and `manifest.json` when adding/removing a page.
 2. Update sidebar/navigation and any affected field/tool/route references.
 3. Run `npm run docs:check` and `node --test tests/wiki.test.mjs`.
