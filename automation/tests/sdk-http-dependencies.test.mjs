@@ -204,18 +204,131 @@ for (const mode of ['esm','cjs']) {
     await assert.rejects(bounded(transport.start()),/401|non-200|unauthor/i);assert.equal(gets,2);assert.equal(refreshes,1);assert.ok(errors.length);await transport.close();
   });
 
-  test(`${mode}: SDK legacy SSE reconnects and stops retrying after close`, async t=>{
-    let gets=0;
-    const url=await server(t,(_req,res)=>{gets++;res.writeHead(200,{'Content-Type':'text/event-stream'});
-      res.write('retry: 30\nevent: endpoint\ndata: /messages\n\n');
-      if(gets===1)res.end('id: saved-17\ndata: {"jsonrpc":"2.0","method":"fixture/first"}\n\n');
-      else res.write('data: {"jsonrpc":"2.0","method":"fixture/reconnected"}\n\n');});
-    const transport=new sdk.SSEClientTransport(new URL('/sse',url));t.after(()=>transport.close());transport.onerror=()=>{};
-    const reconnected=new Promise(r=>{transport.onmessage=m=>{if(m.method==='fixture/reconnected')r(m);};});
-    await bounded(transport.start());await bounded(reconnected);assert.equal(gets,2);
-    // Do not lock in the SDK's known reconnect-header limitation. The direct
-    // EventSource test below independently requires Last-Event-ID preservation.
-    await transport.close();await wait(90);assert.equal(gets,2);
+  for (const headerForm of ['record', 'tuples', 'Headers']) {
+    test(`${mode}: SDK legacy SSE reconnect preserves cursor and live headers (${headerForm})`, async t => {
+      const requests = [];
+      let tokens = 0, customFetches = 0;
+      const entries = [
+        ['X-Fixture', 'retained'], ['Accept', 'application/json'],
+        ['mcp-protocol-version', 'outdated'], ['Authorization', 'Bearer configured']
+      ];
+      // An explicit initial header remains supported, but a live server cursor wins.
+      if (headerForm === 'record') entries.push(['lAsT-eVeNt-Id', 'configured-start']);
+      const headers = headerForm === 'record' ? Object.fromEntries(entries)
+        : headerForm === 'tuples' ? entries : new Headers(entries);
+      const before = [...new Headers(headers)];
+      const url = await server(t, (req, res) => {
+        requests.push(req.headers);
+        res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+        res.write('retry: 30\nevent: endpoint\ndata: /messages\n\n');
+        if (requests.length === 1) {
+          res.end('id: saved-17\ndata: {"jsonrpc":"2.0","method":"fixture/first"}\n\n');
+        } else {
+          res.write('data: {"jsonrpc":"2.0","method":"fixture/reconnected"}\n\n');
+        }
+      });
+      const observeFetch = (url, init) => { customFetches++; return fetch(url, init); };
+      const options = {
+        requestInit: { headers },
+        authProvider: { token: () => `synthetic-${++tokens}` }
+      };
+      if (headerForm === 'record') options.fetch = observeFetch;
+      if (headerForm === 'tuples') {
+        options.eventSourceInit = { fetch: observeFetch };
+        options.fetch = () => { throw new Error('eventSourceInit.fetch must take precedence'); };
+      }
+      const transport = new sdk.SSEClientTransport(new URL('/sse', url), options);
+      transport.setProtocolVersion('2026-07-28');
+      t.after(() => transport.close());
+      transport.onerror = () => {}; // An EOF is expected before reconnect.
+      const resumed = new Promise(resolve => {
+        transport.onmessage = m => { if (m.method === 'fixture/reconnected') resolve(); };
+      });
+      await bounded(transport.start());
+      await bounded(resumed);
+      assert.equal(requests.length, 2);
+      assert.deepEqual(requests.map(h => h['last-event-id']),
+        [headerForm === 'record' ? 'configured-start' : undefined, 'saved-17']);
+      assert.deepEqual(requests.map(h => h.authorization), ['Bearer synthetic-1', 'Bearer synthetic-2']);
+      for (const h of requests) {
+        assert.equal(h.accept, 'text/event-stream');
+        assert.equal(h['mcp-protocol-version'], '2026-07-28');
+        assert.equal(h['x-fixture'], 'retained');
+      }
+      assert.deepEqual([...new Headers(headers)], before, 'Caller headers must not be mutated');
+      if (headerForm !== 'Headers') assert.equal(customFetches, 2);
+      await transport.close();
+      await wait(90);
+      assert.equal(requests.length, 2);
+    });
+  }
+
+  test(`${mode}: SDK legacy SSE cursor advances, clears, and retains UTF-8 without leaking onto POST`, async t => {
+    const ids = [], posts = [];
+    const unicodeId = 'cursor 雪:🐈';
+    const wireId = Buffer.from(unicodeId, 'utf8').toString('latin1');
+    const url = await server(t, async (req, res) => {
+      if (req.method === 'POST') {
+        posts.push({ headers: req.headers, message: await body(req) });
+        res.writeHead(202); res.end(); return;
+      }
+      ids.push(req.headers['last-event-id']);
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      res.write('retry: 20\nevent: endpoint\ndata: /messages\n\n');
+      if (ids.length === 1) res.end('id: 0\ndata: {"jsonrpc":"2.0","method":"fixture/first"}\n\n');
+      else if (ids.length === 2) res.end('id: changed-2\n\n'); // ID-only block.
+      else if (ids.length === 3) res.end('id:\n\n'); // Explicit cursor reset.
+      else if (ids.length === 4) res.end(`id: ${unicodeId}\n\nid: ignored\0id\n\n`);
+      else res.write('data: {"jsonrpc":"2.0","method":"fixture/resumed"}\n\n');
+    });
+    const transport = new sdk.SSEClientTransport(new URL('/sse', url));
+    t.after(() => transport.close());
+    transport.onerror = () => {};
+    const resumed = new Promise(resolve => {
+      transport.onmessage = m => { if (m.method === 'fixture/resumed') resolve(); };
+    });
+    await bounded(transport.start());
+    await bounded(resumed);
+    assert.deepEqual(ids, [undefined, '0', 'changed-2', undefined, wireId]);
+    const notification = { jsonrpc: '2.0', method: 'fixture/outbound' };
+    await bounded(transport.send(notification));
+    assert.equal(posts.length, 1);
+    assert.deepEqual(posts[0].message, notification);
+    assert.equal(posts[0].headers['last-event-id'], undefined);
+    await transport.close();
+    await wait(70);
+    assert.equal(ids.length, 5);
+  });
+
+  test(`${mode}: SDK legacy SSE reconnect never forwards cursor or auth across an origin redirect`, async t => {
+    let foreignRequests = 0;
+    const foreign = await server(t, (_req, res) => { foreignRequests++; res.writeHead(204); res.end(); });
+    const requests = [];
+    const url = await server(t, (req, res) => {
+      requests.push(req.headers);
+      if (requests.length === 1) {
+        res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+        res.end('retry: 20\nevent: endpoint\ndata: /messages\n\nid: private-cursor\n\n');
+      } else {
+        res.writeHead(302, { Location: new URL('/foreign', foreign).href }); res.end();
+      }
+    });
+    const transport = new sdk.SSEClientTransport(new URL('/sse', url), {
+      authProvider: { token: () => 'synthetic-origin-token' }
+    });
+    t.after(() => transport.close());
+    const rejected = new Promise(resolve => {
+      transport.onerror = error => {
+        if (requests.length > 1) { transport.close(); resolve(error); }
+      };
+    });
+    await bounded(transport.start());
+    const error = await bounded(rejected);
+    assert.match(error.message, /redirect|origin|302/i);
+    assert.equal(requests.length, 2);
+    assert.equal(requests[1]['last-event-id'], 'private-cursor');
+    assert.equal(requests[1].authorization, 'Bearer synthetic-origin-token');
+    assert.equal(foreignRequests, 0);
   });
 
   test(`${mode}: EventSource itself preserves Last-Event-ID on reconnect and stops on close`, async t=>{

@@ -6,10 +6,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 export const UPSTREAM_SDK_VERSION = "2.4.0";
 export const UPSTREAM_URL = "https://registry.npmjs.org/@modelcontextprotocol/client/-/client-2.4.0.tgz";
 export const UPSTREAM_INTEGRITY = "sha512-LgrD2OphHuG12vfKFKz6SOnq7bKHQmhGJIAYdD+MZBn2npHEyry6uD8zvktodtl5CQM85MO0anUyD9JwmUmxww==";
-export const SDK_VERSION = "2.4.0-studio-native.1";
+export const SDK_VERSION = "2.4.0-studio-native.2";
 export const REPACK_FILENAME = `modelcontextprotocol-client-${SDK_VERSION}.tgz`;
 export const SDK_SPEC = `file:vendor/${REPACK_FILENAME}`;
-export const PATCH_ID = "studio-mcp-client-2.4.0-native-node-v2";
+export const PATCH_ID = "studio-mcp-client-2.4.0-native-node-sse-v3";
 export const NODE_ONLY_MESSAGE = "Studio MCP client is Node-only; command must equal process.execPath.";
 const modificationNotice = "// Modified by Civitai Metadata Studio: native Node-only spawning (see STUDIO-PATCH.json).\n";
 const startAnchor = "\tasync start() {\n";
@@ -20,6 +20,14 @@ const makeTarget = (name, binding, originalSHA256, patchedSHA256, from, to) => O
     Object.freeze({ from: startAnchor, to: `${startAnchor}\t\tif (this._serverParams.command !== ${binding}.execPath) throw Object.assign(new TypeError(${JSON.stringify(NODE_ONLY_MESSAGE)}), { code: "ERR_STUDIO_NODE_ONLY" });\n` })
   ])
 });
+const sseAnchor = "\t\t\t\tfetch: async (url, init) => {\n\t\t\t\t\tconst headers = await this._commonHeaders();\n";
+const sseInsertion = "\t\t\t\t\t// Modified by Civitai Metadata Studio: preserve reconnect cursor (see STUDIO-PATCH.json).\n" +
+  '\t\t\t\t\tconst lastEventId = new Headers(init?.headers).get("last-event-id");\n' +
+  '\t\t\t\t\tif (lastEventId !== null) headers.set("Last-Event-ID", lastEventId);\n';
+const makeSseTarget = (name, originalSHA256, patchedSHA256) => Object.freeze({
+  name, originalSHA256, patchedSHA256,
+  edits: Object.freeze([Object.freeze({ from: sseAnchor, to: sseAnchor + sseInsertion })])
+});
 export const PATCH_TARGETS = Object.freeze([
   makeTarget("stdio.mjs", "process",
     "d44adf6ca40eb7a9cafb35dec9658de2b9e17c7dea6be01c06fb8e0d594dc211",
@@ -28,7 +36,13 @@ export const PATCH_TARGETS = Object.freeze([
   makeTarget("stdio.cjs", "node_process.default",
     "48de5b37b235ad86be60286b1bc8218dc42dd4e2fbb2d79d41534d55bc2f457b",
     "d7e894439f93216f98f97617d9e720ccb1e5065a5029802d66c0a30b50f10eaf",
-    'let cross_spawn = require("cross-spawn");', modificationNotice + 'let cross_spawn = require("node:child_process").spawn;')
+    'let cross_spawn = require("cross-spawn");', modificationNotice + 'let cross_spawn = require("node:child_process").spawn;'),
+  makeSseTarget("index.mjs",
+    "b78923b9b9d342109f4fc2a03a9dcea7241fbb89bb2943ec4c9f05a23891b1cf",
+    "9cd3d0133fb99389b48c0c1f8c63289a64aad5549520b0925f7d215629852808"),
+  makeSseTarget("index.cjs",
+    "a77f4641ef2138baac0aa10c899e1a56e3f0c86369392a6197153ca75d61bf05",
+    "76d64076ca1e6bdf4129900058348d4800ec04fd800f074fe237a9c4e553e5e7")
 ]);
 const defaultRoot = fileURLToPath(new URL("../automation/", import.meta.url));
 const digest = bytes => createHash("sha256").update(bytes).digest("hex");
@@ -115,7 +129,7 @@ export async function patchMcpSdk({ automationRoot = defaultRoot, checkOnly = fa
     catch (error) { if (error.code === "EEXIST") throw fail("Another SDK patch operation holds the lock; retry after it finishes. Restore the dependency with npm ci --ignore-scripts if a crashed process left a stale lock."); throw error; }
   }
   try {
-    // Validate BOTH inputs and expected outputs before replacing either module.
+    // Validate every input and expected output before replacing any module.
     const plans = await planPatches(packageRoot, io);
     const changes = plans.filter(plan => plan.changed);
     if (checkOnly && changes.length) throw fail("Managed MCP patch is not prepared. Run npm run sdk:patch before importing the client transport.");

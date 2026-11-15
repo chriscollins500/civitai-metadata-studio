@@ -56,13 +56,13 @@ await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
 const provenance = {
   name: manifest.name, version: SDK_VERSION, patch: PATCH_ID,
   upstream: { version: UPSTREAM_SDK_VERSION, url: UPSTREAM_URL, integrity: UPSTREAM_INTEGRITY },
-  modifications: ["Native Node-only ESM/CommonJS spawning with modification notices", "Remove the unused cross-spawn dependency", "Local prerelease version and this modification record"],
+  modifications: ["Native Node-only ESM/CommonJS spawning with modification notices", "Preserve legacy SSE Last-Event-ID through the SDK fetch wrapper in ESM/CommonJS", "Remove the unused cross-spawn dependency", "Local prerelease version and this modification record"],
   modules: PATCH_TARGETS.map(({ name, originalSHA256, patchedSHA256 }) => ({ name, originalSHA256, patchedSHA256 }))
 };
 await fs.writeFile(join(packageRoot, "dist/STUDIO-PATCH.json"), JSON.stringify(provenance, null, 2) + "\n");
 const files = await fileTree(packageRoot);
 const changed = [...new Set([...Object.keys(files), ...Object.keys(originalFiles)])].filter(name => files[name] !== originalFiles[name]).sort();
-if (JSON.stringify(changed) !== JSON.stringify(["dist/STUDIO-PATCH.json", "dist/stdio.cjs", "dist/stdio.mjs", "package.json"])) throw new Error("Unexpected SDK source changes.");
+if (JSON.stringify(changed) !== JSON.stringify(["dist/STUDIO-PATCH.json", "dist/index.cjs", "dist/index.mjs", "dist/stdio.cjs", "dist/stdio.mjs", "package.json"])) throw new Error("Unexpected SDK source changes.");
 if (!Object.keys(originalFiles).some(path => /^licen[cs]e/i.test(path))) throw new Error("Upstream SDK license missing.");
 const packResult = JSON.parse(await run(process.execPath, [process.env.npm_execpath, "pack", packageRoot, "--ignore-scripts", "--json", "--pack-destination", scratch], root));
 // npm 11 returns an array; npm 12 keys this result by package name.
