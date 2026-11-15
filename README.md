@@ -16,7 +16,7 @@
 <p align="center">
   <a href="https://chriscollins500.github.io/civitai-metadata-studio/app/"><img alt="Try the editor in your browser" src="https://img.shields.io/badge/Try_It-In_Your_Browser-006b59?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
   <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><img alt="Download the app as a ZIP" src="https://img.shields.io/badge/Download-The_App-006b59?style=for-the-badge&logo=files&logoColor=white"></a>
-  <a href="dist/civitai-metadata-studio.html"><img alt="View the standalone HTML file" src="https://img.shields.io/badge/View-Standalone_HTML-17211d?style=for-the-badge&logo=html5&logoColor=white"></a>
+  <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html"><img alt="Download the standalone HTML file" src="https://img.shields.io/badge/Download-Standalone_HTML-17211d?style=for-the-badge&logo=html5&logoColor=white"></a>
   <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki"><img alt="Read the complete user and developer wiki" src="https://img.shields.io/badge/Explore-The_Wiki-4d7167?style=for-the-badge&logo=readthedocs&logoColor=white"></a>
 </p>
 
@@ -57,7 +57,9 @@ Want to try it before downloading? [Open the hosted editor](https://chriscollins
 3. **Drop in one image or a whole batch.** PNG, JPEG, and WebP are supported.
 4. **Review, edit, and save.** Every result is a new copy; your originals stay exactly where they are.
 
-There is no installer and nothing to configure. Keep the HTML file anywhere you like—even on a USB drive. If you prefer the loose file, open the [standalone HTML](dist/civitai-metadata-studio.html) and use GitHub's **Download raw file** button.
+There is no installer and nothing to configure. Keep the HTML file anywhere you like—even on a USB drive. If you prefer the loose file, [download the standalone HTML directly](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html).
+
+**Current release: [1.0.1](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1).** The download buttons follow the latest published release. For the exact 1.0.1 files, checksums, SDK/dependency changes, and verification results, read the [release notes](docs/releases/v1.0.1.md).
 
 Want a guided tour? The [complete wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki) covers first steps, every field, workflow detection, privacy, troubleshooting, HTTP/MCP automation, and release verification. Start with [Getting started](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started) or browse the [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map).
 
@@ -150,7 +152,7 @@ Choose the folders it may read, the folder for new exports, and whether it may c
 
 [Set up the API and MCP companion →](docs/automation.md)
 
-[See the tested builds, browser coverage, and validation limits →](docs/validation-1.0.md)
+[See the 1.0.1 test results, artifact checksums, and validation limits →](docs/releases/v1.0.1.md#validation-and-exact-files)
 
 ## Your pixels stay your pixels
 

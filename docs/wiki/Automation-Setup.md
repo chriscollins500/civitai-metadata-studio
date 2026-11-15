@@ -13,15 +13,18 @@ The portable HTML does not need Node, npm, or a server. The companion is an opti
 
 ## Prerequisites
 
-Use Node.js **24 or newer**, a checkout of the repository, and existing folders for input and output. The optional companion has pinned dependencies; the browser app still has no runtime dependencies.
+Use Node.js **24 or newer**, a checkout of the repository, and existing folders for input and output. For the released version, use the **[v1.0.1 source](https://github.com/chriscollins500/civitai-metadata-studio/tree/v1.0.1)** or its source-code archive on the [release page](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1). The portable app ZIP contains only the HTML, not the companion. The optional companion has pinned dependencies; the browser app still has no runtime dependencies.
 
 From the repository directory:
 
 ```powershell
 npm ci --prefix automation --ignore-scripts
+npm run sdk:check
 ```
 
-This installs the optional companion packages. It does not install a browser or turn the HTML into an installed desktop application. Reuse an existing compatible Node installation; do not weaken TLS verification to work around local certificate issues.
+This installs the optional companion packages and verifies the reviewed development-client SDK archive and installed file hashes. There is no patch-install hook. It does not install a browser or turn the HTML into an installed desktop application. Reuse an existing compatible Node installation; do not weaken TLS verification to work around local certificate issues.
+
+The 1.0.1 development client uses the managed `2.4.0-studio-native.2` SDK repack, with native Node-only spawning and the legacy-SSE reconnect fix. Its coordinated dependency pins are `eventsource` **5.1.5**, `eventsource-parser` **4.1.3**, and `pkce-challenge` **6.0.0**. The server SDK and Playwright are unchanged. See the [MCP compatibility notes](https://github.com/chriscollins500/civitai-metadata-studio/wiki/MCP-Guide#compatibility) and [managed SDK review](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.1/docs/managed-sdk-patch.md) for the exact scope.
 
 ## Start HTTP with a temporary token
 

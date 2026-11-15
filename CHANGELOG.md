@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Refreshes the wiki, README downloads, and provenance guides for the published immutable 1.0.1 release, with pinned checksums/attestation commands, current SDK setup and test evidence, and clearly labeled historical reports. No application or release asset changes.
+
 ## 1.0.1 - 2026-11-15
 
 - Synchronizes the portable editor, companion, OpenAPI, and documentation versions, with a release-version consistency regression and freshly verified portable assets.

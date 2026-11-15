@@ -10,6 +10,14 @@ Current implementation: MCP protocol **2026-07-28**, official server SDK **2.4.0
 
 Host configuration formats vary. The example below is a common `mcpServers` shape, not a promise that every host accepts that exact file.
 
+### What changed in 1.0.1
+
+The repository's **development/test client**, not the companion's server SDK, uses the reviewed `@modelcontextprotocol/client@2.4.0-studio-native.2` repack. Its Node-only stdio launcher accepts only `process.execPath` and uses native `node:child_process.spawn`, without a shell or legacy-spawn fallback. The six unused standalone spawning packages are removed; the dependency tree is 14 packages instead of 20. This restriction applies to that test client, not to every external MCP host's configuration. Playwright and its independent bundled code are unchanged.
+
+The client's legacy-SSE fetch wrapper now forwards EventSource's reconnect `Last-Event-ID` in ESM and CommonJS while retaining auth/protocol headers, POST separation, and the default redirect policy. Its exact coordinated pins are `eventsource` 5.1.5, `eventsource-parser` 4.1.3, and `pkce-challenge` 6.0.0. These are reviewed major-version overrides, not an upstream compatibility guarantee.
+
+The companion still exposes **stdio and Streamable HTTP**; this client fix does not add a legacy-SSE server endpoint. ESM/CommonJS transport, synthetic OAuth/PKCE, native process-lifecycle, and reconnect regressions run on Windows/Linux with Node.js 24 and 26. They do not establish real-provider OAuth interoperability. [Managed patch and reproduction details](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.1/docs/managed-sdk-patch.md).
+
 ## Stdio setup
 
 Install the optional companion dependencies first. Configure your host to launch Node directly with absolute paths:
