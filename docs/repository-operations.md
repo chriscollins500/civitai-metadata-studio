@@ -19,6 +19,8 @@ Configuration sources are reviewed with the code. Live GitHub settings are separ
 | Community | Support and conduct expectations without invented response guarantees. | `SUPPORT.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` |
 | About / social preview | Recognizable project links and sharing artwork. | Pages homepage URL; `docs/assets/social-preview.png` |
 
+Live community entry points: [public roadmap board](https://github.com/users/chriscollins500/projects/1), [welcome](https://github.com/chriscollins500/civitai-metadata-studio/discussions/4), [support/privacy guidance](https://github.com/chriscollins500/civitai-metadata-studio/discussions/5), and [1.0.0 introduction](https://github.com/chriscollins500/civitai-metadata-studio/discussions/6). The three Discussions are pinned; their editable source copies remain under `.github/community/`.
+
 ## Branch and tag protections
 
 The reviewed profiles are `.github/repository/main-ruleset.json` and `release-tags-ruleset.json`. Apply them through the repository Rules settings or the official REST rulesets API, then read back the effective rules.
@@ -95,6 +97,8 @@ Review release notes, protocol/Node changes, transitive dependencies, action com
 ## Community intake and moderation
 
 Issue forms route browser, hosted, HTTP, MCP, documentation, and metadata-mismatch reports without asking for private files. The chooser links Q&A, the wiki, and private vulnerability reporting. Blank public issues are disabled for normal users; the available forms cover defects and concrete proposals.
+
+Use block mappings for issue-form `attributes`. An unquoted comma inside a YAML flow mapping can create an unintended key even when the file parses successfully. The community regression checks prevent that shape; also inspect the live chooser and actual forms after publication. Parsing valid YAML is not the same as satisfying GitHub's form schema.
 
 Launch Discussions from reviewed `.github/community/` sources, checking existing titles before creating duplicates. Pin the welcome and support guidance and the release introduction. Keep Q&A answerable and use announcement-format categories for maintainer news. Do not seed fake conversations, endorsements, usage counts, or testimonials.
 
