@@ -8,7 +8,7 @@
   "scripts": {
     "api": "node --use-system-ca http.mjs",
     "mcp": "node --use-system-ca mcp.mjs",
-    "test": "node --test tests/*.test.mjs",
+    "test": "node ../scripts/patch-mcp-sdk.mjs && node --import ./test-support/block-legacy-spawn.mjs --test tests/*.test.mjs",
     "schema": "node generate-openapi.mjs",
     "test:browser": "playwright test"
   },

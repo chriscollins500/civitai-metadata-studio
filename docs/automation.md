@@ -94,6 +94,8 @@ Configure your local MCP host to run Node directly. Replace these example paths 
 
 Windows JSON paths can use forward slashes, such as `C:/Images`. The host launches the companion and owns its lifetime. Stdout contains only protocol messages; diagnostics go to stderr. Stdio does not use an HTTP token.
 
+The example above configures your external MCP host; that host controls its own launcher. Studio's repository test client is a separate, deliberately Node-only launcher: its [managed SDK patch](managed-sdk-patch.md) requires the exact `process.execPath` and a script argument. It does not modify your host or require you to change a working host configuration.
+
 ### Streamable HTTP
 
 The API process also serves MCP at `http://127.0.0.1:4318/mcp`, with the same temporary bearer token and permissions. This is a local endpoint, not a public cloud connector. The official SDK handles framing, discovery, protocol validation, progress, and cancellation.
@@ -103,9 +105,14 @@ An assistant can inspect an image, review evidence, edit a recipe, and export a 
 ## Verify it
 
 ```powershell
+npm ci --prefix automation --ignore-scripts
+npm run sdk:patch
+npm run sdk:check
 npm run test:automation
 npm run test:browser
 ```
+
+`test:automation` automatically prepares the patch too, then runs the entire automation suite with a tripwire that rejects `cross-spawn`, `path-key`, `shebang-regex`, `shebang-command`, `which`, and `isexe`. These remain upstream-declared installed packages; bypassing them is not a lockfile removal. See the [patch contract and update procedure](managed-sdk-patch.md). CI runs the full project on Node.js 24 and 26 on Windows and Linux.
 
 Browser tests use existing Chrome and Edge installations; the runner does not download a browser. They exercise the actual portable file, narrow/wide layouts, keyboard controls, editing history, validation, filtering, malformed input, and reopen-verified downloads.
 

@@ -19,9 +19,13 @@ npm run verify
 
 ```powershell
 npm ci --prefix automation --ignore-scripts
+npm run sdk:patch
+npm run sdk:check
 npm run test:automation
 npm run test:browser
 ```
+
+`test:automation` also prepares and verifies the [managed Node-only SDK patch](docs/managed-sdk-patch.md) before importing the client. A fresh install restores upstream files, so reapply the patch after `npm ci`. Do not bypass a version or source-hash failure by changing the expected digests without reviewing the upstream source. There are no installation hooks. The suite blocks all six legacy spawning packages to detect fallback, and CI runs the full project on Node.js 24 and 26 on both Windows and Linux.
 
 The optional companion shares `src/engine.mjs` with the portable build. Keep operation validation in `automation/schemas.mjs`; regenerate the public OpenAPI description with `npm --prefix automation run schema`. Never introduce a second parser, metadata record, or writer for automation. Maintain explicit read/write roots, local authentication, revision checks, bounded state, network opt-in, and new-file-only exports.
 

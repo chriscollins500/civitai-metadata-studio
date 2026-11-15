@@ -39,3 +39,17 @@ test("Pages publishing stays main-only, behind verification, without contents-wr
   assert.doesNotMatch(pages, /contents: write|secrets\./);
   assert.match(pages, /without rebuilding it/);
 });
+
+test("required OS checks retain their names and cover both Node runtimes with the managed patch", async () => {
+  const workflow = await read(".github/workflows/ci.yml");
+  const verify = workflow.slice(workflow.indexOf("  verify:"), workflow.indexOf("  attest:"));
+  assert.match(verify, /name: Verify \(\$\{\{ matrix\.os \}\}\)/);
+  assert.match(verify, /- ubuntu-latest/); assert.match(verify, /- windows-latest/);
+  assert.match(verify, /node-version: 24/); assert.match(verify, /node-version: 26/);
+  assert.ok(verify.indexOf("npm ci --prefix automation --ignore-scripts") < verify.indexOf("npm run sdk:patch"));
+  assert.ok(verify.indexOf("npm run sdk:patch") < verify.indexOf("npm run test:automation"));
+  assert.match(verify.slice(verify.indexOf("node-version: 26")), /npm run sdk:check\s+npm run ci/);
+  const manifest = JSON.parse(await read("automation/package.json"));
+  assert.match(manifest.scripts.test, /^node \.\.\/scripts\/patch-mcp-sdk\.mjs && node --import \.\/test-support\/block-legacy-spawn\.mjs --test /);
+  for (const hook of ["preinstall", "install", "postinstall", "prepare"]) assert.equal(manifest.scripts[hook], undefined);
+});
