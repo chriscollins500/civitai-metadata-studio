@@ -11,7 +11,9 @@ body:
         Prefer a minimal synthetic fixture. Review screenshots and reports before posting.
   - type: input
     id: version
-    attributes: {label: Application version, placeholder: 1.0.0}
+    attributes:
+      label: Application version
+      placeholder: 1.0.0
     validations: {required: true}
   - type: dropdown
     id: mismatch
@@ -28,11 +30,18 @@ body:
     validations: {required: true}
   - type: input
     id: environment
-    attributes: {label: Browser or automation environment, description: Include current versions, not local paths.}
+    attributes:
+      label: Browser or automation environment
+      description: Include current versions, not local paths.
     validations: {required: true}
   - type: dropdown
     id: format
-    attributes: {label: Container, options: [PNG or APNG, JPEG, WebP or animated WebP]}
+    attributes:
+      label: Container
+      options:
+        - PNG or APNG
+        - JPEG
+        - WebP or animated WebP
     validations: {required: true}
   - type: textarea
     id: evidence
