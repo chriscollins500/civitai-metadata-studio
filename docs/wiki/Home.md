@@ -10,6 +10,12 @@ The main app is **one portable HTML file**. No installer, account, or image uplo
 
 <p align="center"><a href="https://chriscollins500.github.io/civitai-metadata-studio/app/"><strong>Try the editor</strong></a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><strong>Download the portable app</strong></a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started">Start in 30 seconds</a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map">Explore every guide</a></p>
 
+## Current release · 1.0.1
+
+[Version 1.0.1](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1), published **November 15, 2026**, keeps the same simple browser workflow and improves the optional API/MCP tooling: native Node spawning, a lean verified SDK repack, coordinated dependency updates, and reliable reconnect cursors. Playwright is unchanged; the browser app still has no runtime dependencies.
+
+Prefer a single file? [Download the standalone HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html). The download buttons follow the latest release; [release verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance) provides pinned 1.0.1 files, exact checksums, signed provenance, and test evidence. Existing browser users can replace their app copy—no image conversion or migration is needed.
+
 ## Choose your path
 
 | You want to… | Start here | Then explore |

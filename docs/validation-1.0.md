@@ -1,5 +1,7 @@
 # Studio 1.0 validation
 
+> **Historical 1.0.0 report.** For the current 1.0.1 release, use the [versioned release evidence](releases/v1.0.1.md#validation-and-exact-files) and [maintained verification guide](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance). The hashes and local-only limitations below describe the original run, not 1.0.1.
+
 Local verification completed on **2026-11-14**. This records local test evidence for version 1.0.0; publication and remote CI status are tracked separately on GitHub.
 
 ## Portable artifacts

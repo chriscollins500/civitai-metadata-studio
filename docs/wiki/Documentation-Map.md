@@ -47,7 +47,7 @@ This wiki is organized in layers: a friendly start, task-oriented guides, exact 
 
 ## Documentation evidence and freshness
 
-The original full documentation review covered application **1.0.0** and official references on **2026-11-14**. Maintenance/version checks cover **1.0.1** on **2026-11-15**, with no generation-field or API-operation changes. API/provider behavior, browser support, host configuration, and SDK versions can drift. The running companion's schema is authoritative for its contract; a badge or historical test count is not a substitute for current evidence.
+The original full documentation review covered application **1.0.0** and official references on **2026-11-14**. The **1.0.1** release/link review on **2026-11-15** updates downloads, exact release evidence, SDK/dependency scope, and test results, with no generation-field or API-operation changes. Start with the [current release](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1) and [verification record](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance#v101-release-evidence). API/provider behavior, browser support, host configuration, and SDK versions can drift. The running companion's schema is authoritative for its contract; a badge or historical test count is not a substitute for current evidence.
 
 Primary references:
 
@@ -64,6 +64,7 @@ For branch/tag protections, Pages deployment, issue forms, dependency proposals,
 
 1. Edit the source pages and `manifest.json` when adding/removing a page.
 2. Update sidebar/navigation and any affected field/tool/route references.
+   Keep friendly download links on `/releases/latest/download/…`; keep checksum evidence and tag-specific verification pinned to the version it describes. Check that latest resolves to the stated release and that both HTML and ZIP downloads match its checksum manifest. Keep historical hashes/counts clearly labeled.
 3. Run `npm run docs:check` and `node --test tests/wiki.test.mjs`.
 4. Review a normal source commit; preserve unrelated work.
 5. Fetch the wiki repository and inspect intervening edits before copying the reviewed `.md` pages into its root. Do not copy the JSON manifest or test tooling as wiki pages.

@@ -18,11 +18,14 @@ For the companion and installed Chrome/Edge:
 
 ```powershell
 npm ci --prefix automation --ignore-scripts
+npm run sdk:check
 npm run test:automation
 npm run test:browser
 ```
 
 The browser configuration uses installed browsers, not an automatic browser download. Test the **built HTML**, including real new-copy downloads and reopening, rather than only mocking the source API.
+
+`sdk:check` verifies the integrity-pinned development-client repack and all 102 installed SDK file hashes; it does not modify dependencies. Maintainers can run `npm run sdk:repack` to reproduce the archive from its verified upstream input. That reproduction makes a bounded upstream download and is not required to open the portable editor. See the [managed SDK recipe](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.1/docs/managed-sdk-patch.md).
 
 ## Match additional checks to the risk
 
@@ -48,7 +51,17 @@ For UI, test keyboard paths, dialogs/focus, narrow/wide geometry, long content, 
 
 ## Evidence snapshot, not an eternal score
 
-The pre-wiki 1.0.0 validation snapshot recorded **86 core**, **12 automation**, and **36 browser checks** passing. Browser testing used Chrome and Edge on Windows. Windows/Linux CI validates Node behavior and packaging; it is not Safari/macOS browser certification.
+### Released 1.0.1 · November 15, 2026
+
+The [release-tag CI run](https://github.com/chriscollins500/civitai-metadata-studio/actions/runs/43697086790) passed **102 core + 117 automation/MCP + 5 site tests** (224 total), plus **36 Chrome/Edge checks per configuration**, on both Windows and Linux with Node.js 24 and 26. The SDK archive reproduced byte-for-byte in each configuration. There were no failed or skipped tests. Conditional website jobs were intentionally skipped for the tag run; they are not missing tests.
+
+The final ZIP-extracted HTML was also tested directly in Chrome and Edge on Windows: synthetic image import, edit, new-copy export, reopen, encoded-pixel preservation, and measured overflow checks passed. Frozen local, CI, draft-download, and published-download bytes matched. All three public asset attestations verified against the exact tag and source commit; a modified-copy control was rejected. [Exact files and release boundaries](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance#v101-release-evidence).
+
+These are automated release checks, not human usability, manual screen-reader, Safari/macOS certification, real-provider OAuth interoperability, or a new live Civitai corpus run. Future source changes can alter test totals; use the actual run rather than repeating this snapshot as a permanent score.
+
+### Historical 1.0.0 coverage
+
+The pre-wiki 1.0.0 snapshot recorded **86 core**, **12 automation**, and **36 browser checks** passing. The earlier [original 1.0.0 report](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.0/docs/validation-1.0.md) records its own test inventory and limitations. Neither is the 1.0.1 release gate.
 
 Public regression coverage included a complex 119-node graph and structural normalization of 121 model-family labels. A family-label test is not proof that real images from every family were generated or tested. A synthetic 8192×8192 PNG is not universal 8K coverage. Current test totals can grow after that snapshot; report the actual run.
 

@@ -4,25 +4,39 @@
 
 Download from the [official releases](https://github.com/chriscollins500/civitai-metadata-studio/releases). The portable ZIP contains one HTML file with the full MIT notice embedded. The standalone HTML, ZIP, and checksum manifest have GitHub/Sigstore build attestations.
 
+## v1.0.1 release evidence
+
+**[1.0.1 is the current published release](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1)**, published **2026-11-15 at 09:15:21 UTC**. GitHub reports it as immutable: the published assets and associated tag cannot be replaced. Its source commit is `88cf29a9d36009bac5b682336d65f8f7f16e0e48`; unlike the historical 1.0.0 rebuild below, its build attestations refer directly to this release tag and commit.
+
+These links are pinned to **1.0.1**, so they continue to match this evidence after another release becomes latest:
+
+| Download | Bytes | SHA-256 |
+| --- | ---: | --- |
+| [Standalone HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.1/civitai-metadata-studio.html) | 401,007 | `5ea34399c41be1288d4d62ea8d00e0e08fb42da69228b4b76b69686cbf364b22` |
+| [Portable ZIP](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.1/civitai-metadata-studio.zip) | 89,708 | `418f70d11041d4ff50aee0852f777e2012f962259dbfbf54424b281c1799b1e2` |
+| [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.1/SHA256SUMS.txt) | 189 | `1bbed9e1002d738c90f85c646f34ba46f29ff3ac6d2d52e3c63e2d46136135ad` |
+
+The HTML's version is **1.0.1**, with UTC build date **2026-11-15**. The ZIP contains exactly one HTML entry whose bytes equal the standalone file. Its verified inline-script CSP digest is `mmzTnzuqsEm5GddfL4gaF/gIBlYMUb4t1dbCSk4KBuY=`. Frozen local files, CI downloads, draft downloads, and the re-downloaded public assets matched these hashes; all three public build attestations verified against the exact tag, commit, and workflow. A modified-copy control was correctly rejected.
+
+The [release CI](https://github.com/chriscollins500/civitai-metadata-studio/actions/runs/43697086790) passed **224 project tests + 36 Chrome/Edge checks per Windows/Linux × Node.js 24/26 configuration**. The ZIP-extracted app was also tested directly in Chrome and Edge. See [testing evidence and limits](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Development-and-Testing#released-101--november-15-2026) and the [versioned release notes](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.1/docs/releases/v1.0.1.md).
+
+The dependency/native-SDK/reconnect fixes are in the companion's source, not new browser runtime dependencies. The portable editing workflow stays unchanged. Download the source-code archive on the release page for the optional companion; the portable ZIP is only the browser app.
+
 ## Verify with GitHub CLI
 
-With a current authenticated GitHub CLI and the downloaded file in your working directory:
+For the **1.0.1** file above, use a current authenticated GitHub CLI in the download directory:
 
 ```powershell
-gh attestation verify civitai-metadata-studio.zip --repo chriscollins500/civitai-metadata-studio --signer-workflow chriscollins500/civitai-metadata-studio/.github/workflows/ci.yml --deny-self-hosted-runners
+gh attestation verify civitai-metadata-studio.zip --repo chriscollins500/civitai-metadata-studio --signer-workflow chriscollins500/civitai-metadata-studio/.github/workflows/ci.yml --source-ref refs/tags/v1.0.1 --source-digest 88cf29a9d36009bac5b682336d65f8f7f16e0e48 --deny-self-hosted-runners
 ```
 
-Substitute `civitai-metadata-studio.html` or `SHA256SUMS.txt` to verify the other assets. Advanced consumers can add `--source-digest <full-commit-sha>` to pin a reviewed build source. Verify the repository/workflow identity as well as the digest; “some signature exists” is not enough.
+Substitute `civitai-metadata-studio.html` or `SHA256SUMS.txt` to verify the other assets. This requires the exact 1.0.1 source ref and commit, not merely a signature from some build. If you download a later release through a **latest** link, use that release's documented ref/commit instead; do not compare it with 1.0.1 hashes.
 
 Checksums detect byte changes against a trusted expected value. Attestations additionally bind the digest to authenticated provenance. Neither is a malware-safety guarantee, Windows Authenticode signature, macOS notarization, browser trust badge, or a claim of certified SLSA level.
 
-## v1.0.1 maintenance release
-
-The maintenance release contains the reviewed dependency/native-SDK/reconnect fixes and keeps the browser workflow unchanged. Its final HTML/ZIP, source-tag provenance, exact hashes, and validation limits are recorded in the [versioned release notes](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.1/docs/releases/v1.0.1.md). Verify against `--source-ref refs/tags/v1.0.1` to require that release's source reference. Historical 1.0.0 hashes below do not apply to 1.0.1.
-
 ## v1.0.0 evidence
 
-These are the published **2026-11-14** assets, not hashes for every future build:
+**Historical only.** These are the published **2026-11-14** assets, not the current 1.0.1 checksums:
 
 | File | Bytes | SHA-256 |
 | --- | ---: | --- |
@@ -46,7 +60,7 @@ Signing occurs on version-tag pushes or an explicit manual CI run on **main** wi
 
 ## Dates and reproducibility
 
-The repository enables immutable **future** releases: prepare a draft, attach and verify all assets, then publish. Published immutable assets/tags cannot be modified. This does not retroactively make the existing v1.0.0 release immutable, and it is not a reason to recreate it. Version-tag rules independently prevent moves/deletion. See [repository operations](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/docs/repository-operations.md).
+The repository enables immutable releases, and **v1.0.1 is published and immutable**. Prepare a draft, attach and verify all assets, then publish. Published immutable assets/tags cannot be modified. This does not retroactively make the existing v1.0.0 release immutable, and it is not a reason to recreate it. Version-tag rules independently prevent moves/deletion. See [repository operations](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/docs/repository-operations.md).
 
 CI derives `SOURCE_DATE_EPOCH` from the reviewed committed release date/version, and build inputs are LF-normalized. A later rebuild can therefore reproduce the published date rather than silently changing bytes. A mismatch fails signing; it is never an instruction to replace old release assets.
 

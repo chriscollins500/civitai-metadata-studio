@@ -7,12 +7,14 @@
 You can [try the hosted editor](https://chriscollins500.github.io/civitai-metadata-studio/app/) first. It uses the same portable HTML, with local image processing and the same Civitai network controls. Browser cache storage belongs to its HTTPS origin/profile; it is separate from a downloaded file's storage. Download below for offline use.
 
 1. Open the [latest release](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest).
-2. Download `civitai-metadata-studio.zip` and extract it.
+2. [Download `civitai-metadata-studio.zip`](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip) and extract it.
 3. Open `civitai-metadata-studio.html` in a current desktop browser.
 
-You can download the HTML asset directly instead. Keep it on a local drive or USB storage. A local web server is not required for ordinary use. The project targets current browser standards; it does not maintain legacy-browser compatibility.
+You can [download the HTML directly](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html) instead. Keep it on a local drive or USB storage. A local web server is not required for ordinary use. The project targets current browser standards; it does not maintain legacy-browser compatibility.
 
-The ZIP contains one HTML file with the project's MIT notice. `SHA256SUMS.txt` and GitHub/Sigstore attestations are available for optional [download verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance).
+The current published release is **[1.0.1](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1)**. The links above follow the latest release. If you already use the editor, replace your HTML app copy; your original images need no conversion. Keep a previous app copy separately if you want to retain it.
+
+The ZIP contains one HTML file with the project's MIT notice. [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/SHA256SUMS.txt) and GitHub/Sigstore attestations are available for optional [download verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance), including pinned links for 1.0.1.
 
 ## Open an image
 
