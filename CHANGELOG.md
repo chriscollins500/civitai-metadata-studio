@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-- Fixes wiki heading anchors with a single-pass, slug-only scanner instead of regex-based HTML stripping; adds regressions for quoted attributes, comments, incomplete markup, Unicode, and duplicate anchors. The portable application and release assets are unchanged.
+## 1.0.2 - 2026-11-17
+
+- Fixes wiki heading anchors with a single-pass, slug-only scanner instead of regex-based HTML stripping; adds 14 regressions for quoted attributes, comments, incomplete markup, Unicode, and duplicate anchors. Resolves the wiki checker's CodeQL alert without changing image-editing behavior.
 - Corrects the browser cooldown test's mocked CORS exposure of Retry-After and controls its clock, so cache-clear coverage no longer depends on runner speed. No application behavior changes.
-- Refreshes the wiki, README downloads, and provenance guides for the published immutable 1.0.1 release, with pinned checksums/attestation commands, current SDK setup and test evidence, and clearly labeled historical reports. No application or release asset changes.
+- Refreshes the wiki, README downloads, and provenance guides with version-pinned checksums/attestation commands, current SDK setup and test evidence, and clearly labeled historical reports.
+- Synchronizes version reporting to 1.0.2 and rebuilds the standalone HTML, matching ZIP, and checksum manifest for a new GitHub/Sigstore-attested release. Runtime code, dependencies, and metadata contracts are otherwise unchanged; existing releases are not replaced.
 
 ## 1.0.1 - 2026-11-15
 

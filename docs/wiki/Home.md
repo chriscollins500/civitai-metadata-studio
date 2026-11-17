@@ -10,11 +10,11 @@ The main app is **one portable HTML file**. No installer, account, or image uplo
 
 <p align="center"><a href="https://chriscollins500.github.io/civitai-metadata-studio/app/"><strong>Try the editor</strong></a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><strong>Download the portable app</strong></a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started">Start in 30 seconds</a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map">Explore every guide</a></p>
 
-## Current release · 1.0.1
+## Current release · 1.0.2
 
-[Version 1.0.1](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1), published **November 15, 2026**, keeps the same simple browser workflow and improves the optional API/MCP tooling: native Node spawning, a lean verified SDK repack, coordinated dependency updates, and reliable reconnect cursors. Playwright is unchanged; the browser app still has no runtime dependencies.
+[Version 1.0.2](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2) hardens wiki heading checks, resolves their CodeQL alert, and makes the browser cooldown regression deterministic. The image-editing workflow, optional companion dependencies, and metadata contracts are unchanged. The browser app still has no runtime dependencies.
 
-Prefer a single file? [Download the standalone HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html). The download buttons follow the latest release; [release verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance) provides pinned 1.0.1 files, exact checksums, signed provenance, and test evidence. Existing browser users can replace their app copy—no image conversion or migration is needed.
+Prefer a single file? [Download the standalone HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html). The download buttons follow the latest release; [release verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance) provides version-pinned files, exact checksums, signed provenance, and test evidence. Existing browser users can replace their app copy—no image conversion or migration is needed.
 
 ## Choose your path
 
@@ -51,4 +51,4 @@ Prefer a single file? [Download the standalone HTML](https://github.com/chriscol
 
 ## About this documentation
 
-This wiki documents the **1.0.1 application** and current release infrastructure. The maintenance release keeps the same browser workflow and metadata contract while improving SDK/tooling reliability. Guides distinguish implemented behavior, tested evidence, and limitations. The [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map) lists every chapter, its audience, primary sources, and maintenance process. Examples use synthetic data and illustrative paths—not private images or credentials.
+This wiki documents the **1.0.2 application** and current release infrastructure. The maintenance release keeps the same browser workflow and metadata contract while improving tooling reliability. Guides distinguish implemented behavior, tested evidence, and limitations. The [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map) lists every chapter, its audience, primary sources, and maintenance process. Examples use synthetic data and illustrative paths—not private images or credentials.

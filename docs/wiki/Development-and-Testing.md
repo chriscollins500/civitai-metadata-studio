@@ -51,6 +51,14 @@ For UI, test keyboard paths, dialogs/focus, narrow/wide geometry, long content, 
 
 ## Evidence snapshot, not an eternal score
 
+### Release 1.0.2 · November 17, 2026
+
+The release gates run **116 core + 117 automation/MCP + 5 site tests** (238 total), plus **36 Chrome/Edge checks per Windows/Linux × Node.js 24/26 configuration**. That is **274 tests per OS/runtime combination**. All suites, reproducible SDK/clean-install checks, artifact verification, and CodeQL must pass before publication. The [release record](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2) supplies the successful tag run and exact source commit; the [versioned notes](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.2/docs/releases/v1.0.2.md#validation-and-exact-files) pin the artifact hashes.
+
+Fourteen focused wiki regressions cover the single-pass heading scanner. The browser cooldown test exposes the mocked `Retry-After` header and advances a fixed clock, so its result does not depend on runner speed. Final ZIP-extracted HTML checks exercise PNG, real browser-encoded JPEG/WebP, edited new-copy exports, reopened metadata, and encoded-payload preservation in Chrome and Edge. CI and draft downloads must match the frozen final bytes before publication.
+
+These are automated checks, not human usability, manual screen-reader, Safari/macOS certification, real-provider OAuth interoperability, or a fresh Civitai/private-image corpus run. The browser behavior and dependencies are unchanged apart from version reporting.
+
 ### Released 1.0.1 · November 15, 2026
 
 The [release-tag CI run](https://github.com/chriscollins500/civitai-metadata-studio/actions/runs/43697086790) passed **102 core + 117 automation/MCP + 5 site tests** (224 total), plus **36 Chrome/Edge checks per configuration**, on both Windows and Linux with Node.js 24 and 26. The SDK archive reproduced byte-for-byte in each configuration. There were no failed or skipped tests. Conditional website jobs were intentionally skipped for the tag run; they are not missing tests.

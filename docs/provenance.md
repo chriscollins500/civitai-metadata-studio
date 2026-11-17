@@ -4,17 +4,17 @@ The app still works by opening one HTML file. Verification is optional for every
 
 ## Check a release
 
-Download the ZIP from the [official release page](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest). For the published **1.0.1** release, these pinned downloads match the [exact checksum and test record](releases/v1.0.1.md#validation-and-exact-files): [HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.1/civitai-metadata-studio.html), [ZIP](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.1/civitai-metadata-studio.zip), and [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.1/SHA256SUMS.txt).
+Download the ZIP from the [official release page](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest). For **1.0.2**, these pinned downloads match the [exact checksum and test record](releases/v1.0.2.md#validation-and-exact-files): [HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.2/civitai-metadata-studio.html), [ZIP](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.2/civitai-metadata-studio.zip), and [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.2/SHA256SUMS.txt).
 
-With a current GitHub CLI, verify that version's exact tag and source commit:
+With a current GitHub CLI, verify that version's exact tag and expected signer workflow:
 
 ```powershell
-gh attestation verify civitai-metadata-studio.zip --repo chriscollins500/civitai-metadata-studio --signer-workflow chriscollins500/civitai-metadata-studio/.github/workflows/ci.yml --source-ref refs/tags/v1.0.1 --source-digest 88cf29a9d36009bac5b682336d65f8f7f16e0e48 --deny-self-hosted-runners
+gh attestation verify civitai-metadata-studio.zip --repo chriscollins500/civitai-metadata-studio --signer-workflow chriscollins500/civitai-metadata-studio/.github/workflows/ci.yml --source-ref refs/tags/v1.0.2 --deny-self-hosted-runners
 ```
 
-You can verify the standalone HTML or `SHA256SUMS.txt` by substituting that filename. A successful result confirms the artifact digest, certificate, expected repository/workflow identity, source ref/commit, and signed provenance. A changed file fails verification. When verifying a different release, use its recorded tag and commit; **latest** links may eventually serve a newer version.
+You can verify the standalone HTML or `SHA256SUMS.txt` by substituting that filename. For an additional exact-commit constraint, add `--source-digest` followed by the source commit recorded on the [1.0.2 release page](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2). A successful result verifies the artifact digest, certificate, expected repository/workflow identity, source ref, and signed provenance. A changed file fails verification. When verifying a different release, use its recorded tag and commit; **latest** links may eventually serve a newer version.
 
-Version **1.0.1**, published **2026-11-15**, is an immutable GitHub release. Its [tag CI](https://github.com/chriscollins500/civitai-metadata-studio/actions/runs/43697086790) and independent download checks verified all three assets before and after publication. Its attested build source is the release commit `88cf29a9d36009bac5b682336d65f8f7f16e0e48`. The [wiki verification guide](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance#v101-release-evidence) lists the exact hashes and distinguishes the older 1.0.0 rebuild.
+The immutable **1.0.1** release remains unchanged. Its [tag CI](https://github.com/chriscollins500/civitai-metadata-studio/actions/runs/43697086790) and independent download checks verified all three assets before and after its **2026-11-15** publication. Its attested source is `88cf29a9d36009bac5b682336d65f8f7f16e0e48`; use `--source-ref refs/tags/v1.0.1 --source-digest 88cf29a9d36009bac5b682336d65f8f7f16e0e48` for those older files. The [wiki verification guide](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance) keeps historical hashes separate.
 
 Checksums alone detect byte changes when compared with a trusted copy. Attestations add authenticated provenance. Neither is a malware-safety guarantee, Windows Authenticode signature, macOS notarization, or an automatic browser trust badge.
 
@@ -48,4 +48,4 @@ If the app's source changes after a release, a manual run targeting that older r
 
 The GitHub CLI can download attestation bundles and trusted roots for offline checks. Online verification is the simplest default because GitHub can bind the repository name to its current repository identity. See the official [offline-verification guide](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/verify-attestations-offline).
 
-Primary documentation checked **2026-11-14**: [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations), [the official action](https://github.com/actions/attest), and [CLI verification options](https://cli.github.com/manual/gh_attestation_verify).
+Primary documentation: [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations), [CLI verification options](https://cli.github.com/manual/gh_attestation_verify), and [draft-first release management](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository), checked **2026-11-17**. The [official action](https://github.com/actions/attest) was reviewed **2026-11-14**; its pinned version is unchanged.

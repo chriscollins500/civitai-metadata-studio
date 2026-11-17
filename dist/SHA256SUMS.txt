@@ -1,2 +1,2 @@
-5ea34399c41be1288d4d62ea8d00e0e08fb42da69228b4b76b69686cbf364b22  civitai-metadata-studio.html
-418f70d11041d4ff50aee0852f777e2012f962259dbfbf54424b281c1799b1e2  civitai-metadata-studio.zip
+62e35b46a75e6344d2827afd62934d70c43e7a185d70f5007cdd104e5e758cd9  civitai-metadata-studio.html
+bf0ca437e70979feb34c5e9bcad9a2aea02ac9b2c9d4ae3bcf8c33e1b2617cb2  civitai-metadata-studio.zip

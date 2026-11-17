@@ -5,7 +5,7 @@
 
   Studio.constants = Object.freeze({
     APP_NAME: "Civitai Metadata Studio",
-    APP_VERSION: "1.0.1",
+    APP_VERSION: "1.0.2",
     SCHEMA: "civitai-metadata-studio.record",
     API_ROOT: "https://civitai.com/api/v1",
     API_RESPONSE_LIMIT: 4 * 1024 * 1024,
