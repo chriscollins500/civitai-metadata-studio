@@ -59,7 +59,7 @@ Want to try it before downloading? [Open the hosted editor](https://chriscollins
 
 There is no installer and nothing to configure. Keep the HTML file anywhere you like—even on a USB drive. If you prefer the loose file, [download the standalone HTML directly](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html).
 
-**Current release: [1.0.1](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1).** The download buttons follow the latest published release. For the exact 1.0.1 files, checksums, SDK/dependency changes, and verification results, read the [release notes](docs/releases/v1.0.1.md).
+**Current release: [1.0.2](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2).** The download buttons follow the latest published release. This maintenance update hardens documentation checks and browser regressions while keeping the same image-editing workflow. Read the [release notes and exact checksums](docs/releases/v1.0.2.md).
 
 Want a guided tour? The [complete wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki) covers first steps, every field, workflow detection, privacy, troubleshooting, HTTP/MCP automation, and release verification. Start with [Getting started](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started) or browse the [documentation map](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map).
 
@@ -152,7 +152,7 @@ Choose the folders it may read, the folder for new exports, and whether it may c
 
 [Set up the API and MCP companion →](docs/automation.md)
 
-[See the 1.0.1 test results, artifact checksums, and validation limits →](docs/releases/v1.0.1.md#validation-and-exact-files)
+[See the 1.0.2 test results, artifact checksums, and validation limits →](docs/releases/v1.0.2.md#validation-and-exact-files)
 
 ## Your pixels stay your pixels
 

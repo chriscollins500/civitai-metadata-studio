@@ -4,9 +4,29 @@
 
 Download from the [official releases](https://github.com/chriscollins500/civitai-metadata-studio/releases). The portable ZIP contains one HTML file with the full MIT notice embedded. The standalone HTML, ZIP, and checksum manifest have GitHub/Sigstore build attestations.
 
+## v1.0.2 release evidence
+
+**[1.0.2](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2)** is the maintenance release for the wiki-checker/CodeQL and browser-test reliability fixes. The image-editing workflow and dependencies are unchanged; the app's reported version and build date are refreshed. The [versioned release record](https://github.com/chriscollins500/civitai-metadata-studio/blob/v1.0.2/docs/releases/v1.0.2.md) documents the scope, exact files, and verification limits.
+
+| Download | Bytes | SHA-256 |
+| --- | ---: | --- |
+| [Standalone HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.2/civitai-metadata-studio.html) | 401,007 | `62e35b46a75e6344d2827afd62934d70c43e7a185d70f5007cdd104e5e758cd9` |
+| [Portable ZIP](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.2/civitai-metadata-studio.zip) | 89,711 | `bf0ca437e70979feb34c5e9bcad9a2aea02ac9b2c9d4ae3bcf8c33e1b2617cb2` |
+| [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/download/v1.0.2/SHA256SUMS.txt) | 189 | `2b9abb917158657b641d9d2690c3604f7351c8daf97adcd386342cdecd576109` |
+
+Version **1.0.2**, UTC build date **2026-11-17**. The single HTML entry in the ZIP is byte-identical to the standalone file. The inline-script CSP digest is `QueFzdpDQsTl222v39gVPsbu9OjIXXJcD4Z1vYVDUC0=`. Publication requires Windows/Linux Node.js 24/26 suites, CodeQL, ZIP-extracted Chrome/Edge smoke checks, CI/draft byte comparisons, and all three GitHub/Sigstore signatures to pass. The release page records the final source commit and successful tag workflow.
+
+For these files, use:
+
+```powershell
+gh attestation verify civitai-metadata-studio.zip --repo chriscollins500/civitai-metadata-studio --signer-workflow chriscollins500/civitai-metadata-studio/.github/workflows/ci.yml --source-ref refs/tags/v1.0.2 --deny-self-hosted-runners
+```
+
+Substitute the HTML or checksum filename for the other assets. Add `--source-digest` with the exact commit recorded on the release page for a commit-pinned check. [Testing scope](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Development-and-Testing#release-102--november-17-2026) distinguishes automated gates from untested platforms and real-provider behavior.
+
 ## v1.0.1 release evidence
 
-**[1.0.1 is the current published release](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1)**, published **2026-11-15 at 09:15:21 UTC**. GitHub reports it as immutable: the published assets and associated tag cannot be replaced. Its source commit is `88cf29a9d36009bac5b682336d65f8f7f16e0e48`; unlike the historical 1.0.0 rebuild below, its build attestations refer directly to this release tag and commit.
+**Historical [1.0.1 release](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1)**, published **2026-11-15 at 09:15:21 UTC**. GitHub reports it as immutable: the published assets and associated tag cannot be replaced. Its source commit is `88cf29a9d36009bac5b682336d65f8f7f16e0e48`; unlike the historical 1.0.0 rebuild below, its build attestations refer directly to this release tag and commit.
 
 These links are pinned to **1.0.1**, so they continue to match this evidence after another release becomes latest:
 
@@ -22,7 +42,7 @@ The [release CI](https://github.com/chriscollins500/civitai-metadata-studio/acti
 
 The dependency/native-SDK/reconnect fixes are in the companion's source, not new browser runtime dependencies. The portable editing workflow stays unchanged. Download the source-code archive on the release page for the optional companion; the portable ZIP is only the browser app.
 
-## Verify with GitHub CLI
+## Verify the historical 1.0.1 files
 
 For the **1.0.1** file above, use a current authenticated GitHub CLI in the download directory:
 
@@ -36,7 +56,7 @@ Checksums detect byte changes against a trusted expected value. Attestations add
 
 ## v1.0.0 evidence
 
-**Historical only.** These are the published **2026-11-14** assets, not the current 1.0.1 checksums:
+**Historical only.** These are the published **2026-11-14** assets, not current-release checksums:
 
 | File | Bytes | SHA-256 |
 | --- | ---: | --- |

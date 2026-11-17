@@ -12,9 +12,9 @@ You can [try the hosted editor](https://chriscollins500.github.io/civitai-metada
 
 You can [download the HTML directly](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html) instead. Keep it on a local drive or USB storage. A local web server is not required for ordinary use. The project targets current browser standards; it does not maintain legacy-browser compatibility.
 
-The current published release is **[1.0.1](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.1)**. The links above follow the latest release. If you already use the editor, replace your HTML app copy; your original images need no conversion. Keep a previous app copy separately if you want to retain it.
+The current release is **[1.0.2](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2)**. The links above follow the latest published release. If you already use the editor, replace your HTML app copy; your original images need no conversion. Keep a previous app copy separately if you want to retain it.
 
-The ZIP contains one HTML file with the project's MIT notice. [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/SHA256SUMS.txt) and GitHub/Sigstore attestations are available for optional [download verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance), including pinned links for 1.0.1.
+The ZIP contains one HTML file with the project's MIT notice. [SHA256SUMS.txt](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/SHA256SUMS.txt) and GitHub/Sigstore attestations are available for optional [download verification](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Release-and-Provenance), including pinned links for 1.0.2.
 
 ## Open an image
 

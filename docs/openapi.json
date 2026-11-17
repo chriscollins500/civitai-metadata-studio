@@ -2,7 +2,7 @@
   "openapi": "3.2.1",
   "info": {
     "title": "Civitai Metadata Studio local API",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Local, authenticated automation using the portable editor's canonical engine. Configured filesystem roots only. No original overwrites."
   },
   "servers": [
