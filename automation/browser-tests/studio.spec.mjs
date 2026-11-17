@@ -127,21 +127,31 @@ test("browser verification batches hashes, links exact identities and reuses its
 });
 
 test("browser rate-limit cooldown survives clearing the public model cache", async ({ page }) => {
+  const now = new Date();
+  await page.clock.setFixedTime(now);
   let calls = 0;
   await page.route("https://civitai.com/api/v1/**", async (route) => {
     calls += 1;
-    await route.fulfill({ status: 429, headers: { "Access-Control-Allow-Origin": "*", "Retry-After": "60" }, json: {} });
+    await route.fulfill({ status: 429, headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Expose-Headers": "Retry-After",
+      "Retry-After": "60"
+    }, json: {} });
   });
   await openImage(page, imageFixture("png", { resources: [{ name: "Fixture", role: "checkpoint", hashes: { AutoV2: "ABCDEF1234" } }] }));
   await page.locator("#verifyButton").click();
   await expect(page.locator("#statusTitle")).toHaveText("Verification needs attention");
   await expect(page.locator("#statusSummary")).toContainText("rate-limited");
+  await expect(page.locator("#statusSummary")).toContainText("60 seconds");
   await page.getByRole("tab", { name: "Resources", exact: true }).click();
   await page.locator("#cacheButton").click();
   await page.locator("#clearCacheButton").click();
   await page.keyboard.press("Escape");
+  // Go past the hidden-header fallback without relying on the runner's speed.
+  await page.clock.setFixedTime(new Date(now.getTime() + 2000));
   await page.locator("#verifyButton").click();
   await expect(page.locator("#statusSummary")).toContainText("0 API requests");
+  await expect(page.locator("#statusSummary")).toContainText("58 seconds");
   expect(calls).toBe(1);
 });
 
