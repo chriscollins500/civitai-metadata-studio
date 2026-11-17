@@ -26,10 +26,39 @@ function proseAndFences(markdown, report, page) {
   return { prose: prose.join("\n"), blocks };
 }
 
+// Generate a slug, not sanitized HTML. Only emit allowed anchor characters;
+// skip tags/quoted attributes and comments in one pass. Unfinished markup is
+// ignored through the end of the heading, within this checker's small subset.
+function headingSlug(heading) {
+  const text = heading.toLowerCase(), slug = [];
+  let inTag = false, quote = "";
+  for (let offset = 0; offset < text.length;) {
+    if (!inTag && text.startsWith("<!--", offset)) {
+      const end = text.indexOf("-->", offset + 4);
+      if (end === -1) break;
+      offset = end + 3;
+      continue;
+    }
+    const character = String.fromCodePoint(text.codePointAt(offset));
+    offset += character.length;
+    if (inTag) {
+      if (quote) {
+        if (character === quote) quote = "";
+      } else if (character === '"' || character === "'") quote = character;
+      else if (character === ">") inTag = false;
+      continue;
+    }
+    if (character === "<") inTag = true;
+    else if (/^[\p{L}\p{N}_-]$/u.test(character)) slug.push(character);
+    else if (/^\s$/u.test(character)) slug.push("-");
+  }
+  return slug.join("");
+}
+
 function headingAnchors(prose) {
   const anchors = new Set(), counts = new Map();
   for (const match of prose.matchAll(/^#{1,6}\s+(.+?)\s*#*$/gm)) {
-    const base = match[1].toLowerCase().replace(/<[^>]*>/g, "").replace(/[^\p{L}\p{N}_\s-]/gu, "").replace(/\s/g, "-");
+    const base = headingSlug(match[1]);
     const count = counts.get(base) || 0;
     counts.set(base, count + 1);
     anchors.add(count ? `${base}-${count}` : base);

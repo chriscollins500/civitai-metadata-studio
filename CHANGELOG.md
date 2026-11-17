@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixes wiki heading anchors with a single-pass, slug-only scanner instead of regex-based HTML stripping; adds regressions for quoted attributes, comments, incomplete markup, Unicode, and duplicate anchors. The portable application and release assets are unchanged.
+- Corrects the browser cooldown test's mocked CORS exposure of Retry-After and controls its clock, so cache-clear coverage no longer depends on runner speed. No application behavior changes.
 - Refreshes the wiki, README downloads, and provenance guides for the published immutable 1.0.1 release, with pinned checksums/attestation commands, current SDK setup and test evidence, and clearly labeled historical reports. No application or release asset changes.
 
 ## 1.0.1 - 2026-11-15
