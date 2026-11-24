@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="512" viewBox="0 0 768 512" role="img" aria-labelledby="title desc">
+  <title id="title">The night shift</title><desc id="desc">An original illustrated observatory under a mint moon, with distant mountains and a river of starlight.</desc>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#172448"/><stop offset="1" stop-color="#406473"/></linearGradient>
+    <linearGradient id="water" x2="1" y2="1"><stop stop-color="#a7edcf"/><stop offset="1" stop-color="#417c83"/></linearGradient>
+    <radialGradient id="halo"><stop stop-color="#bdf2c7" stop-opacity=".3"/><stop offset="1" stop-color="#bdf2c7" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="768" height="512" fill="url(#sky)"/>
+  <circle cx="551" cy="150" r="145" fill="url(#halo)"/><circle cx="551" cy="150" r="55" fill="#d7f6cd"/><circle cx="570" cy="132" r="48" fill="#2c3f59"/>
+  <g fill="#e1f5d8"><circle cx="85" cy="83" r="2"/><circle cx="165" cy="52" r="1.5"/><circle cx="234" cy="114" r="2"/><circle cx="302" cy="56" r="1.5"/><circle cx="394" cy="120" r="1.5"/><circle cx="463" cy="56" r="2"/><circle cx="652" cy="67" r="1.5"/><circle cx="693" cy="198" r="2"/><circle cx="105" cy="204" r="1.5"/><circle cx="359" cy="192" r="2"/><circle cx="438" cy="167" r="1.5"/></g>
+  <path d="m70 154 77-40" stroke="#c4e6ce" stroke-width="2"/><path d="m70 154 43-22" stroke="#e5f7d7" stroke-width="3"/>
+  <path d="M0 321 113 224l95 106 118-84 106 96 99-113 143 111 94-65v237H0Z" fill="#486a7c"/>
+  <path d="m0 356 141-76 133 98 121-66 131 70 101-86 141 64v152H0Z" fill="#294c5c"/>
+  <path d="M0 424c110-90 191-45 285-33s145-12 223-27 164 39 260 26v122H0Z" fill="#153b3f"/>
+  <path d="M489 384c-85 23-146 40-112 59s131 18 86 69H238c157-45 3-45 38-73s129-42 213-55Z" fill="url(#water)"/>
+  <path d="M0 463c79-42 152-31 222 49H0Zm768-43c-86-12-135 40-190 92h190Z" fill="#102b31"/>
+  <g fill="#16343b"><path d="m47 388 25-56 25 56H83v40H61v-40Zm579 12 23-51 23 51h-13v31h-20v-31Z"/><path d="m90 414 18-42 18 42h-10v27H99v-27Z"/></g>
+  <path d="M192 372h99v-74h-99Z" fill="#d3d6b7"/><path d="M184 300c0-39 115-39 115 0Z" fill="#8ee0c8"/><path d="M238 270v-12h7v12" fill="none" stroke="#d7f875" stroke-width="4"/>
+  <path d="M202 324h20v23h-20Zm59 0h20v23h-20Z" fill="#f8c994"/><path d="M233 338h20v34h-20Z" fill="#32515b"/><path d="M178 372h127v8H178Z" fill="#0d292f"/>
+  <path d="m256 278 33-29 9 10-34 29Z" fill="#c0e8cb"/><circle cx="296" cy="252" r="7" fill="#d7f875"/>
+  <g fill="#aacdd0" opacity=".6"><ellipse cx="373" cy="463" rx="25" ry="2"/><ellipse cx="338" cy="486" rx="31" ry="2"/><ellipse cx="411" cy="444" rx="15" ry="1.5"/></g>
+</svg>

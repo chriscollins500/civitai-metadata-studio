@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Explore the project website
+    url: https://chriscollins500.github.io/civitai-metadata-studio/
+    about: Editor, learning sample, all guides, verified downloads, privacy, developer tools, and community.
   - name: Ask a question
     url: https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/q-a
     about: Friendly usage help belongs in Q&A; use an issue for a reproducible defect.

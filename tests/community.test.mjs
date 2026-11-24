@@ -1,6 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+function linksToProjectHome(source) {
+  return [...source.matchAll(/(?:href="|\]\(|url:\s*)(https:\/\/[^\s")]+)/gu)].some(([, href]) => {
+    try {
+      const url = new URL(href);
+      return url.origin === "https://chriscollins500.github.io" && url.pathname === "/civitai-metadata-studio/" && !url.username && !url.password && !url.search && !url.hash;
+    } catch { return false; }
+  });
+}
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("issue-form attributes use block mappings so prose commas cannot become unknown keys", async () => {
@@ -19,9 +27,47 @@ test("reviewed main rules require CI and PRs without a solo-maintainer review de
   assert.equal(main.rules.find((rule) => rule.type === "pull_request").parameters.required_approving_review_count, 0);
   const checks = main.rules.find((rule) => rule.type === "required_status_checks").parameters;
   assert.equal(checks.strict_required_status_checks_policy, true);
-  assert.deepEqual(checks.required_status_checks.map((check) => check.context).sort(), ["Verify (ubuntu-latest)", "Verify (windows-latest)"]);
-  assert.ok(checks.required_status_checks.every((check) => check.integration_id === 15368));
+  assert.deepEqual(checks.required_status_checks.map((check) => check.context).sort(), ["CodeQL", "Verify (ubuntu-latest)", "Verify (windows-latest)"]);
+  for (const check of checks.required_status_checks) assert.equal(check.integration_id, check.context === "CodeQL" ? 57789 : 15368);
+  assert.equal(main.rules.find(rule => rule.type === "pull_request").parameters.require_extra_approval_for_unattributed_changes, true);
   assert.ok(main.rules.some((rule) => rule.type === "deletion")); assert.ok(main.rules.some((rule) => rule.type === "non_fast_forward"));
+});
+
+test("public entry points route back to the hub without stale first-release claims", async () => {
+  for (const path of ["README.md", "SUPPORT.md", "CONTRIBUTING.md", "ROADMAP.md", "docs/wiki/Home.md", "docs/wiki/_Sidebar.md", "docs/wiki/_Footer.md", ".github/community/welcome.md", ".github/community/support-and-privacy.md", ".github/ISSUE_TEMPLATE/config.yml"]) {
+    assert.ok(linksToProjectHome(await read(path)), path + " must link to the exact project website");
+  }
+  assert.doesNotMatch(await read("ROADMAP.md"), /The 1\.0\.0 product/);
+  const bug = await read(".github/ISSUE_TEMPLATE/bug_report.yml");
+  assert.match(bug, /Project website, navigation, search, or learning hub/);
+  assert.match(bug, /Application version or website URL/);
+  for (const form of ["bug_report", "metadata_mismatch"]) assert.doesNotMatch(await read(".github/ISSUE_TEMPLATE/" + form + ".yml"), /placeholder: 1\.0\.0/);
+});
+test("home-link checks reject embedded URLs, lookalike hosts and credential tricks", () => {
+  const home = "https://chriscollins500.github.io/civitai-metadata-studio/";
+  for (const source of ['<a href="' + home + '">home</a>', "[home](" + home + ")", "url: " + home]) assert.equal(linksToProjectHome(source), true);
+  for (const href of [
+    "https://example.invalid/" + home,
+    "https://chriscollins500.github.io.example.invalid/civitai-metadata-studio/",
+    "https://chriscollins500.github.io@example.invalid/civitai-metadata-studio/",
+    "https://example.invalid@chriscollins500.github.io/civitai-metadata-studio/",
+    home + "not-the-home/", home + "?redirect=elsewhere", home + "#not-home"
+  ]) assert.equal(linksToProjectHome("[home](" + href + ")"), false, href);
+});
+
+test("roadmap notes scope only the five existing Next/Explore cards", async () => {
+  const notes = JSON.parse(await read(".github/community/roadmap-notes.json"));
+  assert.equal(notes.schemaVersion, 1);
+  assert.equal(notes.projectNumber, 1);
+  assert.equal(notes.items.length, 5);
+  assert.equal(new Set(notes.items.map(item => item.draftId)).size, 5);
+  for (const item of notes.items) {
+    assert.ok(["Next", "Explore"].includes(item.expectedStatus));
+    assert.match(item.draftId, /^DI_/);
+    assert.match(item.body, /## Scope/); assert.match(item.body, /## Acceptance/); assert.match(item.body, /## Boundaries/);
+    assert.match(item.body, /https:\/\/chriscollins500\.github\.io\/civitai-metadata-studio\//);
+    assert.doesNotMatch(item.body, /deadline|will ship on/i);
+  }
 });
 test("version-tag profile prevents moves and deletion but permits new versions", async () => {
   const tags = JSON.parse(await read(".github/repository/release-tags-ruleset.json"));

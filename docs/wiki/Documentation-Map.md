@@ -2,6 +2,8 @@
 
 This wiki is organized in layers: a friendly start, task-oriented guides, exact references, and a maintainer handbook. You do not need to read it from beginning to end.
 
+Prefer a searchable overview? The [website learning hub](https://chriscollins500.github.io/civitai-metadata-studio/learn/#guide-directory) indexes every chapter locally and includes a synthetic practice image. The [project home](https://chriscollins500.github.io/civitai-metadata-studio/) connects it to the editor, verified downloads, trust explanations, developers, and community.
+
 ## Start and everyday use
 
 | Guide | Question it answers |

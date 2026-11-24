@@ -25,7 +25,7 @@ Moderation is not a promise that every report is proven, every disagreement will
 
 For harassment, threats, doxxing, or other platform abuse, use GitHub's **Report content / Report abuse** flow. That channel goes to GitHub, not to a separate private inbox operated by this project. Do not post private details in an issue or Discussion to get attention.
 
-For a non-sensitive moderation question, use General Discussions and describe the concern without naming private individuals or repeating harmful content. Ask for review calmly; maintainers can reconsider a decision when relevant new context is available. There is no guaranteed response deadline.
+For a non-sensitive moderation question, use [General Discussions](https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/general) and describe the concern without naming private individuals or repeating harmful content. Ask for review calmly; maintainers can reconsider a decision when relevant new context is available. There is no guaranteed response deadline.
 
 For a software vulnerability, use the distinct [private security reporting channel](https://github.com/chriscollins500/civitai-metadata-studio/security/advisories/new). Do not use security advisories for ordinary conduct disputes or private support attachments.
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "applicationVersion": "1.0.2",
-  "reviewed": "2026-11-17",
+  "reviewed": "2026-11-24",
   "wikiBase": "https://github.com/chriscollins500/civitai-metadata-studio/wiki/",
   "pages": [
     "Home", "Getting-Started", "Workspace-and-Keyboard", "Generation-Fields",

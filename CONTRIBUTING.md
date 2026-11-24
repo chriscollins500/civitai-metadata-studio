@@ -2,7 +2,7 @@
 
 Thanks for helping improve Civitai Metadata Studio. The distributed application must remain a dependency-free, portable HTML file that keeps private image data on the user's device.
 
-New here? Start with [support](SUPPORT.md), the [wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki), or the [roadmap](ROADMAP.md). Please follow our [code of conduct](CODE_OF_CONDUCT.md). A helpful question, documentation correction, accessibility report, or minimal synthetic fixture is a valuable contribution.
+New here? Start with the [project website](https://chriscollins500.github.io/civitai-metadata-studio/), [support](SUPPORT.md), the [wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki), or the [roadmap](ROADMAP.md). Please follow our [code of conduct](CODE_OF_CONDUCT.md). A helpful question, documentation correction, accessibility report, or minimal synthetic fixture is a valuable contribution.
 
 ## Development
 
@@ -36,7 +36,7 @@ The optional companion shares `src/engine.mjs` with the portable build. Keep ope
 - Never infer a Civitai model or version ID from a name or filename.
 - Start editable dimensions from the image's actual pixels.
 - Preserve encoded PNG, JPEG, WebP, and animation payloads during metadata-only export.
-- Do not transmit or persist image bytes, prompts, workflows, local paths, credentials, or tokens.
+- Keep image bytes, prompts, workflows, local paths, credentials, and tokens out of provider requests, identity caches, telemetry, and public logs. Deliberate local exports may contain user-selected metadata; local companion authentication is configured separately, never stored in browser caches.
 - Exclude bypassed, inactive, disabled, disconnected, and unresolved-switch resources.
 - Do not retry HTTP 429 responses; honor one shared bounded cooldown.
 - Preserve accessible names, keyboard operation, visible focus, and responsive behavior.
@@ -49,8 +49,8 @@ When reporting a bug, include the application version, browser, image format, ob
 
 ## Pull requests and maintenance
 
-Use a focused branch and explain the user-visible outcome, shared implementation boundary, regression evidence, and untested surfaces in the pull-request template. Identity/privacy/payload invariants need tests, not just reassuring descriptions. PRs should pass the required Windows/Linux checks before merging. A second-person approval is not mandatory while the project has a solo maintainer; that does not make CI optional.
+Use a focused branch and explain the user-visible outcome, shared implementation boundary, regression evidence, and untested surfaces in the pull-request template. Identity/privacy/payload invariants need tests, not just reassuring descriptions. PRs must pass the required Windows/Linux checks and CodeQL before merging. A second-person approval is not mandatory while the project has a solo maintainer; that does not make CI optional.
 
 Dependabot proposes weekly grouped minor/patch updates for `automation/` and GitHub Actions. Major updates remain separate review decisions. Dependencies stay pinned, Actions stay pinned to immutable commits, and no dependency PR is automatically merged. Security-update PRs remain distinct from routine version maintenance.
 
-Changes to the landing page use `npm run site:build` and `npm run site:check`; see [repository operations](docs/repository-operations.md) for hosting, protections, release immutability, and community maintenance. Deployment/publication is a deliberate maintainer action, not a side effect of submitting a PR.
+Changes to the website use `npm run test:site`, `npm run site:build`, `npm run site:check`, and the existing `npm run test:browser` suite. Preview with `node scripts/serve-site.mjs --port 4173` at the printed project-prefixed URL. See [repository operations](docs/repository-operations.md) for the exact public-file allowlist, budgets, hosting, protections, and community maintenance. A reviewed push to main deploys automatically after verification; submitting a PR does not publish it.

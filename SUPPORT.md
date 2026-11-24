@@ -2,6 +2,8 @@
 
 You do not need to understand ComfyUI, hashes, or image-generation jargon to ask for help. Tell us what you were trying to do and what happened.
 
+The [project website](https://chriscollins500.github.io/civitai-metadata-studio/) connects the editor, [learning hub and sample](https://chriscollins500.github.io/civitai-metadata-studio/learn/), [verified downloads](https://chriscollins500.github.io/civitai-metadata-studio/downloads/), [privacy boundaries](https://chriscollins500.github.io/civitai-metadata-studio/trust/), and community.
+
 ## Choose the right door
 
 | You need… | Go here |
@@ -18,7 +20,7 @@ You do not need to understand ComfyUI, hashes, or image-generation jargon to ask
 
 ## The most useful details
 
-Include the application version; browser/OS or Node/MCP-host versions; image format; smallest reproducible steps; expected and actual behavior; and safe warning/problem codes. Say whether it happens before verification, after import, or after exporting/reopening.
+Include the application version (or exact website page URL); browser/OS or Node/MCP-host versions; image format where relevant; smallest reproducible steps; expected and actual behavior; and safe warning/problem codes. Say whether it happens before verification, after import, or after exporting/reopening. Website navigation/search/theme reports do not require an image.
 
 For workflow detection, identify relevant node classes, switches, enabled states, and the output path. The graph saved inside the image may differ from the workflow currently open in ComfyUI. For identity problems, exact public AIR/version/file IDs and hashes are more useful than similar names.
 

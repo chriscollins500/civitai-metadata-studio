@@ -21,6 +21,13 @@
 </p>
 
 <p align="center">
+  <a href="https://chriscollins500.github.io/civitai-metadata-studio/"><strong>Explore the project website</strong></a> ·
+  <a href="https://chriscollins500.github.io/civitai-metadata-studio/learn/">Try a sample & learn</a> ·
+  <a href="https://chriscollins500.github.io/civitai-metadata-studio/trust/">Privacy & proof</a> ·
+  <a href="https://chriscollins500.github.io/civitai-metadata-studio/community/">Join the community</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/chriscollins500/civitai-metadata-studio/actions/workflows/ci.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/chriscollins500/civitai-metadata-studio/ci.yml?branch=main&style=flat-square&label=verified%20build"></a>
   <img alt="Works with PNG, JPEG, and WebP" src="https://img.shields.io/badge/images-PNG%20%C2%B7%20JPEG%20%C2%B7%20WebP-006b59?style=flat-square">
   <img alt="Designed for current browsers" src="https://img.shields.io/badge/browser-current%20standards-4d7167?style=flat-square">
@@ -51,6 +58,8 @@ That recipe is useful—but it is often incomplete, duplicated, or simply wrong.
 ## Use it in 30 seconds
 
 Want to try it before downloading? [Open the hosted editor](https://chriscollins500.github.io/civitai-metadata-studio/app/). It uses the same portable file, with local image processing. Download a copy below when you want offline use.
+
+No image handy? The [learning hub](https://chriscollins500.github.io/civitai-metadata-studio/learn/) includes an original illustrated sample with synthetic metadata, interactive examples, and a locally searchable directory of every guide. The [download hub](https://chriscollins500.github.io/civitai-metadata-studio/downloads/) keeps signed stable-release receipts separate from the current hosted app.
 
 1. **[Download the app](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip).** It is a tiny ZIP containing one HTML file.
 2. **Unzip it, then double-click the HTML file.** It opens in your current web browser like a small desktop app.
