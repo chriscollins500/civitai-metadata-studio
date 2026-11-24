@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.2",
+  "tag": "v1.0.2",
+  "sourceCommit": "cc02cfb65ea872312dbe2e7f1304df271bf02c52",
+  "buildDate": "2026-11-17",
+  "publishedAt": "2026-11-17T01:35:50Z",
+  "verifiedOn": "2026-11-24",
+  "workflowRun": 43995424809,
+  "assets": [
+    { "filename": "civitai-metadata-studio.html", "bytes": 401007, "sha256": "62e35b46a75e6344d2827afd62934d70c43e7a185d70f5007cdd104e5e758cd9" },
+    { "filename": "civitai-metadata-studio.zip", "bytes": 89711, "sha256": "bf0ca437e70979feb34c5e9bcad9a2aea02ac9b2c9d4ae3bcf8c33e1b2617cb2" },
+    { "filename": "SHA256SUMS.txt", "bytes": 189, "sha256": "2b9abb917158657b641d9d2690c3604f7351c8daf97adcd386342cdecd576109" }
+  ]
+}

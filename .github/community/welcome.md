@@ -4,12 +4,16 @@ Welcome to **Civitai Metadata Studio**. Open an AI image, understand its hidden 
 
 You do not need ComfyUI, an account, or any special terminology to get started.
 
+Start at the [project website](https://chriscollins500.github.io/civitai-metadata-studio/): a friendly tour, an original sample with synthetic metadata, all 28 searchable guides, downloads, privacy boundaries, developer tools, and community—all connected.
+
 ## Pick the next step that fits you
 
 | I want to… | Take me there |
 | --- | --- |
+| Learn without sharing a personal image | [Learning hub & sample](https://chriscollins500.github.io/civitai-metadata-studio/learn/) |
 | Try the editor now | [Open in the browser](https://chriscollins500.github.io/civitai-metadata-studio/app/) |
 | Keep a portable/offline copy | [Download the app](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest) |
+| Check the download and its signed origin | [Version-pinned files, hashes & provenance](https://chriscollins500.github.io/civitai-metadata-studio/downloads/) |
 | Learn with a simple walkthrough | [Getting started](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started) |
 | Understand a field, badge, or warning | [All 28 guides](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map) |
 | Ask a question | [Q&A](https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/q-a) |
@@ -37,4 +41,4 @@ Want to discard an image? Use **Remove**, **Clear**, or **Clear all**. Saving do
 
 Use **Q&A** for help, **Ideas** for exploration, **Show and tell** for public-safe examples, and **Announcements** for project news. Minimal synthetic examples are especially welcome. Please follow the [community code of conduct](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/CODE_OF_CONDUCT.md).
 
-The [roadmap](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/ROADMAP.md) is directional, not a set of promised dates. Clear evidence, preserved originals, accessibility, and privacy remain the priorities.
+The [live roadmap](https://github.com/users/chriscollins500/projects/1) and its [planning boundaries](https://github.com/chriscollins500/civitai-metadata-studio/blob/main/ROADMAP.md) are directional, not a set of promised dates. Clear evidence, preserved originals, accessibility, and privacy remain the priorities. [Current release](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest) links track shipped software; older release introductions stay historical.

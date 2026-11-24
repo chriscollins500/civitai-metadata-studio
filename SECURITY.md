@@ -1,5 +1,11 @@
 # Security and privacy notes
 
+## Project website
+
+The [GitHub Pages hub](https://chriscollins500.github.io/civitai-metadata-studio/) serves static pages and local assets without analytics, remote fonts, advertising, image-upload forms, or background API calls. Its optional dependency-free script provides local search, guide filtering, keyboard examples, copying, and a theme toggle. The only stored preference is `cms.site.theme`; denied storage is nonfatal. The hub has a deny-by-default CSP, same-origin-only assets, Subresource Integrity for CSS/JS, and no connection permission.
+
+GitHub receives ordinary site requests and connection information. Following an external link visits that service normally. The hosted `app/` is the unchanged portable editor, with its own Civitai-only network boundary below; hosting it does not create a remote image-processing service. The optional HTTP/MCP companion remains separately installed and local.
+
 ## Local-first boundary
 
 The portable HTML has no server component. The optional local automation companion is described below. Image and model-file bytes are processed locally and are never sent to Civitai. Automatic lookup transmits only resource hashes or numeric model-version IDs. SHA-256 hashes are batched, and exact version reads share cached and in-flight responses. Name text is transmitted only after an explicit search. The explicit image importer sends only the public image ID, with full metadata requested.

@@ -9,7 +9,7 @@ Configuration sources are reviewed with the code. Live GitHub settings are separ
 | Surface | Purpose | Source or maintenance point |
 | --- | --- | --- |
 | README | Friendly explanation and primary links. | `README.md` |
-| GitHub Pages | A simple introduction and the real browser editor. | `site/`, `scripts/build-site.mjs`, CI Pages jobs |
+| GitHub Pages | A learning/download/trust/developer/community hub and the real browser editor. | `site/`, `scripts/build-site.mjs`, CI Pages jobs |
 | Wiki | Layered user, automation, and maintainer reference. | `docs/wiki/`; separate native wiki Git repository |
 | Issues | Reproducible bugs, identity mismatches, concrete proposals. | `.github/ISSUE_TEMPLATE/` |
 | Pull requests | Reviewable implementation and exact validation evidence. | `.github/pull_request_template.md` |
@@ -28,13 +28,13 @@ The reviewed profiles are `.github/repository/main-ruleset.json` and `release-ta
 ### Main
 
 - Pull-request changes rather than direct pushes.
-- Required GitHub Actions checks: **Verify (ubuntu-latest)** and **Verify (windows-latest)**, with the branch up to date.
+- Required checks: **Verify (ubuntu-latest)** and **Verify (windows-latest)** from GitHub Actions (app 15368), plus **CodeQL** from GitHub Advanced Security (app 57789), with the branch up to date.
 - Resolved review conversations.
 - No force-pushes or branch deletion.
 - Zero required second-person approvals while the project is maintained solo.
 - No always-bypass actor that can quietly skip the checks.
 
-The required checks already include syntax, docs/contracts, core tests, companion tests, package verification, and site checks. Status names and app bindings must match the live checks; renaming a required job without migrating its rules can block every PR. CodeQL remains enabled separately; a successful analysis run is not a claim of zero vulnerabilities.
+The OS checks include syntax, docs/contracts, core tests, companion tests, package verification, site checks, and Chrome/Edge browser checks on Node.js 24/26. Status names and app bindings must match the live checks; renaming a required job without migrating its rules can block every PR. CodeQL is independently required; a successful analysis is not a claim of zero vulnerabilities.
 
 Before tightening rules, ensure a valid contributor path exists. Use a test/setup PR to verify passing checks and normal merge behavior. Never test deletion/force-push protection by attempting a destructive operation on the real main branch. A maintainer can review configuration through Settings if an emergency correction is necessary; do not weaken protections as an unannounced workaround.
 
@@ -56,7 +56,11 @@ An immutable GitHub release can also have a release attestation. A release attes
 
 Public entry: `https://chriscollins500.github.io/civitai-metadata-studio/`.
 
-The landing page is buildless HTML/CSS with no scripts, embedded frames, forms, analytics, or external font/runtime dependencies. Its CSP forbids network connections. **Open editor** navigates to `app/`, which is a byte-for-byte copy of the reviewed portable HTML with its original CSP intact.
+The hub has six main pages—Overview, Learn, Get the app, Trust, Developers, Community—and a project-root-aware 404. One shared layout, route/guide catalog, stylesheet, and small dependency-free script connect every page. No framework, external fonts, embedded frames, upload forms, tracking, service worker, or third-party runtime is added.
+
+The hub's CSP denies network connections and allows only same-origin scripts/styles/images, with SHA-384 Subresource Integrity on the reviewed script and stylesheet. Local search, guide filtering, case-study tabs, copying, and optional theme selection progressively enhance ordinary HTML. Navigation, examples, all guide links, and downloads remain available without JavaScript. Only the disclosed `cms.site.theme` preference may be stored; denied storage/clipboard access is nonfatal.
+
+**Open editor** navigates to `app/`, a byte-for-byte copy of the reviewed portable HTML with its original CSP intact. The hub never reads images. The illustrated learning sample has synthetic metadata and no resource identities; its 768×512 pixels intentionally disagree with the old 1024×1024 generation setting.
 
 The editor retains its own bounded Civitai network behavior. Hosting does not upload selected images or turn the local companion into a remote server. GitHub receives ordinary website requests/connection information, and browser cache storage belongs to the new HTTPS origin/profile—not to an old `file:` copy.
 
@@ -66,11 +70,17 @@ The editor retains its own bounded Civitai network behavior. Hosting does not up
 npm run site:build
 npm run site:check
 npm run test:site
+node scripts/serve-site.mjs --port 4173
+npm run test:browser
 ```
 
-The builder first runs the existing HTML and release ZIP verifiers. It copies the current verified `dist` artifact without rewriting it and renders only the landing page's version/digest placeholders. It writes to the dedicated ignored `.tmp/pages` directory; no private repository tree or support log is recursively copied.
+The builder first runs the existing HTML and release ZIP verifiers. It copies the current verified `dist` artifact without rewriting it and renders reviewed pages from `site/content.mjs`, `layout.mjs`, and `pages.mjs`. It writes to a dedicated directory under ignored `.tmp/`; no repository tree or support log is recursively copied. Existing symlinks/junctions and unsafe output locations are rejected.
 
-The site contains exactly nine allowlisted files: landing HTML/CSS, editor HTML, favicon, social PNG, public artifact manifest, robots/sitemap, and `.nojekyll`. `release.json` records the app version, recorded build date, byte sizes, and complete artifact hashes. It contains no credentials or private machine paths. Site tests reject altered app bytes, unexpected files, broken local links, scripts on the landing page, and unsafe output locations.
+The deployment contains exactly **20 files**, declared in `site/contract.mjs`: seven hub HTML pages; the editor; CSS/JS; favicon/social/illustration/sample assets; the public OpenAPI document; two receipts; robots/sitemap; and `.nojekyll`. The checker rejects unexpected/missing files rather than silently deleting them. Budgets are 32 KiB each for CSS/JS, 64 KiB per hub page, and 2 MiB total.
+
+`release.json` records the current hosted app's version/date/size/hash, hub routes, guide count, and each asset's SHA-256. `stable-release.json` comes from reviewed `site/release-evidence.json` and independently records the immutable stable download assets, exact source/tag, and signing workflow run. The website never silently calls GitHub to discover a release. On a new app release, update the receipt only after checking the published bytes and attestations; do not substitute a CI build hash for signed-release evidence.
+
+Site regressions reject altered app/assets/receipts, unsafe code/CSP/SRI, broken cross-page anchors, accessibility references, catalog drift, private paths, arbitrary preview-server paths, and over-budget files. Browser checks exercise all routes, local search, focus/keyboard tabs, theme contrast, no-JavaScript fallback, denied storage/clipboard, 320px/enlarged text, reduced motion/forced colors, 404 recovery, and a real sample save/reopen with encoded-payload proof. These are bounded checks, not full manual screen-reader or WCAG certification.
 
 Local `npm test` rebuilds the HTML; `npm run verify` refreshes its matching ZIP before site tests. CI's verification jobs can therefore test a newly rebuilt pair. The separate Pages build job checks out a clean reviewed main commit and copies its **committed** portable pair; it does not deploy a separately dated CI rebuild or a PR artifact.
 
@@ -96,18 +106,20 @@ Review release notes, protocol/Node changes, transitive dependencies, action com
 
 ## Community intake and moderation
 
-Issue forms route browser, hosted, HTTP, MCP, documentation, and metadata-mismatch reports without asking for private files. The chooser links Q&A, the wiki, and private vulnerability reporting. Blank public issues are disabled for normal users; the available forms cover defects and concrete proposals.
+Issue forms route website/navigation/learning, browser editor, hosted editor, HTTP, MCP, documentation, and metadata-mismatch reports without asking for private files. The chooser links the website, Q&A, wiki, and private vulnerability reporting. Blank public issues are disabled for normal users; the available forms cover defects and concrete proposals.
 
 Use block mappings for issue-form `attributes`. An unquoted comma inside a YAML flow mapping can create an unintended key even when the file parses successfully. The community regression checks prevent that shape; also inspect the live chooser and actual forms after publication. Parsing valid YAML is not the same as satisfying GitHub's form schema.
 
 Launch Discussions from reviewed `.github/community/` sources, checking existing titles before creating duplicates. Pin the welcome and support guidance and the release introduction. Keep Q&A answerable and use announcement-format categories for maintainer news. Do not seed fake conversations, endorsements, usage counts, or testimonials.
 
-The public roadmap uses draft items to avoid manufacturing a backlog of issues. Priorities are directional, no dates are invented, and exploration is not a feature commitment. Completed items should link to a real merged change or verified outcome. Existing project content must not be overwritten during setup.
+The public roadmap uses draft items to avoid manufacturing a backlog of issues. Its README mirrors `ROADMAP.md`; reviewed scope/acceptance notes for five existing Next/Explore cards live in `.github/community/roadmap-notes.json`. Priorities are directional, no dates are invented, and exploration is not a feature commitment. Synchronization must compare the live baseline first, preserve statuses and historical Done cards, and stop on intervening edits. Projects access is separate from repository access; missing scope is not permission to create a replacement board.
 
 The code of conduct routes platform-abuse reports to GitHub's own private flow and accurately explains that it is not a private maintainer inbox. Security advisories are for vulnerabilities, not ordinary conduct disputes or private support uploads. No personal email address or response SLA is invented.
 
 ## Periodic review
 
 Check that required CI job names still match rules, future releases are immutable, website/editor digests agree, public links work, dependency proposals remain bounded, and documentation matches actual product behavior. Reconcile direct wiki/Discussion edits into their versioned sources before republishing. Never copy an old support report into a public fixture without a fresh privacy review.
+
+For this hub update, the [REST ruleset contract](https://docs.github.com/en/rest/repos/rules#update-a-repository-ruleset) and [custom Pages workflow requirements](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) were rechecked **2026-11-24**. The CodeQL app binding comes from the actual successful repository check, not an assumed Actions integration ID.
 
 Primary documentation reviewed **2026-11-14**: [rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets), [REST rules](https://docs.github.com/en/rest/repos/rules), [immutable releases](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases), [Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [Dependabot version updates](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configure-version-updates), [Discussions categories](https://docs.github.com/en/discussions/managing-discussions-for-your-community/managing-categories-for-discussions), and [social previews](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview).

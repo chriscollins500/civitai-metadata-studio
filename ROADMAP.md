@@ -2,6 +2,8 @@
 
 The priority is a trustworthy everyday tool: clear evidence, preserved originals, practical accessibility, and a portable browser experience. This roadmap is directional—not a delivery schedule or a promise that every idea will ship.
 
+Start at the [project website](https://chriscollins500.github.io/civitai-metadata-studio/) for the editor, learning sample, downloads, trust boundaries, and community routes. The [current published release](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest) defines shipped app capabilities; this board does not.
+
 ## How to read it
 
 - **Now:** bounded work actively being prepared or verified.
@@ -24,7 +26,7 @@ No dates are invented to make the board look busy. Use [Ideas](https://github.co
 
 ## Already available
 
-The 1.0.0 product provides a portable HTML editor, 16 generation fields, 14 resource roles, exact Civitai verification, bounded identity caching, new-copy payload-preserving exports, and optional local HTTP/MCP automation. The [wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki) explains the implemented details and limitations.
+The current product provides a portable HTML editor, 16 generation fields, 14 resource roles, exact Civitai verification, bounded identity caching, new-copy payload-preserving exports, and optional local HTTP/MCP automation. The [wiki](https://github.com/chriscollins500/civitai-metadata-studio/wiki) explains the implemented details and limitations. Historical Done cards retain their original release numbers and evidence.
 
 ## What will not be traded away
 

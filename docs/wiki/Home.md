@@ -8,6 +8,8 @@ Civitai Metadata Studio reveals the generation information hidden inside an imag
 
 The main app is **one portable HTML file**. No installer, account, or image uploads. The optional API/MCP companion is a separate way for scripts and assistants to use the same engine.
 
+The [project website](https://chriscollins500.github.io/civitai-metadata-studio/) is the friendly front door: [learn with an original synthetic sample](https://chriscollins500.github.io/civitai-metadata-studio/learn/), search all 28 guides locally, [verify a download](https://chriscollins500.github.io/civitai-metadata-studio/downloads/), review [privacy and proof](https://chriscollins500.github.io/civitai-metadata-studio/trust/), or find the right [community route](https://chriscollins500.github.io/civitai-metadata-studio/community/). The wiki remains the detailed reference; the website does not replace it or upload images.
+
 <p align="center"><a href="https://chriscollins500.github.io/civitai-metadata-studio/app/"><strong>Try the editor</strong></a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip"><strong>Download the portable app</strong></a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki/Getting-Started">Start in 30 seconds</a> · <a href="https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map">Explore every guide</a></p>
 
 ## Current release · 1.0.2

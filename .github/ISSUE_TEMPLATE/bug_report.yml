@@ -1,5 +1,5 @@
 name: Bug report
-description: Something does not work in the browser editor, HTTP API, MCP companion, or documentation.
+description: Something does not work in the website, browser editor, HTTP API, MCP companion, or documentation.
 title: "[Bug]: "
 labels:
   - bug
@@ -18,6 +18,7 @@ body:
       options:
         - Portable HTML editor
         - Hosted editor on GitHub Pages
+        - Project website, navigation, search, or learning hub
         - Local HTTP API
         - MCP over stdio
         - MCP over Streamable HTTP
@@ -28,9 +29,9 @@ body:
   - type: input
     id: version
     attributes:
-      label: Application version
-      description: The application/release version; include a source commit when testing a development checkout.
-      placeholder: 1.0.0
+      label: Application version or website URL
+      description: The app/release version, exact website page URL, or source commit for a development checkout.
+      placeholder: App version shown in Studio, or the affected website URL
     validations:
       required: true
 

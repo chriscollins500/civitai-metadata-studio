@@ -1,5 +1,7 @@
 ## Civitai Metadata Studio
 
+[**Project website**](https://chriscollins500.github.io/civitai-metadata-studio/) · [Editor](https://chriscollins500.github.io/civitai-metadata-studio/app/) · [Learn & sample](https://chriscollins500.github.io/civitai-metadata-studio/learn/) · [Trust & downloads](https://chriscollins500.github.io/civitai-metadata-studio/downloads/)
+
 [**Home**](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Home) · [Download ZIP](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.zip) · [All guides](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Documentation-Map)
 
 [Release 1.0.2](https://github.com/chriscollins500/civitai-metadata-studio/releases/tag/v1.0.2) · [Standalone HTML](https://github.com/chriscollins500/civitai-metadata-studio/releases/latest/download/civitai-metadata-studio.html)

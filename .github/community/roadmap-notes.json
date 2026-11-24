@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "projectNumber": 1,
+  "projectId": "PVT_kwHOEu9bf84BrqCx",
+  "readmeSource": "ROADMAP.md",
+  "preservation": "Update only matching existing draft bodies after checking the live title/status/baseline. Do not change statuses, historical Done cards, or dates.",
+  "items": [
+    {
+      "draftId": "DI_lAHOEu9bf84BrqCxzgLuXQk",
+      "title": "Validate current-browser portability with named test evidence",
+      "expectedStatus": "Next",
+      "body": "## Scope\n\nRecord named current-browser and operating-system evidence against an exact built artifact. Cover browser import, edits, verification off/on with bounded mocks, save/reopen, and encoded-payload proof where supported.\n\n## Acceptance\n\n- Record browser/OS versions, artifact version and SHA-256, test commands, and exercised formats.\n- Separate passed, failed, and unrun surfaces; link actionable failures and retest evidence.\n- Compare narrow/wide layout and current-browser file/download behavior without changing the portable architecture.\n\n## Boundaries\n\nThis card is not a claim of universal browser or OS compatibility. No legacy-browser layer, new runtime dependency, or image upload is authorized.\n\n[Current capabilities and evidence](https://chriscollins500.github.io/civitai-metadata-studio/trust/) · [Formats and limits](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Formats-and-Limits)\n"
+    },
+    {
+      "draftId": "DI_lAHOEu9bf84BrqCxzgLuXRE",
+      "title": "Expand complex-workflow and custom-node regression fixtures",
+      "expectedStatus": "Next",
+      "body": "## Scope\n\nAdd minimal, shareable regressions for specific loaders, switches, inactive branches, multiple outputs, and identity conflicts. Start with a reproducible supported-node question rather than scanning unrelated private libraries.\n\n## Acceptance\n\n- State expected positive/negative conditioning, active resources, output reachability, and unresolved diagnostics.\n- Show fail-before/pass-after evidence for each parser change.\n- Verify disabled, bypassed, disconnected, zero-strength, and unresolved dynamic branches do not become identity claims.\n- Preserve original prompt/workflow carriers and encoded payloads during export/reopen.\n\n## Boundaries\n\nUse synthetic or explicitly approved public-safe fixtures. Names never establish model IDs; unsupported custom semantics remain visible uncertainty. No workflow rewiring or universal graph-coverage promise.\n\n[Workflow guide](https://github.com/chriscollins500/civitai-metadata-studio/wiki/ComfyUI-Workflow-Handling) · [Learning examples](https://chriscollins500.github.io/civitai-metadata-studio/learn/)\n"
+    },
+    {
+      "draftId": "DI_lAHOEu9bf84BrqCxzgLuXRA",
+      "title": "Run a manual keyboard and screen-reader accessibility audit",
+      "expectedStatus": "Next",
+      "body": "## Scope\n\nComplement automated checks with keyboard-only and representative screen-reader sessions in named current environments, on both the project hub and the actual built editor.\n\n## Acceptance\n\n- Record browser, OS, assistive technology/version, artifact/URL, and tasks attempted.\n- Check focus order/visibility/return, skip links, dialogs, ARIA tabs, form errors, live statuses, zoom/reflow, reduced motion, and export/reopen.\n- Create concrete issues with minimal steps and retest corrected barriers.\n- Distinguish observations from automated contract checks and untested combinations.\n\n## Boundaries\n\nThis is planned validation, not completed certification or a blanket WCAG conformance claim. Preserve semantic controls and never require a mouse-only workaround.\n\n[Accessibility scope](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Accessibility) · [Report a barrier](https://chriscollins500.github.io/civitai-metadata-studio/community/)\n"
+    },
+    {
+      "draftId": "DI_lAHOEu9bf84BrqCxzgLuXRo",
+      "title": "Improve unresolved-resource explanations without guessing identities",
+      "expectedStatus": "Explore",
+      "body": "## Scope\n\nExplore clearer source/evidence labels and actionable next steps when a resource cannot be positively identified. Review the proposed explanation model before changing behavior.\n\n## Acceptance\n\n- Distinguish missing evidence, unsupported role/type, ambiguous candidates, conflicting stronger identifiers, and provider cooldown.\n- Show what exact evidence was considered without exposing private paths or prompt text.\n- Offer explicit local hashing, exact-ID entry, or user-triggered search where applicable.\n- Test wording and keyboard/screen-reader status announcements with representative synthetic cases.\n\n## Boundaries\n\nExploration does not promise implementation. Never infer IDs from names, hide ambiguity, downgrade stronger conflicts, or equate identity with historical use or licensing permission.\n\n[Identity rules](https://github.com/chriscollins500/civitai-metadata-studio/wiki/AIR-and-Hashes) · [Trust boundaries](https://chriscollins500.github.io/civitai-metadata-studio/trust/)\n"
+    },
+    {
+      "draftId": "DI_lAHOEu9bf84BrqCxzgLuXRk",
+      "title": "Evaluate explicit image/JSON sidecar pairing and conflict rules",
+      "expectedStatus": "Explore",
+      "body": "## Scope\n\nInvestigate a user-controlled association between selected browser images and selected JSON sidecars. Arbitrary browser JSON-sidecar auto-pairing is not currently implemented; CLI paired-sidecar regression coverage is not that feature.\n\n## Acceptance\n\n- Propose explicit association, batch filename/collision handling, precedence, conflicts, and provenance labels.\n- Keep actual decoded pixel dimensions as editable defaults.\n- Specify privacy, bounded parsing, original carrier preservation, and new-copy export behavior.\n- Demonstrate safe synthetic ambiguous/mismatched pairs and document unanswered decisions before an implementation proposal.\n\n## Boundaries\n\nExploration does not authorize filesystem scanning, hidden pairing, workflow rewriting, remote uploads, architecture changes, or a shipping commitment.\n\n[Current limits](https://github.com/chriscollins500/civitai-metadata-studio/wiki/Capabilities-and-Limitations) · [Learning hub](https://chriscollins500.github.io/civitai-metadata-studio/learn/)\n"
+    }
+  ]
+}

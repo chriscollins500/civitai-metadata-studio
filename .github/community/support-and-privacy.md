@@ -2,6 +2,8 @@
 
 You are welcome to ask a basic question. A short explanation of what you expected and what happened is a great start—you do not need to upload your image to ask for help.
 
+Find the whole project at the [website](https://chriscollins500.github.io/civitai-metadata-studio/), start with the [learning hub](https://chriscollins500.github.io/civitai-metadata-studio/learn/), or use the [community hub](https://chriscollins500.github.io/civitai-metadata-studio/community/) to choose the right channel. The [trust guide](https://chriscollins500.github.io/civitai-metadata-studio/trust/) separates this static site's requests, the editor's exact Civitai lookups, and the optional local companion.
+
 ## Questions, bugs, ideas, and vulnerabilities
 
 - **How do I…?** Ask in [Q&A](https://github.com/chriscollins500/civitai-metadata-studio/discussions/categories/q-a). A specific title makes answers easier for the next person to find.
@@ -11,7 +13,7 @@ You are welcome to ask a basic question. A short explanation of what you expecte
 
 ## What makes a report actionable?
 
-Include app version, browser/OS or Node/MCP-host versions, format, smallest steps, expected/actual behavior, and safe warning codes. Say whether it occurs before verification, after import, or after export/reopen.
+Include app version (or the exact website URL), browser/OS or Node/MCP-host versions, format when relevant, smallest steps, expected/actual behavior, and safe warning codes. Say whether it occurs before verification, after import, or after export/reopen. Website search/theme/navigation reports do not need an image.
 
 For a ComfyUI branch, useful details include node class, enabled state, switch value, and output path. Compare the graph embedded in the image, not only a workflow edited afterward. For identity resolution, exact public AIR/version/file IDs and hashes are useful; a similar name is not proof.
 
