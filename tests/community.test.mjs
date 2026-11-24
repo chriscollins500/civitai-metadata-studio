@@ -1,6 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+function linksToProjectHome(source) {
+  return [...source.matchAll(/(?:href="|\]\(|url:\s*)(https:\/\/[^\s")]+)/gu)].some(([, href]) => {
+    try {
+      const url = new URL(href);
+      return url.origin === "https://chriscollins500.github.io" && url.pathname === "/civitai-metadata-studio/" && !url.username && !url.password && !url.search && !url.hash;
+    } catch { return false; }
+  });
+}
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("issue-form attributes use block mappings so prose commas cannot become unknown keys", async () => {
@@ -26,15 +34,25 @@ test("reviewed main rules require CI and PRs without a solo-maintainer review de
 });
 
 test("public entry points route back to the hub without stale first-release claims", async () => {
-  const home = "https://chriscollins500.github.io/civitai-metadata-studio/";
   for (const path of ["README.md", "SUPPORT.md", "CONTRIBUTING.md", "ROADMAP.md", "docs/wiki/Home.md", "docs/wiki/_Sidebar.md", "docs/wiki/_Footer.md", ".github/community/welcome.md", ".github/community/support-and-privacy.md", ".github/ISSUE_TEMPLATE/config.yml"]) {
-    assert.ok((await read(path)).includes(home), path + " must link to the project website");
+    assert.ok(linksToProjectHome(await read(path)), path + " must link to the exact project website");
   }
   assert.doesNotMatch(await read("ROADMAP.md"), /The 1\.0\.0 product/);
   const bug = await read(".github/ISSUE_TEMPLATE/bug_report.yml");
   assert.match(bug, /Project website, navigation, search, or learning hub/);
   assert.match(bug, /Application version or website URL/);
   for (const form of ["bug_report", "metadata_mismatch"]) assert.doesNotMatch(await read(".github/ISSUE_TEMPLATE/" + form + ".yml"), /placeholder: 1\.0\.0/);
+});
+test("home-link checks reject embedded URLs, lookalike hosts and credential tricks", () => {
+  const home = "https://chriscollins500.github.io/civitai-metadata-studio/";
+  for (const source of ['<a href="' + home + '">home</a>', "[home](" + home + ")", "url: " + home]) assert.equal(linksToProjectHome(source), true);
+  for (const href of [
+    "https://example.invalid/" + home,
+    "https://chriscollins500.github.io.example.invalid/civitai-metadata-studio/",
+    "https://chriscollins500.github.io@example.invalid/civitai-metadata-studio/",
+    "https://example.invalid@chriscollins500.github.io/civitai-metadata-studio/",
+    home + "not-the-home/", home + "?redirect=elsewhere", home + "#not-home"
+  ]) assert.equal(linksToProjectHome("[home](" + href + ")"), false, href);
 });
 
 test("roadmap notes scope only the five existing Next/Explore cards", async () => {

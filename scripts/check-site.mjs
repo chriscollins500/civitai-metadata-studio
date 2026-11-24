@@ -10,8 +10,11 @@ import Studio from "../src/engine.mjs";
 
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 const sri = bytes => "sha384-" + createHash("sha384").update(bytes).digest("base64");
-const unescape = text => text.replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-const attrs = tag => Object.fromEntries([...tag.matchAll(/([\w:-]+)="([^"]*)"/gu)].map(([, key, value]) => [key, unescape(value)]));
+const entities = Object.freeze({ amp: "&", quot: '"', "#39": "'", lt: "<", gt: ">" });
+// Decode only our generator's five entities, exactly once. Replacement text is
+// never rescanned: &amp;quot; must stay &quot;, not become a quote.
+export const decodeSiteAttribute = text => text.replace(/&(amp|quot|#39|lt|gt);/gu, (_, entity) => entities[entity]);
+const attrs = tag => Object.fromEntries([...tag.matchAll(/([\w:-]+)="([^"]*)"/gu)].map(([, key, value]) => [key, decodeSiteAttribute(value)]));
 export async function checkSite(output = siteOutput) {
   const errors = [], inventory = [], bytes = new Map();
   try { await assertSiteOutput(output); }
@@ -85,8 +88,12 @@ export async function checkSite(output = siteOutput) {
     if ([...html.matchAll(/<h1(?:\s|>)/gu)].length !== 1 || [...html.matchAll(/<main(?:\s|>)/gu)].length !== 1) errors.push("Every page must have one h1 and main: " + page.path);
     const csp = attrs(html.match(/<meta http-equiv="Content-Security-Policy"[^>]+>/u)?.[0] || "").content || "";
     for (const directive of ["default-src 'none'", "style-src 'self'", "script-src 'self'", "img-src 'self'", "connect-src 'none'", "object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-src 'none'", "worker-src 'none'"]) if (!csp.split(";").some(value => value.trim() === directive)) errors.push("Unsafe/missing CSP directive: " + directive + " in " + page.path);
-    const scripts = [...html.matchAll(/<script\b[^>]*>[\s\S]*?<\/script>/giu)];
-    if (scripts.length !== 1 || attrs(scripts[0]?.[0] || "").src !== project.base + "site.js" || attrs(scripts[0]?.[0] || "").integrity !== sri(bytes.get("site.js") || "") || !/\bdefer\b/u.test(scripts[0]?.[0] || "") || !/>\s*<\/script>$/u.test(scripts[0]?.[0] || "")) errors.push("Only the approved local script with SRI is allowed: " + page.path);
+    const scripts = [...html.matchAll(/<\/?script\b[^>]*>/giu)];
+    const approved = '<script src="' + project.base + 'site.js" integrity="' + sri(bytes.get("site.js") || "") + '" defer></script>';
+    // This is a strict serialized-build contract, not an HTML sanitizer. Count
+    // both tags and require the exact reviewed element; alternate valid end-tag
+    // whitespace/casing and any inline body must fail rather than be filtered.
+    if (scripts.length !== 2 || !html.includes(approved)) errors.push("Only the approved local script with SRI is allowed: " + page.path);
     const styles = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/giu)];
     if (styles.length !== 1 || attrs(styles[0]?.[0] || "").href !== project.base + "styles.css" || attrs(styles[0]?.[0] || "").integrity !== sri(bytes.get("styles.css") || "")) errors.push("Stylesheet SRI mismatch: " + page.path);
     if (/<(?:iframe|form|embed|object|style|base)\b|<[^>]+\s(?:on[\w]+|style)\s*=/iu.test(html)) errors.push("No inline code, forms, or embedded content: " + page.path);
@@ -100,7 +107,7 @@ export async function checkSite(output = siteOutput) {
     for (const reference of html.matchAll(/\b(?:aria-labelledby|aria-describedby|aria-controls|for)="([^"]+)"/gu)) for (const id of reference[1].split(/\s+/u)) if (!ids.includes(id)) errors.push("Broken accessible reference: " + id + " in " + page.path);
     const canonical = attrs(html.match(/<link rel="canonical"[^>]*>/u)?.[0] || "").href;
     if (canonical !== project.url + page.route || !html.includes('property="og:url" content="' + canonical + '"')) errors.push("Page canonical/social URL mismatch: " + page.path);
-    for (const link of html.matchAll(/\b(?:href|src)="([^"]+)"/gu)) checkLink(unescape(link[1]), page.path);
+    for (const link of html.matchAll(/\b(?:href|src)="([^"]+)"/gu)) checkLink(decodeSiteAttribute(link[1]), page.path);
     if (Buffer.byteLength(html) > budgets.page) errors.push("Page exceeds performance budget: " + page.path);
   }
   const css = text("styles.css"), script = text("site.js");

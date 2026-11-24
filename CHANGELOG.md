@@ -4,6 +4,7 @@
 
 - Adds a cohesive, dependency-free GitHub Pages hub: guided learning with an original synthetic sample, all 28 searchable wiki guides, signed stable-download receipts, privacy/provenance explanations, developer interfaces, and community routes.
 - Adds local-only search, optional light/dark preference, keyboard case studies, no-JavaScript content, project-root 404 recovery, strict CSP/SRI, explicit deployment inventory/budgets, and Chrome/Edge regression coverage.
+- Hardens website-checker entity decoding, exact script-element validation, and URL-aware entry-point tests in response to automated PR review, with targeted regressions.
 - Connects repository, wiki, support/discussions, issue forms, and roadmap sources; requires the correctly bound CodeQL check alongside Windows/Linux CI. Keeps the signed v1.0.2 HTML/ZIP/checksums and all historical releases unchanged.
 
 ## 1.0.2 - 2026-11-17

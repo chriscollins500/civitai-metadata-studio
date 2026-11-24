@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, writeFile, unlink, rm, symlink } from "node:f
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSite, validateReleaseEvidence } from "../../scripts/build-site.mjs";
-import { checkSite } from "../../scripts/check-site.mjs";
+import { checkSite, decodeSiteAttribute } from "../../scripts/check-site.mjs";
 import { createSiteServer } from "../../scripts/serve-site.mjs";
 import { publicFiles } from "../contract.mjs";
 import { guides, pages, project } from "../content.mjs";
@@ -66,6 +66,18 @@ test("every page rejects inline scripts, event handlers, forms and unapproved co
 test("site requires deny-by-default CSP and exact SRI on each page", async () => {
   await mutate("trust/index.html", value => value.replace("connect-src 'none'", "connect-src https:"), /CSP/);
   await mutate("downloads/index.html", value => value.replace('integrity="sha384-', 'integrity="changed-'), /SRI/);
+});
+test("attribute entity decoding is single-pass, including nested escaped entities", () => {
+  assert.equal(decodeSiteAttribute("&amp;&quot;&#39;&lt;&gt;"), "&\"'<>");
+  assert.equal(decodeSiteAttribute("&amp;quot; &amp;#39; &amp;lt; &amp;gt; &amp;amp;"), "&quot; &#39; &lt; &gt; &amp;");
+  assert.equal(decodeSiteAttribute("plain &unknown; &#x22;"), "plain &unknown; &#x22;");
+});
+test("script contract rejects valid alternate closing syntax and hidden inline code", async () => {
+  for (const closing of ["</script >", "</ScRiPt\n>", "</script\t>"]) {
+    await mutate("index.html", value => value.replace("</script>", closing), /approved local script/);
+    await mutate("index.html", value => value.replace("</main>", "<script>/*synthetic*/" + closing + "</main>"), /approved local script/);
+  }
+  await mutate("index.html", value => value.replace("defer></script>", "defer>/*synthetic*/</script>"), /approved local script/);
 });
 test("site rejects changed assets and asset manifest receipt drift", async () => {
   await mutate("site.js", value => value + "\n/* changed */", /Asset differs|SRI/);

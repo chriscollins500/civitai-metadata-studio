@@ -16,13 +16,15 @@ Final runs used PowerShell 7.6.9, Node.js 26.13.0, installed Chrome 158.0.8127.8
 | --- | --- |
 | Source syntax | 83 modules checked |
 | Wiki | 28 pages, 2 navigation files, 149 internal links, 4 JSON examples |
-| Core/documentation/community | 118 passed, 0 failed, 0 skipped |
+| Core/documentation/community | 119 passed, 0 failed, 0 skipped |
 | HTTP/MCP/managed SDK | 117 passed, 0 failed, 0 skipped |
-| Site packaging/security/navigation | 17 passed, 0 failed, 0 skipped |
+| Site packaging/security/navigation | 19 passed, 0 failed, 0 skipped |
 | Chrome/Edge browser suite | 80 passed, 0 failed, 0 skipped |
 | Portable HTML, ZIP, and checksum verification | Passed; original 1.0.2 bytes retained |
 
 The initial sandbox run could not create Windows junction fixtures or start Edge. The complete final runs were repeated outside that sandbox; those cases executed and passed. No production protection was disabled.
+
+GitHub's initial PR review additionally identified double entity decoding, an incomplete script-tag check, and a loose URL assertion in the new checker/tests. These were corrected with single-pass decoding, an exact serialized-script contract, URL-origin/path validation, and focused nested-entity/end-tag/lookalike-host regressions before merging. The checker's reviewed-build contract is not a general HTML sanitizer.
 
 Browser profiles cover Chrome/Edge at 1440×1000 and Chrome at 390×844 and 2560×1440. Website checks additionally exercise 320px and doubled root text size on each main page, both themes' text-token contrast, keyboard search/focus return, ARIA case-study tabs, guide/topic filtering, reduced motion, forced colors, disabled JavaScript, denied storage/clipboard, and nested 404 recovery.
 
